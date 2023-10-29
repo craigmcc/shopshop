@@ -10,7 +10,7 @@
 
 // Internal Modules ----------------------------------------------------------
 
-//import {ModeToggle} from "@/components/layout/ModeToggle";
+import {ModeToggle} from "@/components/layout/ModeToggle";
 
 // Public Objects ------------------------------------------------------------
 
@@ -25,9 +25,7 @@ export const LayoutHeader = () => {
                 LayoutHeader
             </div>
             <div className="flex flex-1 items-center justify-end p-2" suppressHydrationWarning>
-{/*
                 <ModeToggle/>
-*/}
             </div>
         </header>
     )

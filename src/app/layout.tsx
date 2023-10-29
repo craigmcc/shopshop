@@ -17,7 +17,7 @@ import "./globals.css";
 import {LayoutFooter} from "@/components/layout/LayoutFooter";
 import {LayoutHeader} from "@/components/layout/LayoutHeader";
 import {LayoutSidebar} from "@/components/layout/LayoutSidebar";
-//import {ThemeProvider} from "@/components/providers/ThemeProvider";
+import {ThemeProvider} from "@/components/providers/ThemeProvider";
 import {cn} from "@/lib/utils";
 
 // Public Objects ------------------------------------------------------------
@@ -36,14 +36,12 @@ export default function RootLayout({
 }) {
   return (
         <html lang="en" suppressHydrationWarning>
-{/*
         <ThemeProvider
             attribute="class"
             defaultTheme="dark"
             enableSystem={false}
             storageKey="shopshop-theme"
         >
-*/}
           <body
               className={cn(
                   inter.className,
@@ -60,9 +58,7 @@ export default function RootLayout({
           </div>
           <LayoutFooter/>
           </body>
-{/*
         </ThemeProvider>
-*/}
         </html>
   )
 }
