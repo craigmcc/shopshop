@@ -135,8 +135,8 @@ enum MemberRole {
 model Profile {
   /// Primary key for this Profile
   id       String  @id @default(uuid())
-  /// Email address (primary) for this Profile
-  email    String  @db.Text
+  /// Email address for this Profile
+  email    String  @unique @db.Text
   /// Optional avatar image URL for this Profile
   imageUrl String? @db.Text
   /// Profile's name
