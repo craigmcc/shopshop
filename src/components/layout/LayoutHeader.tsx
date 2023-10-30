@@ -15,6 +15,7 @@ import {signIn, signOut, useSession} from "next-auth/react";
 // Internal Modules ----------------------------------------------------------
 
 import {ModeToggle} from "@/components/layout/ModeToggle";
+import {Button} from "@/components/ui/button";
 
 // Public Objects ------------------------------------------------------------
 
@@ -29,7 +30,7 @@ export const LayoutHeader = () => {
                 LayoutHeader
             </div>
             <div
-                className="flex flex-1 items-center justify-end p-2"
+                className="flex flex-1 items-center justify-end space-x-2"
                 suppressHydrationWarning
             >
                 <AuthButton/>
@@ -46,15 +47,15 @@ function AuthButton() {
     if (session) {
         return (
             <>
-                <span className="pr-2">{session?.user?.name}</span>
-                <button className="pr-2" onClick={() => signOut()}>Sign out</button>
+                <span>{session?.user?.name}</span>
+                <Button onClick={() => signOut()}>Sign out</Button>
             </>
         );
     }
     return (
         <>
-            <span className="pr-2">Not signed in</span>
-            <button className="pr-2" onClick={() => signIn()}>Sign in</button>
+            <span>Not signed in</span>
+            <Button onClick={() => signIn()}>Sign in</Button>
         </>
     );
 }
