@@ -41,20 +41,20 @@ export default async function RootLayout({
 
     return (
         <html lang="en" suppressHydrationWarning>
+        <body
+            className={cn(
+                inter.className,
+                "bg-indigo-50 dark:bg-indigo-950",
+                "text-black dark:text-white"
+            )}
+            suppressHydrationWarning
+        >
         <ThemeProvider
             attribute="class"
             defaultTheme="dark"
             enableSystem={false}
             storageKey="shopshop-theme"
         >
-            <body
-                className={cn(
-                    inter.className,
-                    "bg-indigo-50 dark:bg-indigo-950",
-                    "text-black dark:text-white"
-                )}
-                suppressHydrationWarning
-            >
             <SessionProvider session={session}>
                 <LayoutHeader/>
                 <div className="h-full">
@@ -65,8 +65,8 @@ export default async function RootLayout({
                 </div>
                 <LayoutFooter/>
             </SessionProvider>
-            </body>
         </ThemeProvider>
+        </body>
         </html>
     )
 }

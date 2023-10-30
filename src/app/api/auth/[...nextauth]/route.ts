@@ -12,6 +12,7 @@ import NextAuth from "next-auth";
 import type {NextAuthOptions} from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 //import GitHubProvider from "next-auth/providers/github";
+import {Profile} from "@prisma/client";
 
 // Internal Modules ----------------------------------------------------------
 
@@ -28,7 +29,7 @@ export const authOptions: NextAuthOptions = {
         // Add our local Profile to the JWT token when the token is created
         async jwt({ token, user, account, profile, isNewUser}) {
             logger.info({
-                context: "NextAuth.jwt",
+                context: "NextAuth.jwt.in",
                 token: token,
                 user: user,
                 account: account,
@@ -36,9 +37,14 @@ export const authOptions: NextAuthOptions = {
                 isNewUser: isNewUser,
             });
             if (user) {
-                token.user = user;
+                token.profile = user;
             }
+            logger.info({
+                context: "NextAuth.jwt.out",
+                token: token,
+            });
             return token;
+
         },
 
         // Note that a redirect was requested
@@ -54,11 +60,16 @@ export const authOptions: NextAuthOptions = {
         // Note that the session is being requested
         async session ({ session, token, user}) {
             logger.info({
-                context: "NextAuth.session",
+                context: "NextAuth.session.in",
                 session: session,
                 token: token,
                 user: user,
             });
+            session.user.profile = token.profile as Profile;
+            logger.info({
+                context: "NextAuth.session.out",
+                session: session,
+            })
             return session;
         },
 
@@ -122,6 +133,11 @@ export const authOptions: NextAuthOptions = {
 */
 
     ],
+
+    session: {
+        strategy: "jwt",
+    },
+
 };
 
 export const handler = NextAuth(authOptions);

@@ -8,7 +8,7 @@
 
 // External Modules ----------------------------------------------------------
 
-import NextAuth from "next-auth";
+import NextAuth, {DefaultSession} from "next-auth";
 
 // Internal Modules ----------------------------------------------------------
 
@@ -22,6 +22,8 @@ declare module "next-auth" {
      * `SessionProvider` React Context
      */
     interface Session {
-        user: Profile;
+        user: {
+            profile: Profile,
+        } & DefaultSession["user"],
     }
 }
