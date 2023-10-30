@@ -1,3 +1,5 @@
+"use client"
+
 // @/components/layout/LayoutHeader.tsx
 
 /**
@@ -7,6 +9,8 @@
  */
 
 // External Modules ----------------------------------------------------------
+
+import {signIn, signOut, useSession} from "next-auth/react";
 
 // Internal Modules ----------------------------------------------------------
 
@@ -24,10 +28,34 @@ export const LayoutHeader = () => {
             <div className="flex flex-1 items-center justify-center" suppressHydrationWarning>
                 LayoutHeader
             </div>
-            <div className="flex flex-1 items-center justify-end p-2" suppressHydrationWarning>
+            <div
+                className="flex flex-1 items-center justify-end p-2"
+                suppressHydrationWarning
+            >
+                <AuthButton/>
                 <ModeToggle/>
             </div>
         </header>
     )
 
 }
+
+function AuthButton() {
+    const { data: session } = useSession();
+
+    if (session) {
+        return (
+            <>
+                <span className="pr-2">{session?.user?.name}</span>
+                <button className="pr-2" onClick={() => signOut()}>Sign out</button>
+            </>
+        );
+    }
+    return (
+        <>
+            <span className="pr-2">Not signed in</span>
+            <button className="pr-2" onClick={() => signIn()}>Sign in</button>
+        </>
+    );
+}
+
