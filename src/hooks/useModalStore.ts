@@ -1,0 +1,79 @@
+// @/hooks/useModalStore.ts
+
+/**
+ * Zustand-based store for managing opening and closing modals.
+ *
+ * Based on "hooks/use-modal-store.ts" from
+ * https://github.com/AntonioErdeljac/next13-discord-clone.git
+ *
+ * @packageDocumentation
+ */
+
+// External Modules ----------------------------------------------------------
+
+import {create} from "zustand";
+
+import {
+    Category,
+    Item,
+    List,
+    Member,
+    Profile,
+} from "@prisma/client";
+
+// Internal Modules ----------------------------------------------------------
+
+// Public Objects ------------------------------------------------------------
+
+/**
+ * Identifiers for modals that can be managed.
+ */
+export enum ModalType {
+    CATEGORY_INSERT = "CategoryInsert",
+    CATEGORY_REMOVE = "CategoryRemove",
+    CATEGORY_UPDATE = "CategoryUpdate",
+    ITEM_INSERT = "ItemInsert",
+    ITEM_REMOVE = "ItemRemove",
+    ITEM_UPDATE = "ItemUpdate",
+    LIST_INSERT = "ListInsert",
+    LIST_REMOVE = "ListRemove",
+    LIST_UPDATE = "ListUpdate",
+}
+
+/**
+ * Various data items that might be associated with a particular modal.
+ */
+interface ModalData {
+    // Data models
+    category?: Category;
+    item?: Item;
+    list?: List;
+    member?: Member;
+    profile?: Profile;
+    // Generic properties
+    query?: Record<string, any>;
+}
+
+/**
+ * Contents of the store for a modal.
+ */
+interface ModalStore {
+    data: ModalData;
+    isOpen: boolean;
+    onClose: () => void;
+    onOpen: (type: ModalType, data?: ModalData) => void;
+    type: ModalType | null;
+}
+
+/**
+ * Hook-like declaration of a modal store.
+ */
+export const useModalStore = create<ModalStore>((set) => ({
+    data: {},
+    isOpen: false,
+    onClose: () => set({type: null, isOpen: false}),
+    onOpen: (type, data = {}) => {
+        set({isOpen: true, type, data});
+    },
+    type: null,
+}));

@@ -15,11 +15,14 @@ import {getServerSession} from "next-auth";
 // Internal Modules ----------------------------------------------------------
 
 import "./globals.css";
+import {authOptions} from "@/app/api/auth/[...nextauth]/route";
 import {LayoutFooter} from "@/components/layout/LayoutFooter";
 import {LayoutHeader} from "@/components/layout/LayoutHeader";
 import {LayoutSidebar} from "@/components/layout/LayoutSidebar";
+import {ModalProvider} from "@/components/providers/ModalProvider";
 import SessionProvider from "@/components/providers/SessionProvider";
 import {ThemeProvider} from "@/components/providers/ThemeProvider";
+import {logger} from "@/lib/ServerLogger";
 import {cn} from "@/lib/utils";
 
 // Public Objects ------------------------------------------------------------
@@ -37,7 +40,11 @@ export default async function RootLayout({
     children: React.ReactNode
 }) {
 
-    const session = await getServerSession();
+    const session = await getServerSession(authOptions);
+    logger.info({
+        context: "RootLayout",
+        session: session,
+    });
 
     return (
         <html lang="en" suppressHydrationWarning>
@@ -57,8 +64,11 @@ export default async function RootLayout({
         >
             <SessionProvider session={session}>
                 <LayoutHeader/>
+                {/*<ModalProvider/>*/}
                 <div className="h-full">
-                    <LayoutSidebar/>
+                    {(session?.user) ? (
+                        <LayoutSidebar/>
+                    ) : null }
                     <main className="md:pl-[72px] h-full">
                         {children}
                     </main>
