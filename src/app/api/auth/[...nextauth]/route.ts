@@ -28,7 +28,7 @@ export const authOptions: NextAuthOptions = {
 
         // Add our local Profile to the JWT token when the token is created
         async jwt({ token, user, account, profile, isNewUser}) {
-            logger.info({
+            logger.trace({
                 context: "NextAuth.jwt.in",
                 token: token,
                 user: user,
@@ -39,7 +39,7 @@ export const authOptions: NextAuthOptions = {
             if (user) {
                 token.profile = user;
             }
-            logger.info({
+            logger.trace({
                 context: "NextAuth.jwt.out",
                 token: token,
             });
@@ -49,7 +49,7 @@ export const authOptions: NextAuthOptions = {
 
         // Note that a redirect was requested
         async redirect({ url, baseUrl}) {
-            logger.info({
+            logger.trace({
                 context: "NextAuth.redirect",
                 url: url,
                 baseUrl: baseUrl,
@@ -59,14 +59,14 @@ export const authOptions: NextAuthOptions = {
 
         // Note that the session is being requested
         async session ({ session, token, user}) {
-            logger.info({
+            logger.trace({
                 context: "NextAuth.session.in",
                 session: session,
                 token: token,
                 user: user,
             });
             session.user.profile = token.profile as Profile;
-            logger.info({
+            logger.trace({
                 context: "NextAuth.session.out",
                 session: session,
             })
@@ -75,7 +75,7 @@ export const authOptions: NextAuthOptions = {
 
         // Note that a sign in has been requested
         async signIn({ user, account, profile, email, credentials }) {
-            logger.info({
+            logger.trace({
                 context: "NextAuth.signIn",
                 user: user,
                 account: account,
@@ -93,7 +93,7 @@ export const authOptions: NextAuthOptions = {
         CredentialsProvider({
 
             async authorize(credentials, request) {
-                logger.info({
+                logger.trace({
                     context: "CredentialsProvider.authorize",
                     credentials: credentials,
                 });

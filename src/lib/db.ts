@@ -23,13 +23,12 @@ declare global {
 /**
  * A singleton instance of PrismaClient.
  */
-export const db = globalThis.prisma || new PrismaClient();
-
-if (process.env.NODE_ENV !== "production") {
+if (!globalThis.prisma) {
     const segments = process.env.DATABASE_URL!.split("/");
     logger.info({
         context: "db",
         message: `Initializing PrismaClient for database '${segments[segments.length - 1]}`,
     });
-    globalThis.prisma = db;
+    globalThis.prisma = new PrismaClient();
 }
+export const db = globalThis.prisma;

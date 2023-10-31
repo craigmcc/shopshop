@@ -21,14 +21,9 @@ import {logger} from "@/lib/ServerLogger";
 export async function LayoutSidebar() {
 
     const session = await getServerSession(authOptions);
-    logger.info({
+    logger.trace({
         context: "LayoutSidebar",
         session: session,
-    });
-    const profile = session?.user.profile;
-    logger.info({
-        context: "LayoutSidebar2",
-        profile: profile,
     });
 
     return (
