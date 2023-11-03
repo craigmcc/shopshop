@@ -63,8 +63,8 @@ export default async function RootLayout({
             storageKey="shopshop-theme"
         >
             <SessionProvider session={session}>
+                <ModalProvider/>
                 <LayoutHeader/>
-                {/*<ModalProvider/>*/}
                 <div className="h-full">
                     {(session?.user) ? (
                         <LayoutSidebar/>

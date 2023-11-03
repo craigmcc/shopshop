@@ -25,15 +25,18 @@ export async function LayoutSidebar() {
         context: "LayoutSidebar",
         session: session,
     });
+    if (!session) {
+        return null;
+    }
 
     return (
         <aside
             className="hidden md:flex h-full w-[72px] flex-col fixed bg-indigo-200 dark:bg-indigo-800"
         >
-            {session?.user.profile ? (
+            {session.user.profile ? (
                 <>
-                    <div>{session?.user.profile.name}</div>
-                    <div>{session?.user.profile.scope}</div>
+                    <div>{session.user.profile.name}</div>
+                    <div>{session.user.profile.scope}</div>
                 </>
             ) : (
                 <div>Not Signed In</div>

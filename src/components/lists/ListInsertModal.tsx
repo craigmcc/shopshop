@@ -4,13 +4,15 @@
 /**
  * Create a new List.
  *
+ * Required ModalData:
+ * - profile                            Profile of current user
+ *
  * @packageDocumentation
  */
 
 // External Modules ----------------------------------------------------------
 
-import {redirect, useRouter} from "next/navigation";
-import {useSession} from "next-auth/react";
+import {useRouter} from "next/navigation";
 import {useForm} from "react-hook-form";
 import {v4 as uuidv4} from "uuid";
 import * as z from "zod";
@@ -37,6 +39,7 @@ import {
 } from "@/components/ui/form";
 import {Input} from "@/components/ui/input";
 import {ModalType, useModalStore} from "@/hooks/useModalStore";
+import {logger} from "@/lib/ClientLogger";
 
 // Public Objects ------------------------------------------------------------
 
@@ -44,13 +47,18 @@ export const ListInsertModal = () => {
 
     const {data, isOpen, onClose, type} = useModalStore();
     const router = useRouter();
-    const isModalOpen = isOpen && type === ModalType.LIST_INSERT;
+    const profile = data.profile;
+    const isModalOpen = isOpen && type === ModalType.LIST_INSERT
+        && (!!profile);
 
-    const {data: session} = useSession();
-    if (!session) {
-        redirect("/");
-    }
-    const profile = session.user.profile;
+    logger.info({
+        context: "ListInsertModal",
+        data: data,
+        isOpen: isOpen,
+        type: type,
+        profile: profile,
+        isModalOpen: isModalOpen,
+    });
 
     const formSchema = z.object({
         inviteCode: z.string().min(1, {
@@ -68,11 +76,15 @@ export const ListInsertModal = () => {
         defaultValues: {
             inviteCode: uuidv4(),
             name: "",
-            profileId: profile.id,
+            profileId: profile ? profile.id : "",
         },
         resolver: zodResolver(formSchema),
     });
     const isLoading = form.formState.isSubmitting;
+    if (!profile) {
+        onClose();
+        return null;
+    }
 
     const handleClose = () => {
         form.reset();
@@ -84,10 +96,11 @@ export const ListInsertModal = () => {
             await ListActions.insert(values);
             form.reset();
             router.refresh();
-            onClose();
         } catch (error) {
             // TODO - error handling
             console.log(error);
+        } finally {
+            onClose();
         }
     }
 

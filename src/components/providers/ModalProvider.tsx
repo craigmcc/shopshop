@@ -10,7 +10,6 @@
 
 // External Modules ----------------------------------------------------------
 
-import {redirect} from "next/navigation";
 import {useEffect, useState} from "react";
 
 // Internal Modules ----------------------------------------------------------
@@ -23,8 +22,6 @@ import {ListInsertModal} from "@/components/lists/ListInsertModal";
 export const ModalProvider = () => {
 
     const [isMounted, setIsMounted] = useState<boolean>(false);
-
-    // TODO - check for authenticated Profile?  (not for SignInModal or HomePage)
 
     useEffect(() => {
         setIsMounted(true);
