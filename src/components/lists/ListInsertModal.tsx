@@ -48,8 +48,7 @@ export const ListInsertModal = () => {
     const {data, isOpen, onClose, type} = useModalStore();
     const router = useRouter();
     const profile = data.profile;
-    const isModalOpen = isOpen && type === ModalType.LIST_INSERT
-        && (!!profile);
+    const isModalOpen = isOpen && type === ModalType.LIST_INSERT;
 
     logger.info({
         context: "ListInsertModal",
@@ -81,10 +80,6 @@ export const ListInsertModal = () => {
         resolver: zodResolver(formSchema),
     });
     const isLoading = form.formState.isSubmitting;
-    if (!profile) {
-        onClose();
-        return null;
-    }
 
     const handleClose = () => {
         form.reset();
