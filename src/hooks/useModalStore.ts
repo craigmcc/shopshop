@@ -35,9 +35,8 @@ export enum ModalType {
     ITEM_INSERT = "ItemInsert",
     ITEM_REMOVE = "ItemRemove",
     ITEM_UPDATE = "ItemUpdate",
-    LIST_INSERT = "ListInsert",
+    LIST_FORM = "ListForm",
     LIST_REMOVE = "ListRemove",
-    LIST_UPDATE = "ListUpdate",
 }
 
 /**

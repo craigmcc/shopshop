@@ -1,11 +1,12 @@
 "use client"
-// @/components/lists/ListInsertModal.tsx
+// @/components/lists/ListIFormModal.tsx
 
 /**
  * Create a new List.
  *
  * Required ModalData:
  * - profile                            Profile of current user
+ * - list                               List (if editing) or null (if creating)
  *
  * @packageDocumentation
  */
@@ -43,20 +44,19 @@ import {logger} from "@/lib/ClientLogger";
 
 // Public Objects ------------------------------------------------------------
 
-export const ListInsertModal = () => {
+export const ListFormModal = () => {
 
     const {data, isOpen, onClose, type} = useModalStore();
-    const router = useRouter();
+    const isModalOpen = isOpen && type === ModalType.LIST_FORM;
+    const list = data.list;
     const profile = data.profile;
-    const isModalOpen = isOpen && type === ModalType.LIST_INSERT;
+    const router = useRouter();
 
     logger.info({
-        context: "ListInsertModal",
+        context: "ListFormModal",
         data: data,
-        isOpen: isOpen,
-        type: type,
-        profile: profile,
         isModalOpen: isModalOpen,
+        type: type,
     });
 
     const formSchema = z.object({
@@ -71,12 +71,19 @@ export const ListInsertModal = () => {
         }),
     });
 
-    const form = useForm({
-        defaultValues: {
+    const defaultValues = list
+        ? {
+            inviteCode: list.inviteCode,
+            name: list.name,
+            profileId: list.profileId,
+        } : {
             inviteCode: uuidv4(),
             name: "",
             profileId: profile ? profile.id : "",
-        },
+        };
+
+    const form = useForm({
+        defaultValues: defaultValues,
         resolver: zodResolver(formSchema),
     });
     const isLoading = form.formState.isSubmitting;
@@ -88,13 +95,17 @@ export const ListInsertModal = () => {
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         try {
-            await ListActions.insert(values);
-            form.reset();
+            if (list) {
+                await ListActions.update(list.id, values);
+            } else {
+                await ListActions.insert(values);
+            }
             router.refresh();
         } catch (error) {
             // TODO - error handling
             console.log(error);
         } finally {
+            form.reset();
             onClose();
         }
     }
@@ -104,7 +115,11 @@ export const ListInsertModal = () => {
             <DialogContent className="bg-white text-black p-0 overflow-hidden">
                 <DialogHeader>
                     <DialogTitle className="text-2xl text-center font-bold">
-                        Create New List
+                        {(list) ? (
+                            <span>Edit Existing List</span>
+                        ) : (
+                            <span>Create New List</span>
+                        )}
                     </DialogTitle>
                 </DialogHeader>
                 <Form {...form}>

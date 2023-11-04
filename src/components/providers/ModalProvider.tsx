@@ -15,7 +15,7 @@ import {useEffect, useState} from "react";
 // Internal Modules ----------------------------------------------------------
 
 // TODO - imports of components that are modals go here.
-import {ListInsertModal} from "@/components/lists/ListInsertModal";
+import {ListFormModal} from "@/components/lists/ListFormModal";
 
 // Public Objects ------------------------------------------------------------
 
@@ -34,7 +34,7 @@ export const ModalProvider = () => {
     return (
         <>
             {/* TODO - instantiations of modal components go here */}
-            <ListInsertModal/>
+            <ListFormModal/>
         </>
     )
 
