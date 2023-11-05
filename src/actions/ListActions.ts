@@ -10,7 +10,7 @@
 
 // External Modules ----------------------------------------------------------
 
-import {Prisma, List} from "@prisma/client";
+import {Prisma, List, MemberRole} from "@prisma/client";
 
 // Internal Modules ----------------------------------------------------------
 
@@ -54,6 +54,8 @@ export const all = async (profileId: string): Promise<List[]> => {
 
 /**
  * Create and return a new List instance, if it satisfies validation.
+ * In addition, the specified profileId that created this List
+ * will be added as a Member with an ADMIN role.
  *
  * @param list                          List to be created
  *
@@ -72,7 +74,14 @@ export const insert = async (list: Prisma.ListUncheckedCreateInput): Promise<Lis
 
     try {
         const result = await db.list.create({
-            data: list,
+            data: {
+                ...list,
+                members: {
+                    create: [
+                        {profileId: list.profileId, role: MemberRole.ADMIN}
+                    ],
+                }
+            }
         });
         return result;
     } catch (error) {
@@ -91,7 +100,7 @@ export const insert = async (list: Prisma.ListUncheckedCreateInput): Promise<Lis
  * @throws NotUnique                    If a unique key violation is attempted
  * @throws ServerError                  If some other error occurs
  */
-export const update = async (listId: string, list: Prisma.ListUpdateInput): Promise<List> => {
+export const update = async (listId: string, list: Prisma.ListUncheckedUpdateInput): Promise<List> => {
 
     logger.info({
         context: "ListActions.update",

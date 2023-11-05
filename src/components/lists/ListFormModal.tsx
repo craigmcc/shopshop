@@ -1,5 +1,5 @@
 "use client"
-// @/components/lists/ListIFormModal.tsx
+// @/components/lists/ListFormModal.tsx
 
 /**
  * Create a new List.
