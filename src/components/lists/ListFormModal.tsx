@@ -60,26 +60,16 @@ export const ListFormModal = () => {
     });
 
     const formSchema = z.object({
-        inviteCode: z.string().min(1, {
-            message: "Invite Code is required",
-        }),
         name: z.string().min(1, {
             message: "List name is required",
-        }),
-        profileId: z.string().min(1, {
-            message: "Profile ID is required",
         }),
     });
 
     const defaultValues = list
         ? {
-            inviteCode: list.inviteCode,
             name: list.name,
-            profileId: list.profileId,
         } : {
-            inviteCode: uuidv4(),
             name: "",
-            profileId: profile ? profile.id : "",
         };
 
     const form = useForm({
@@ -95,10 +85,19 @@ export const ListFormModal = () => {
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         try {
+            logger.info({
+                context: "ListFormModal.onSubmit",
+                values: values,
+                list: list,
+            })
             if (list) {
                 await ListActions.update(list.id, values);
             } else {
-                await ListActions.insert(values);
+                await ListActions.insert({
+                    ...values,
+                    inviteCode: uuidv4(),
+                    profileId: profile!.id,
+                });
             }
             router.refresh();
         } catch (error) {
@@ -125,31 +124,33 @@ export const ListFormModal = () => {
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
 
-                        <FormField
-                            control={form.control}
-                            name="name"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel
-                                        className="text-xs font-bold text-zinc-500 dark:text-secondary/70"
-                                    >
-                                        List Name:
-                                    </FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            autoFocus
-                                            className="bg-zinc-300/50 border-0 focus-visible:ring-0 text-black focus-visible:ring-offset-0"
-                                            disabled={isLoading}
-                                            placeholder="Enter list name"
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+                        <div className="space-y-8 px-6">
+                            <FormField
+                                control={form.control}
+                                name="name"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel
+                                            className="text-xs font-bold text-zinc-500 dark:text-secondary/70"
+                                        >
+                                            List Name:
+                                        </FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                autoFocus
+                                                className="bg-zinc-300/50 border-0 focus-visible:ring-0 text-black focus-visible:ring-offset-0"
+                                                disabled={isLoading}
+                                                placeholder="Enter list name"
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
 
-                        <DialogFooter className="bg-gray-100 px-6 py-4">
+                        <DialogFooter className="bg-gray-100 dark:bg-gray-600 px-6 py-4">
                             <Button variant="default" disabled={isLoading}>
                                 Save
                             </Button>

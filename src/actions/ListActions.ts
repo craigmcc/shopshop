@@ -46,10 +46,8 @@ export const all = async (profileId: string): Promise<List[]> => {
                 }
             },
         },
-    })
+    });
 
-
-    return [];
 }
 
 /**
@@ -87,6 +85,42 @@ export const insert = async (list: Prisma.ListUncheckedCreateInput): Promise<Lis
     } catch (error) {
         throw new ServerError(error as Error, "ListActions.insert");
     }
+
+}
+
+/**
+ * Return the specified List, if the specified Profile is a Member.
+ * It includes the specified Member child so that we can check the role.
+ *
+ * @param profileId                     Profile ID of the user for which to retrieve a List
+ * @param listId                        List ID of the requested list
+ *
+ * @throws ServerError                  If a low level error occurs
+ */
+export const member = async (profileId: string, listId: string): Promise<List | null> => {
+    logger.info({
+        context: "ListActions.member",
+        profileId: profileId,
+        listId: listId,
+    });
+
+    return await db.list.findUnique({
+        include: {
+            members: {
+                where: {
+                    profileId: profileId,
+                }
+            },
+        },
+        where: {
+            id: listId,
+            members: {
+                some: {
+                    profileId: profileId,
+                }
+            },
+        },
+    });
 
 }
 

@@ -67,7 +67,9 @@ export default async function RootLayout({
                 <LayoutHeader/>
                 <div className="h-full">
                     {(session?.user) ? (
-                        <LayoutSidebar/>
+                        <div className="hidden md:flex h-full w-[72px] flex-col fixed">
+                            <LayoutSidebar/>
+                        </div>
                     ) : null }
                     <main className="md:pl-[72px] h-full">
                         {children}

@@ -8,43 +8,45 @@
 
 // External Modules ----------------------------------------------------------
 
-import {getServerSession} from "next-auth";
+import {redirect} from "next/navigation";
 
 // Internal Modules ----------------------------------------------------------
 
-import {authOptions} from "@/app/api/auth/[...nextauth]/route";
+import * as ListActions from "@/actions/ListActions";
+import {ListCreateItem} from "@/components/lists/ListCreateItem";
+import {ListSelectItem} from "@/components/lists/ListSelectItem";
+import {ScrollArea} from "@/components/ui/scroll-area";
 import {Separator} from "@/components/ui/separator";
-import {logger} from "@/lib/ServerLogger";
+import {currentProfile} from "@/lib/currentProfile";
 
 // Public Objects ------------------------------------------------------------
 
 export async function LayoutSidebar() {
 
-    const session = await getServerSession(authOptions);
-    logger.trace({
-        context: "LayoutSidebar",
-        session: session,
-    });
-    if (!session) {
+    const profile = await currentProfile();
+    if (!profile) {
         return null;
     }
+    const lists = await ListActions.all(profile.id);
 
     return (
         <aside
-            className="hidden md:flex h-full w-[72px] flex-col fixed bg-indigo-200 dark:bg-indigo-800"
+            className="space-y-4 flex flex-col items-center h-full text-primary w-full dark:bg-[#1E1F22] bg-[#E3E5E8] py-3"
         >
-            {session.user.profile ? (
-                <>
-                    <div>{session.user.profile.name}</div>
-                    <div>{session.user.profile.scope}</div>
-                </>
-            ) : (
-                <div>Not Signed In</div>
-            )}
+            <div className="w-full">
+                <ListCreateItem/>
+            </div>
             <Separator
                 className="h-[2px] bg-yellow-600 rounded-md"
             />
-            <p>Layout Sidebar with some extra height</p>
+            <ScrollArea className="flex-1 w-full">
+                {lists.map((list) => (
+                    <div key={list.id} className="pb-4">
+                        <ListSelectItem list={list}/>
+                    </div>
+                ))}
+            </ScrollArea>
+
         </aside>
     )
 
