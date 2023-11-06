@@ -14,6 +14,7 @@
 // External Modules ----------------------------------------------------------
 
 import {useRouter} from "next/navigation";
+import {useEffect} from "react";
 import {useForm} from "react-hook-form";
 import {v4 as uuidv4} from "uuid";
 import * as z from "zod";
@@ -65,17 +66,21 @@ export const ListFormModal = () => {
         }),
     });
 
-    const defaultValues = list
-        ? {
-            name: list.name,
-        } : {
-            name: "",
-        };
+    const defaultValues = {
+        name: "",
+    };
 
     const form = useForm({
         defaultValues: defaultValues,
         resolver: zodResolver(formSchema),
     });
+
+    useEffect(() => {
+        if (list) {
+            form.setValue("name", list.name);
+        }
+    }, [form, list]);
+
     const isLoading = form.formState.isSubmitting;
 
     const handleClose = () => {
