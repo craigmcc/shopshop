@@ -17,6 +17,10 @@ import {Prisma, List, MemberRole} from "@prisma/client";
 import {db} from "@/lib/db";
 import {BadRequest, NotFound, NotUnique, ServerError} from "@/lib/HttpErrors";
 import {logger} from "@/lib/ServerLogger";
+import {
+    ListWithCategoriesWithItems,
+    ListWithMembersWithProfiles
+} from "@/types/types";
 
 // Public Actions ------------------------------------------------------------
 
@@ -30,23 +34,103 @@ import {logger} from "@/lib/ServerLogger";
  * @throws ServerError                  If a low level error occurs
  */
 export const all = async (profileId: string): Promise<List[]> => {
+
     logger.info({
         context: "ListActions.all",
         profileId: profileId,
     });
 
-    return await db.list.findMany({
-        orderBy: {
-            name: "asc",
-        },
-        where: {
-            members: {
-                some: {
-                    profileId: profileId,
+    try {
+        return await db.list.findMany({
+            orderBy: {
+                name: "asc",
+            },
+            where: {
+                members: {
+                    some: {
+                        profileId: profileId,
+                    }
+                },
+            },
+        });
+    } catch (error) {
+        throw new ServerError(error as Error, "ListActions.find");
+    }
+
+}
+
+/**
+ * Return the requested List, with nested Categories and Items, if any.
+ * Otherwise, return null.
+ *
+ * @param listId                        ID of the List to be returned
+ *
+ * @throws ServerError                  If a low level error occurs
+ */
+export const findCategories = async (listId: string): Promise<ListWithCategoriesWithItems | null> => {
+
+    logger.info({
+        context: "ListActions.find",
+        listId: listId,
+    });
+
+    try {
+        return await db.list.findUnique(({
+            include: {
+                categories: {
+                    include: {
+                        items: {
+                            orderBy: {
+                                name: "asc",
+                            }
+                        }
+                    },
+                    orderBy: {
+                        name: "asc",
+                    },
                 }
             },
-        },
+            where: {
+                id: listId,
+            }
+        }));
+    } catch (error) {
+        throw new ServerError(error as Error, "ListActions.find");
+    }
+
+}
+
+/**
+ * Return the requested List, with nested Members and Profiles, if any.
+ * Otherwise, return null.
+ *
+ * @param listId                        ID of the List to be returned
+ *
+ * @throws ServerError                  If a low level error occurs
+ */
+export const findMembers = async (listId: string): Promise<ListWithMembersWithProfiles | null> => {
+
+    logger.info({
+        context: "ListActions.find",
+        listId: listId,
     });
+
+    try {
+        return await db.list.findUnique(({
+            include: {
+                members: {
+                    include: {
+                        profile: true,
+                    },
+                }
+            },
+            where: {
+                id: listId,
+            }
+        }));
+    } catch (error) {
+        throw new ServerError(error as Error, "ListActions.find");
+    }
 
 }
 
@@ -104,23 +188,27 @@ export const member = async (profileId: string, listId: string): Promise<List | 
         listId: listId,
     });
 
-    return await db.list.findUnique({
-        include: {
-            members: {
-                where: {
-                    profileId: profileId,
-                }
+    try {
+        return await db.list.findUnique({
+            include: {
+                members: {
+                    where: {
+                        profileId: profileId,
+                    }
+                },
             },
-        },
-        where: {
-            id: listId,
-            members: {
-                some: {
-                    profileId: profileId,
-                }
+            where: {
+                id: listId,
+                members: {
+                    some: {
+                        profileId: profileId,
+                    }
+                },
             },
-        },
-    });
+        });
+    } catch (error) {
+        throw new ServerError(error as Error, "ListActions.member");
+    }
 
 }
 
