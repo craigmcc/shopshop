@@ -46,7 +46,7 @@
     "@types/uuid": "^9.0.6",
     "autoprefixer": "^10",
     "eslint": "^8",
-    "eslint-config-next": "14.0.0",
+    "eslint-config-next": "14.0.1",
     "postcss": "^8",
     "prisma": "^5.5.2",
     "tailwindcss": "^3",
