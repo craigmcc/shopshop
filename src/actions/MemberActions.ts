@@ -48,3 +48,58 @@ export const insert = async (member: Prisma.MemberUncheckedCreateInput): Promise
     }
 
 }
+
+/**
+ * Cause the specified Member to leave.
+ *
+ * @param profileId                     ID of the Profile to leave
+ * @param listId                        ID of the List to leave
+ *
+ * @throws ServerError                  If an error occurs
+ */
+export const leave = async (profileId: string, listId: string): Promise<void> => {
+
+    logger.info({
+        context: "MemberActions.leave",
+        profileId,
+        listId,
+    });
+
+    try {
+        await db.member.deleteMany({
+            where: {
+                profileId,
+                listId,
+            }
+        })
+    } catch (error) {
+        throw new ServerError(error as Error, "MemberActions.leave");
+    }
+
+}
+
+/**
+ * Cause the specified Member to be removed.
+ *
+ * @param memberId                      ID of the Member to be removed
+ *
+ * @throws ServerError                  If an error occurs
+ */
+export const remove = async (memberId: string): Promise<void> => {
+
+    logger.info({
+        context: "MemberActions.remove",
+        memberId,
+    });
+
+    try {
+        await db.member.delete({
+            where: {
+                id: memberId,
+            }
+        })
+    } catch (error) {
+        throw new ServerError(error as Error, "MemberActions.remove");
+    }
+
+}
