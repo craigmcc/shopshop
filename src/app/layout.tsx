@@ -8,6 +8,7 @@
 
 // External Modules ----------------------------------------------------------
 
+import {GeistSans} from "geist/font";
 import type {Metadata} from "next";
 import {Inter} from "next/font/google";
 import {getServerSession} from "next-auth";
@@ -50,7 +51,8 @@ export default async function RootLayout({
         <html lang="en" suppressHydrationWarning>
         <body
             className={cn(
-                inter.className,
+                //inter.className,
+                GeistSans.className,
                 "bg-indigo-50 dark:bg-indigo-950",
                 "text-black dark:text-white"
             )}
