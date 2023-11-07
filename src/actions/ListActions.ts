@@ -213,6 +213,34 @@ export const member = async (profileId: string, listId: string): Promise<List | 
 }
 
 /**
+ * Remove an existing List (as well as it's children), if any, and return the
+ * removed List object.
+ *
+ *
+ */
+export const remove = async (listId: string): Promise<List> => {
+
+    logger.info({
+        context: "ListActions.remove",
+        listId,
+    });
+
+    // TODO - validations
+
+    try {
+        const result = await db.list.delete({
+            where: {
+                id: listId,
+            }
+        });
+        return result;
+    } catch (error) {
+        throw new ServerError(error as Error, "ListActions.remove");
+    }
+
+}
+
+/**
  * Update an existing List, and return the updated value.
  *
  * @param listId                        ID of the list to be updated

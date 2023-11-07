@@ -88,7 +88,7 @@ export const ListSidebarHeader = ({
                        onClick={() => onOpen(ModalType.LIST_REMOVE, {list, profile})}
                        className="text-rose-500 px-3 py-2 text-sm cursor-pointer"
                    >
-                       Delete List
+                       Remove List
                        <Icons.Remove className="h-4 w-4 ml-auto" />
                    </DropdownMenuItem>
                )}

@@ -94,7 +94,7 @@ export const ListFormModal = () => {
                 context: "ListFormModal.onSubmit",
                 values: values,
                 list: list,
-            })
+            });
             if (list) {
                 await ListActions.update(list.id, values);
             } else {
