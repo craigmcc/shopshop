@@ -16,7 +16,6 @@ import {useForm} from "react-hook-form";
 import * as z from "zod";
 import {zodResolver} from "@hookform/resolvers/zod";
 
-
 // Internal Modules ----------------------------------------------------------
 
 import {Button} from "@/components/ui/button";
@@ -100,7 +99,7 @@ export const SignInForm = () => {
                 router.push("/");
                 router.refresh();
             } else {
-                alert("Invalid email address or password, please try again");
+                alert("Invalid email address or password, please try again.");
             }
         } catch (error) {
             // TODO - error handling

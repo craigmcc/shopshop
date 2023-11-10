@@ -15,6 +15,7 @@ import {useEffect, useState} from "react";
 // Internal Modules ----------------------------------------------------------
 
 // TODO - imports of components that are modals go here.
+import {SignUpModal} from "@/components/auth/SignUpModal";
 import {ListFormModal} from "@/components/lists/ListFormModal";
 import {ListLeaveModal} from "@/components/lists/ListLeaveModal";
 import {ListRemoveModal} from "@/components/lists/ListRemoveModal";
@@ -36,6 +37,7 @@ export const ModalProvider = () => {
     return (
         <>
             {/* TODO - instantiations of modal components go here */}
+            <SignUpModal/>
             <ListFormModal/>
             <ListLeaveModal/>
             <ListRemoveModal/>

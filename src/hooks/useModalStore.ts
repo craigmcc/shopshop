@@ -40,6 +40,7 @@ export enum ModalType {
     LIST_LEAVE = "ListLeave",
     LIST_MEMBERS = "ListMembers",
     LIST_REMOVE = "ListRemove",
+    PROFILE_SIGNUP = "ProfileSignUp",
 }
 
 /**

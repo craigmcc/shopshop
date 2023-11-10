@@ -13,9 +13,9 @@
 import {signIn, signOut, useSession} from "next-auth/react";
 
 // Internal Modules ----------------------------------------------------------
-
 import {ModeToggle} from "@/components/layout/ModeToggle";
 import {Button} from "@/components/ui/button";
+import {ModalType, useModalStore} from "@/hooks/useModalStore";
 
 // Public Objects ------------------------------------------------------------
 
@@ -34,6 +34,7 @@ export const LayoutHeader = () => {
                 suppressHydrationWarning
             >
                 <AuthButton/>
+                <SignUpButton/>
                 <ModeToggle/>
             </div>
         </header>
@@ -54,9 +55,23 @@ function AuthButton() {
     }
     return (
         <>
-            <span>Not signed in</span>
             <Button onClick={() => signIn()}>Sign in</Button>
         </>
     );
 }
 
+function SignUpButton() {
+
+    const {data: session} = useSession();
+    const {onOpen} = useModalStore();
+    if (session) {
+        return null;
+    }
+
+    return (
+        <Button onClick={() => onOpen(ModalType.PROFILE_SIGNUP, {})}>
+            Sign Up
+        </Button>
+    )
+
+}
