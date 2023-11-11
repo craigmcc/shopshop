@@ -13,6 +13,8 @@
 
 import {useRouter} from "next/navigation";
 import {signIn} from "next-auth/react";
+import {useState} from "react";
+import ReCAPTCHA from "react-google-recaptcha";
 import {useForm} from "react-hook-form";
 import * as z from "zod";
 import {zodResolver} from "@hookform/resolvers/zod";
@@ -44,9 +46,12 @@ import {logger} from "@/lib/ClientLogger";
 
 export const SignUpModal = () => {
 
+    const RECAPTCHA_SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY
+        ? process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY : "unknown";
     const {isOpen, onClose, type} = useModalStore();
     const isModalOpen = isOpen && type === ModalType.PROFILE_SIGNUP;
     const router = useRouter();
+    const [token, setToken] = useState<string>("");
 
     logger.trace({
         context: "SignUpModal",
@@ -103,6 +108,10 @@ export const SignUpModal = () => {
         });
         form.reset();
         onClose();
+    }
+
+    const onSuccess = (theToken: string | null) => {
+        setToken(theToken ? theToken : "");
     }
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
@@ -272,6 +281,12 @@ export const SignUpModal = () => {
                         </div>
 
                         <DialogFooter className="bg-gray-100 dark:bg-gray-600 px-6 py-4">
+                            <ReCAPTCHA
+                                className="px-8"
+                                onChange={onSuccess}
+                                sitekey={RECAPTCHA_SITE_KEY}
+                                size="compact"
+                            />
                             <Button variant="default" disabled={isLoading}>
                                 Sign Up
                             </Button>
