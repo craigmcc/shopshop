@@ -60,9 +60,12 @@ export const SignUpModal = () => {
     });
 
     const formSchema = z.object({
-        email: z.string().email({
-            message: "Valid email address is required",
-        }), // TODO - uniqueness check
+        email: z.string()
+            .email("Must be a valid email address")
+            .refine(async (value) => {
+                const profile = await ProfileActions.email(value);
+                return !profile;
+            }, "That email address is already in use"),
         name: z.string().min(1, {
             message: "User name is required",
         }),
@@ -71,24 +74,8 @@ export const SignUpModal = () => {
         }), // TODO - password strength check
         password2: z.string().min(1, {
             message: "Confirmation password is required",
-        })
-        // TODO - implement recaptcha
+        }),
     })
-        .refine((data) => data.password1 === data.password2, {
-            message: "Password and Confirmation Password must match",
-            path: ["password2"]
-        });
-/*
-        .superRefine(({ password1, password2 }, context) => {
-            if (password1 !== password2) {
-                context.addIssue({
-                    code: "custom",
-                    message: "Password and Confirmation Password must match",
-                    path: ["password2"],
-                });
-            }
-        });
-*/
 
     const form = useForm({
         defaultValues: {
