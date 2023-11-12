@@ -91,6 +91,9 @@ export const email = async (email: string): Promise<Profile | null> => {
                 email: email,
             }
         });
+        if (result) {
+            result.password = "";
+        }
         return result;
     } catch (error) {
         throw new ServerError(error as Error, "ProfileActions.email");
@@ -118,6 +121,9 @@ export const find = async (profileId: string): Promise<Profile | null> => {
                 id: profileId,
             }
         });
+        if (result) {
+            result.password = "";
+        }
         return result;
     } catch (error) {
         throw new ServerError(error as Error, "ProfileActions.find");
@@ -144,7 +150,9 @@ export const insert = async (profile: Prisma.ProfileUncheckedCreateInput): Promi
         }
     });
 
-    // TODO - validations
+    if ((await email(profile.email)) !== null) {
+        throw new NotUnique("That email address is already in use");
+    }
 
     try {
         const result = await db.profile.create({
@@ -153,6 +161,9 @@ export const insert = async (profile: Prisma.ProfileUncheckedCreateInput): Promi
                 password: await hashPassword(profile.password),
             }
         });
+        if (result) {
+            result.password = "";
+        }
         return result;
     } catch (error) {
         throw new ServerError(error as Error, "ProfileActions.insert");
@@ -172,7 +183,7 @@ export type VerifyTokenResponse = {
 /**
  * Verify that the specified ReCAPTCHA token is valid.
  *
- * @token                               Token to be valiated
+ * @token                               Token to be validated
  */
 export const verifyToken = async (token: string): Promise<VerifyTokenResponse> => {
 

@@ -17,6 +17,7 @@ import {Profile} from "@prisma/client";
 // Internal Modules ----------------------------------------------------------
 
 import * as ProfileActions from "@/actions/ProfileActions";
+import {db} from "@/lib/db";
 import {verifyPassword} from "@/lib/encryption";
 import {logger} from "@/lib/ServerLogger";
 
@@ -104,7 +105,12 @@ export const authOptions: NextAuthOptions = {
                 const email = credentials?.email ? credentials.email : "";
                 const password = credentials?.password ? credentials.password : "";
                 try {
-                    const profile = await ProfileActions.email(email);
+                    // Do this ourselves because ProfileActions.email() redacts the password
+                    const profile = await db.profile.findUnique({
+                        where: {
+                            email: email,
+                        }
+                    });
                     if (profile) {
                         if (await verifyPassword(password, profile.password)) {
                             profile.password = ""; // Redact the hashed password
