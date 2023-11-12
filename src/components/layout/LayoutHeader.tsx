@@ -10,10 +10,12 @@
 
 // External Modules ----------------------------------------------------------
 
-import {signIn, signOut, useSession} from "next-auth/react";
+import {signIn, useSession} from "next-auth/react";
 
 // Internal Modules ----------------------------------------------------------
+
 import {ModeToggle} from "@/components/layout/ModeToggle";
+import {ProfileMenu} from "@/components/profiles/ProfileMenu";
 import {Button} from "@/components/ui/button";
 import {ModalType, useModalStore} from "@/hooks/useModalStore";
 
@@ -48,14 +50,13 @@ function AuthButton() {
     if (session) {
         return (
             <>
-                <span>{session?.user?.name}</span>
-                <Button onClick={() => signOut()}>Sign out</Button>
+                <ProfileMenu profile={session.user.profile}/>
             </>
         );
     }
     return (
         <>
-            <Button onClick={() => signIn()}>Sign in</Button>
+            <Button onClick={() => signIn()}>Sign In</Button>
         </>
     );
 }
