@@ -10,17 +10,19 @@
 
 // External Modules ----------------------------------------------------------
 
-import {Prisma, List, MemberRole} from "@prisma/client";
+import {List, MemberRole, Prisma} from "@prisma/client";
 
 // Internal Modules ----------------------------------------------------------
 
 import {db} from "@/lib/db";
 import {BadRequest, NotFound, NotUnique, ServerError} from "@/lib/HttpErrors";
+import {InitialListData} from "@/lib/InitialListData";
 import {logger} from "@/lib/ServerLogger";
 import {
     ListWithCategoriesWithItems,
     ListWithMembersWithProfiles
 } from "@/types/types";
+import CategoryUncheckedCreateInput = Prisma.CategoryUncheckedCreateInput;
 
 // Public Actions ------------------------------------------------------------
 
@@ -60,6 +62,31 @@ export const all = async (profileId: string): Promise<List[]> => {
 }
 
 /**
+ * Return the requested List (if any).  Otherwise, return null.
+ *
+ * @param listId                        ID of the List to be returned
+ *
+ * @throws ServerError                  If a low level error occurs
+ */
+export const find = async (listId: string): Promise<List | null> => {
+
+    logger.info({
+        context: "ListActions.find",
+        listId: listId,
+    });
+
+    try {
+        return await db.list.findUnique(({
+            where: {
+                id: listId,
+            }
+        }));
+    } catch (error) {
+        throw new ServerError(error as Error, "ListActions.find");
+    }
+}
+
+/**
  * Return the requested List, with nested Categories and Items, if any.
  * Otherwise, return null.
  *
@@ -70,7 +97,7 @@ export const all = async (profileId: string): Promise<List[]> => {
 export const findCategories = async (listId: string): Promise<ListWithCategoriesWithItems | null> => {
 
     logger.info({
-        context: "ListActions.find",
+        context: "ListActions.findCategories",
         listId: listId,
     });
 
@@ -95,7 +122,7 @@ export const findCategories = async (listId: string): Promise<ListWithCategories
             }
         }));
     } catch (error) {
-        throw new ServerError(error as Error, "ListActions.find");
+        throw new ServerError(error as Error, "ListActions.findCategories");
     }
 
 }
@@ -165,6 +192,7 @@ export const insert = async (list: Prisma.ListUncheckedCreateInput): Promise<Lis
                 }
             }
         });
+        await populate(result.id);
         return result;
     } catch (error) {
         throw new ServerError(error as Error, "ListActions.insert");
@@ -208,6 +236,72 @@ export const member = async (profileId: string, listId: string): Promise<List | 
         });
     } catch (error) {
         throw new ServerError(error as Error, "ListActions.member");
+    }
+
+}
+
+/**
+ * Populate the default Categories and Items for the specified List.
+ *
+ * @param listId                        ID of the List to be populated
+ *
+ * @throws NotFound                     If the specified List cannot be found
+ * @throws ServerError                  If a low level error occurs
+ */
+export const populate = async (listId: string): Promise<void> => {
+
+    logger.info({
+        context: "ListActions.populate",
+        listId: listId,
+    });
+
+    const list = await find(listId);
+    if (!list) {
+        throw new NotFound(`Missing List '${listId}'`, "ListActions.populate");
+    }
+
+    try {
+
+        // Erase all current Items and Categories (via cascade) for this List
+        await db.category.deleteMany({
+            where: {
+                listId: listId,
+            }
+        });
+
+        // Create each defined Category, keeping them around for access to IDs
+        const categories: CategoryUncheckedCreateInput[] = [];
+        for (const element of InitialListData) {
+            const category = {
+                listId: listId,
+                name: element[0],
+            };
+            categories.push(await db.category.create({ data: category }));
+        }
+
+        // For each created category, create the relevant Items
+        for (let i = 0; i < categories.length; i++)  {
+            const element = InitialListData[i];
+            if (element.length > 1) {
+                for (let j = 1; j < element.length; j++) {
+                    await db.item.create({
+                        data : {
+                            categoryId: categories[i].id!,
+                            checked: false,
+                            listId: listId,
+                            name: element[j],
+                            selected: false,
+                        },
+                    });
+                }
+            }
+        }
+
+    } catch (error) {
+        throw new ServerError(
+            error as Error,
+            "ListActions.populate",
+        );
     }
 
 }
