@@ -15,8 +15,8 @@ import {List} from "@prisma/client";
 
 // Internal Modules ----------------------------------------------------------
 
+import {ListAvatar} from "@/components/lists/ListAvatar";
 import {ActionTooltip} from "@/components/shared/ActionTooltip";
-import {initials} from "@/lib/Strings";
 import {cn} from "@/lib/utils";
 
 // Public Objects ------------------------------------------------------------
@@ -52,22 +52,10 @@ export const ListSelectItem = ({
                     params?.listId !== list.id && "group-hover:h-[20px]",
                     params?.listId === list.id ? "h-[36px]" : "h-[8px]"
                 )} />
-                <div className={cn(
-                    "relative group flex mx-3 h-[48px] w-[48px] rounded-[24px] group-hover:rounded-[16px] transition-all overflow-hidden",
-                    params?.listId === list.id && "bg-orange/10 text-orange-500 rounded-[16px]"
-                )}>
-                    {list.imageUrl ? (
-                        <Image
-                            alt="List"
-                            fill
-                            src={list.imageUrl}
-                        />
-                    ) : (
-                        <div className="flex h-[48px] w-[48px] rounded-[24px] group-hover:rounded-[16px] transition-all overflow-hidden items-center justify-center bg-background dark:bg-neutral-700 group-hover:bg-emerald-500 text-xs">
-                            {initials(list.name)}
-                        </div>
-                    )}
-                </div>
+                <ListAvatar
+                    list={list}
+                    listId={String(params?.listId)}
+                />
 
             </button>
         </ActionTooltip>
