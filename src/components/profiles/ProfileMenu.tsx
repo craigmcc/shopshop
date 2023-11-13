@@ -54,7 +54,7 @@ export const ProfileMenu = ({
                     className="px-3 py-2 text-sm cursor-pointer"
                     onClick={() => onOpen(ModalType.PROFILE_UPDATE, {profile})}
                 >
-                    Manage Profile
+                    Update Profile
                     <Icons.User className="h-4 w-4 ml-auto"/>
                 </DropdownMenuItem>
                 <DropdownMenuItem

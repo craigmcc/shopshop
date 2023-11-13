@@ -171,6 +171,53 @@ export const insert = async (profile: Prisma.ProfileUncheckedCreateInput): Promi
 
 }
 
+/**
+ * Update and return the specified Profile.
+ *
+ * @param profileId                     ID of the Profile to be updated
+ * @param profile                       Profile data to be updaed
+ *
+ * @throws BadRequest                   If validation fails
+ * @throws NotFound                     If no such Profile is found
+ * @throws ServerError                  If a low level error is thrown
+ */
+export const update = async (profileId: string, profile: Prisma.ProfileUpdateInput): Promise<Profile> => {
+
+    logger.info({
+        context: "ProfileActions.update",
+        profile: {
+            ...profile,
+            password: profile.password ? "*REDACTED*" : undefined,
+        }
+    });
+
+    if (!await find(profileId)) {
+        throw new NotFound(
+            `Missing Profile '${profileId}'`,
+            "ProfileActions.update"
+        );
+    }
+
+    try {
+        const result = await db.profile.update({
+            data: {
+                ...profile,
+                password: profile.password ? await hashPassword(String(profile.password)) : undefined,
+            },
+            where: {
+                id: profileId,
+            }
+        });
+        if (result) {
+            result.password = "";
+        }
+        return result;
+    } catch (error) {
+        throw new ServerError(error as Error, "ProfileActions.insert");
+    }
+
+}
+
 // Private Objects -----------------------------------------------------------
 
 export type VerifyTokenResponse = {

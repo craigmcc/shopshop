@@ -1,10 +1,11 @@
 "use client"
-// @/components/auth/SignUpModal.tsx
+// @/components/profiles/ProfileUpdateModal.tsx
 
 /**
- * Sign Up form for creating a new Profile.
+ * Form for changing a Profile's settings (other than password).
  *
- * Required ModalData:                  None
+ * Required ModalData:
+ * - profile                            Profile whose settings are to be changed
  *
  * @packageDocumentation
  */
@@ -12,9 +13,8 @@
 // External Modules ----------------------------------------------------------
 
 import {useRouter} from "next/navigation";
-import {signIn} from "next-auth/react";
-import {useState} from "react";
-import ReCAPTCHA from "react-google-recaptcha";
+import {useSession} from "next-auth/react";
+import {useEffect} from "react";
 import {useForm} from "react-hook-form";
 import * as z from "zod";
 import {zodResolver} from "@hookform/resolvers/zod";
@@ -44,17 +44,16 @@ import {logger} from "@/lib/ClientLogger";
 
 // Public Objects ------------------------------------------------------------
 
-export const SignUpModal = () => {
+export const ProfileUpdateModal = () => {
 
-    const RECAPTCHA_SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY
-        ? process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY : "unknown";
-    const {isOpen, onClose, type} = useModalStore();
-    const isModalOpen = isOpen && type === ModalType.PROFILE_SIGNUP;
+    const {data, isOpen, onClose, type} = useModalStore();
+    const isModalOpen = isOpen && type === ModalType.PROFILE_UPDATE;
+    const profile = data.profile;
     const router = useRouter();
-    const [token, setToken] = useState<string>("");
+    const {data: session, status, update} = useSession();
 
     logger.trace({
-        context: "SignUpModal",
+        context: "ProfileUpdateModal",
         isModalOpen: isModalOpen,
         type: type,
     });
@@ -63,87 +62,69 @@ export const SignUpModal = () => {
         email: z.string()
             .email("Must be a valid email address")
             .refine(async (value) => {
-                const profile = await ProfileActions.email(value);
-                return !profile;
+                const result = await ProfileActions.email(value);
+                return !result || (result.id === profile!.id);
             }, "That email address is already in use"),
         name: z.string().min(1, {
             message: "User name is required",
         }),
-        password1: z.string().min(1, {
-            message: "Password is required",
-        }), // TODO - password strength check
-        password2: z.string().min(1, {
-            message: "Confirmation password is required",
-        }),
-    }).refine((data) => data.password1 === data.password2, {
-        message: "Password and Confirmation Password must match",
-        path: ["password2"],
     });
 
     const form = useForm({
         defaultValues: {
             email: "",
             name: "",
-            password1: "",
-            password2: "",
         },
         mode: "onBlur",
         resolver: zodResolver(formSchema),
     });
+
+    useEffect(() => {
+        if (profile) {
+            form.setValue("email", profile.email);
+            form.setValue("name", profile.name);
+        }
+    }, [form, profile]);
+
     const isLoading = form.formState.isSubmitting;
 
     const handleClose = () => {
         logger.trace({
-            context: "SignUpModal.handleClose",
+            context: "ProfileUpdateModal.handleClose",
         });
         form.reset();
         onClose();
     }
 
-    const onSuccess = (theToken: string | null) => {
-        setToken(theToken ? theToken : "");
-    }
-
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         try {
             logger.trace({
-                context: "SignUpModal.onSubmit.request",
+                context: "ProfileUpdateModal.onSubmit.request",
                 email: values.email,
                 name: values.name,
-                password1: "*REDACTED*",
-                password2: "*REDACTED*",
             });
-            const profile = await ProfileActions.insert({
+            // Update the Profile in the database
+            const result = await ProfileActions.update(profile!.id, {
                 email: values.email,
                 name: values.name,
-                password: values.password1,
             });
             logger.trace({
-                context: "SignUpModal.onSubmit.profile",
+                context: "ProfileUpdateModal.onSubmit.profile",
                 profile: {
-                    ...profile,
+                    ...result,
                     password: "*REDACTED*",
                 }
             })
-            const response = await signIn("credentials", {
-                email: values.email,
-                password: values.password1,
-                redirect: false,
-            });
-            logger.trace({
-                context: "SignUpModal.onSubmit.response",
-                response: response,
-            });
-            if (!response?.error) {
-                router.push("/");
-                router.refresh();
-            } else {
-                alert("Invalid email address or password, please try again");
+            // TODO Update the Profile in the user's Session
+/*
+            if (status === "authenticated") {
+                await update({ profile: { email: values.email, name: values.name}});
             }
+*/
         } catch (error) {
             // TODO - error handling
             logger.error({
-                context: "SignUpModal.onSubmit.error",
+                context: "ProfileUpdateModal.onSubmit.error",
                 message: (error as Error).message,
             });
         } finally {
@@ -157,7 +138,7 @@ export const SignUpModal = () => {
             <DialogContent className="bg-white text-black p-0 overflow-hidden">
                 <DialogHeader>
                     <DialogTitle className={"text-2xl text-center font-bold"}>
-                        Sign Up for ShopShop
+                        Update Your Profile Settings
                     </DialogTitle>
                 </DialogHeader>
                 <Form {...form}>
@@ -216,69 +197,9 @@ export const SignUpModal = () => {
                             />
                         </div>
 
-                        <div className="space-y-8 px-6">
-                            <FormField
-                                control={form.control}
-                                name="password1"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel
-                                            className="text-xs font-bold text-zinc-500 dark:text-secondary/70"
-                                        >
-                                            Password:
-                                        </FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                autoComplete="new-password"
-                                                className="bg-zinc-300/50 border-0 focus-visible:ring-0 text-black focus-visible:ring-offset-0"
-                                                disabled={isLoading}
-                                                placeholder="Enter desired password"
-                                                type="password"
-                                                {...field}
-                                            />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
-
-                        <div className="space-y-8 px-6">
-                            <FormField
-                                control={form.control}
-                                name="password2"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel
-                                            className="text-xs font-bold text-zinc-500 dark:text-secondary/70"
-                                        >
-                                            Confirm Password:
-                                        </FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                autoComplete="new-password"
-                                                className="bg-zinc-300/50 border-0 focus-visible:ring-0 text-black focus-visible:ring-offset-0"
-                                                disabled={isLoading}
-                                                placeholder="Enter confirm password"
-                                                type="password"
-                                                {...field}
-                                            />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
-
                         <DialogFooter className="bg-gray-100 dark:bg-gray-600 px-6 py-4">
-                            <ReCAPTCHA
-                                className="px-8"
-                                onChange={onSuccess}
-                                sitekey={RECAPTCHA_SITE_KEY}
-                                size="compact"
-                            />
                             <Button variant="default" disabled={isLoading}>
-                                Sign Up
+                                Save
                             </Button>
                         </DialogFooter>
 

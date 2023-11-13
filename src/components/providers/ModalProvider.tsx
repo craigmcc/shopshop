@@ -19,6 +19,8 @@ import {SignUpModal} from "@/components/auth/SignUpModal";
 import {ListFormModal} from "@/components/lists/ListFormModal";
 import {ListLeaveModal} from "@/components/lists/ListLeaveModal";
 import {ListRemoveModal} from "@/components/lists/ListRemoveModal";
+import {ProfilePasswordModal} from "@/components/profiles/ProfilePasswordModal";
+import {ProfileUpdateModal} from "@/components/profiles/ProfileUpdateModal";
 
 // Public Objects ------------------------------------------------------------
 
@@ -37,10 +39,12 @@ export const ModalProvider = () => {
     return (
         <>
             {/* TODO - instantiations of modal components go here */}
-            <SignUpModal/>
             <ListFormModal/>
             <ListLeaveModal/>
             <ListRemoveModal/>
+            <ProfilePasswordModal/>
+            <ProfileUpdateModal/>
+            <SignUpModal/>
         </>
     )
 
