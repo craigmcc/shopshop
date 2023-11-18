@@ -24,5 +24,5 @@ export const initials = (value: string): string => {
     for (const word of words) {
         results.push(word.charAt(0).toUpperCase());
     }
-    return results.join(" ");
+    return results.join("");
 }

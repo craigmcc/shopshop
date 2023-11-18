@@ -18,6 +18,7 @@ import {useEffect, useState} from "react";
 import {SignUpModal} from "@/components/auth/SignUpModal";
 import {ListFormModal} from "@/components/lists/ListFormModal";
 import {ListLeaveModal} from "@/components/lists/ListLeaveModal";
+import {ListMembersModal} from "@/components/lists/ListMembersModal";
 import {ListRemoveModal} from "@/components/lists/ListRemoveModal";
 import {ProfilePasswordModal} from "@/components/profiles/ProfilePasswordModal";
 import {ProfileUpdateModal} from "@/components/profiles/ProfileUpdateModal";
@@ -41,6 +42,7 @@ export const ModalProvider = () => {
             {/* TODO - instantiations of modal components go here */}
             <ListFormModal/>
             <ListLeaveModal/>
+            <ListMembersModal/>
             <ListRemoveModal/>
             <ProfilePasswordModal/>
             <ProfileUpdateModal/>

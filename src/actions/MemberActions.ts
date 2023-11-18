@@ -10,7 +10,7 @@
 
 // External Modules ----------------------------------------------------------
 
-import {Prisma, Member} from "@prisma/client";
+import {Prisma, Member, MemberRole} from "@prisma/client";
 
 // Internal Modules ----------------------------------------------------------
 
@@ -100,6 +100,31 @@ export const remove = async (memberId: string): Promise<void> => {
         })
     } catch (error) {
         throw new ServerError(error as Error, "MemberActions.remove");
+    }
+
+}
+
+/**
+ * Update the role for the specified Member.
+ *
+ * @param memberId                      ID of the Member to be updated
+ * @param role                          New MemberRole
+ *
+ * @throws ServerError                  If an error occurs
+ */
+export const updateRole = async (memberId: string, role: MemberRole) => {
+
+    try {
+        await db.member.update({
+            data: {
+                role: role,
+            },
+            where: {
+                id: memberId,
+            }
+        });
+    } catch (error) {
+        throw new ServerError(error as Error, "MemberActions.updateRole");
     }
 
 }
