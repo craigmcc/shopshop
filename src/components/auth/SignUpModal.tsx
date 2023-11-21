@@ -271,12 +271,14 @@ export const SignUpModal = () => {
                         </div>
 
                         <DialogFooter className="bg-gray-100 dark:bg-gray-600 px-6 py-4">
+{/* TODO - ContentSecurityPolicy issue
                             <ReCAPTCHA
                                 className="px-8"
                                 onChange={onSuccess}
                                 sitekey={RECAPTCHA_SITE_KEY}
                                 size="compact"
                             />
+*/}
                             <Button variant="default" disabled={isLoading}>
                                 Sign Up
                             </Button>

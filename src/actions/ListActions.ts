@@ -87,6 +87,31 @@ export const find = async (listId: string): Promise<List | null> => {
 }
 
 /**
+ * Return the requested List by inviteCode (if any).  Otherwise, return null.
+ *
+ * @param inviteCode                    Invite code of the requested List
+ *
+ * @throws ServerError                  If a low level error occurs
+ */
+export const findByInviteCode = async (inviteCode: string): Promise<List | null> => {
+
+    logger.info({
+        context: "ListActions.findByInviteCode",
+        inviteCode: inviteCode,
+    });
+
+    try {
+        return await db.list.findFirst(({
+            where: {
+                inviteCode: inviteCode,
+            }
+        }));
+    } catch (error) {
+        throw new ServerError(error as Error, "ListActions.findByInviteCode");
+    }
+}
+
+/**
  * Return the requested List, with nested Categories and Items, if any.
  * Otherwise, return null.
  *

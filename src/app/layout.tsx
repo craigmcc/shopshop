@@ -32,7 +32,7 @@ const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
     title: "ShopShop",
-    description: "Shoppping List Application",
+    description: "Shopping List Application",
 }
 
 export default async function RootLayout({

@@ -40,7 +40,7 @@ export const ListSidebarMember = ({
         <div className="group py-2 rounded-md flex items-center gap-x-2 w-full hover:bg-zinc-700/10 dark:hover:bg-zinc-700/50 transition mb-1">
             <ProfileAvatar
                 profile={member.profile}
-                profileId={profile ? profile.id : ""}
+                profileId={String(profile?.id)}
             />
             <p className="font-semibold text-sm text-zinc-500 group-hover:text-zinc-600 dark:text-zinc-400 dark:group-hover:text-zinc-300 transition">
                 {member.profile.name}

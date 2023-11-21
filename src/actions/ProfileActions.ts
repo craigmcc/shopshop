@@ -55,6 +55,7 @@ export const create = async (profile: ProfileUncheckedCreateInputWithToken): Pro
         }
     });
 
+/* TODO - ContentSecurityPolicy issue
     // Validate the ReCAPTCHA token
     const verifyTokenResponse = await verifyToken(profile.token);
     if (!verifyTokenResponse.success) {
@@ -62,6 +63,7 @@ export const create = async (profile: ProfileUncheckedCreateInputWithToken): Pro
             "Failed ReCAPTCHA validation",
             "ProfileActions.create");
     }
+*/
 
     try {
         return await insert(profile);

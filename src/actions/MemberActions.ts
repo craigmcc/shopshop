@@ -25,7 +25,7 @@ import {logger} from "@/lib/ServerLogger";
  *
  * @param member                        Member to be created
  *
- * @throws BadRequest                   If validation failes
+ * @throws BadRequest                   If validation fails
  * @throws NotUnique                    If a unique key violation is attempted
  * @throws ServerError                  If some other error occurs
  */
