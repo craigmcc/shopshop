@@ -1,7 +1,7 @@
-// @/app/(main)/lists/[listId]/page.tsx
+// @/app/(main)/lists/[listId]/catalogs/page.tsx
 
 /**
- * Main page for a specified List ID.
+ * Manage Catalogs (and Items) for the specified List.
  *
  * @packageDocumentation
  */
@@ -17,13 +17,13 @@ import { currentProfile } from "@/lib/currentProfile";
 
 // Public Objects ------------------------------------------------------------
 
-interface ListIdPageProps {
+interface CatalogsPageProps {
   params: {
     listId: string;
   };
 }
 
-const ListIdPage = async ({ params }: ListIdPageProps) => {
+const CategoriesPage = async ({ params }: CatalogsPageProps) => {
   const profile = await currentProfile();
   if (!profile) {
     alert("Must be signed in to access this page"); // TODO - better formatting
@@ -38,9 +38,9 @@ const ListIdPage = async ({ params }: ListIdPageProps) => {
 
   return (
     <div>
-      ListIdPage for List {list.id} ({list.name}).
+      CatagoriesPage for List {list.id} ({list.name}),
     </div>
   );
 };
 
-export default ListIdPage;
+export default CategoriesPage;
