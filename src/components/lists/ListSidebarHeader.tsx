@@ -9,7 +9,7 @@
 
 // External Modules ----------------------------------------------------------
 
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { MemberRole, Profile } from "@prisma/client";
 import { ListWithMembersWithProfiles } from "@/types/types";
 
@@ -40,6 +40,7 @@ export const ListSidebarHeader = ({
 }: ListSidebarHeaderProps) => {
   const isAdmin = role === MemberRole.ADMIN;
   const { onOpen } = useModalStore();
+  const router = useRouter();
 
   return (
     <DropdownMenu>
@@ -52,9 +53,8 @@ export const ListSidebarHeader = ({
       <DropdownMenuContent className="w-56 space-y-[2px] text-xs font-medium text-black dark:text-neutral-400">
         <DropdownMenuItem
           className="cursor-pointer px-3 py-2 text-sm text-yellow-600 dark:text-yellow-400"
-          onClick={() => redirect(`/lists/{list.id}`)}
+          onClick={() => router.push(`/lists/${list.id}`)}
         >
-          {/* TODO - redirect does not work */}
           Current Contents
           <Icons.List className="ml-auto h-4 w-4" />
         </DropdownMenuItem>
@@ -80,9 +80,8 @@ export const ListSidebarHeader = ({
         {isAdmin && (
           <DropdownMenuItem
             className="cursor-pointer px-3 py-2 text-sm"
-            onClick={() => redirect(`/lists/{list.id}/catalogs`)}
+            onClick={() => router.push(`/lists/${list.id}/categories`)}
           >
-            {/* TODO - redirect does not work */}
             Categories and Items
             <Icons.Categories className="ml-auto h-4 w-4" />
           </DropdownMenuItem>
