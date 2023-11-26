@@ -12,18 +12,20 @@ import { redirect } from "next/navigation";
 
 // Internal Modules ----------------------------------------------------------
 
+import * as CategoryActions from "@/actions/CategoryActions";
 import * as ListActions from "@/actions/ListActions";
+import { CategoriesPageContent } from "@/components/categories/CategoriesPageContent";
 import { currentProfile } from "@/lib/currentProfile";
 
 // Public Objects ------------------------------------------------------------
 
-interface CatalogsPageProps {
+interface CategoriesPageProps {
   params: {
     listId: string;
   };
 }
 
-const CategoriesPage = async ({ params }: CatalogsPageProps) => {
+const CategoriesPage = async ({ params }: CategoriesPageProps) => {
   const profile = await currentProfile();
   if (!profile) {
     alert("Must be signed in to access this page"); // TODO - better formatting
@@ -36,11 +38,9 @@ const CategoriesPage = async ({ params }: CatalogsPageProps) => {
     return redirect("/");
   }
 
-  return (
-    <div>
-      CatagoriesPage for List {list.id} ({list.name}),
-    </div>
-  );
+  const categories = await CategoryActions.all(params.listId);
+
+  return <CategoriesPageContent categories={categories} list={list} />;
 };
 
 export default CategoriesPage;

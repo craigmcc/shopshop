@@ -1,4 +1,4 @@
-"use server"
+"use server";
 
 // @/actions/ListActions.ts
 
@@ -10,17 +10,17 @@
 
 // External Modules ----------------------------------------------------------
 
-import {List, MemberRole, Prisma} from "@prisma/client";
+import { List, MemberRole, Prisma } from "@prisma/client";
 
 // Internal Modules ----------------------------------------------------------
 
-import {db} from "@/lib/db";
-import {BadRequest, NotFound, NotUnique, ServerError} from "@/lib/HttpErrors";
-import {InitialListData} from "@/lib/InitialListData";
-import {logger} from "@/lib/ServerLogger";
+import { db } from "@/lib/db";
+import { BadRequest, NotFound, NotUnique, ServerError } from "@/lib/HttpErrors";
+import { InitialListData } from "@/lib/InitialListData";
+import { logger } from "@/lib/ServerLogger";
 import {
-    ListWithCategoriesWithItems,
-    ListWithMembersWithProfiles
+  ListWithCategoriesWithItems,
+  ListWithMembersWithProfiles,
 } from "@/types/types";
 import CategoryUncheckedCreateInput = Prisma.CategoryUncheckedCreateInput;
 
@@ -36,30 +36,28 @@ import CategoryUncheckedCreateInput = Prisma.CategoryUncheckedCreateInput;
  * @throws ServerError                  If a low level error occurs
  */
 export const all = async (profileId: string): Promise<List[]> => {
+  logger.info({
+    context: "ListActions.all",
+    profileId: profileId,
+  });
 
-    logger.info({
-        context: "ListActions.all",
-        profileId: profileId,
+  try {
+    return await db.list.findMany({
+      orderBy: {
+        name: "asc",
+      },
+      where: {
+        members: {
+          some: {
+            profileId: profileId,
+          },
+        },
+      },
     });
-
-    try {
-        return await db.list.findMany({
-            orderBy: {
-                name: "asc",
-            },
-            where: {
-                members: {
-                    some: {
-                        profileId: profileId,
-                    }
-                },
-            },
-        });
-    } catch (error) {
-        throw new ServerError(error as Error, "ListActions.find");
-    }
-
-}
+  } catch (error) {
+    throw new ServerError(error as Error, "ListActions.all");
+  }
+};
 
 /**
  * Return the requested List (if any).  Otherwise, return null.
@@ -69,22 +67,21 @@ export const all = async (profileId: string): Promise<List[]> => {
  * @throws ServerError                  If a low level error occurs
  */
 export const find = async (listId: string): Promise<List | null> => {
+  logger.info({
+    context: "ListActions.find",
+    listId: listId,
+  });
 
-    logger.info({
-        context: "ListActions.find",
-        listId: listId,
+  try {
+    return await db.list.findUnique({
+      where: {
+        id: listId,
+      },
     });
-
-    try {
-        return await db.list.findUnique(({
-            where: {
-                id: listId,
-            }
-        }));
-    } catch (error) {
-        throw new ServerError(error as Error, "ListActions.find");
-    }
-}
+  } catch (error) {
+    throw new ServerError(error as Error, "ListActions.find");
+  }
+};
 
 /**
  * Return the requested List by inviteCode (if any).  Otherwise, return null.
@@ -93,23 +90,24 @@ export const find = async (listId: string): Promise<List | null> => {
  *
  * @throws ServerError                  If a low level error occurs
  */
-export const findByInviteCode = async (inviteCode: string): Promise<List | null> => {
+export const findByInviteCode = async (
+  inviteCode: string,
+): Promise<List | null> => {
+  logger.info({
+    context: "ListActions.findByInviteCode",
+    inviteCode: inviteCode,
+  });
 
-    logger.info({
-        context: "ListActions.findByInviteCode",
+  try {
+    return await db.list.findFirst({
+      where: {
         inviteCode: inviteCode,
+      },
     });
-
-    try {
-        return await db.list.findFirst(({
-            where: {
-                inviteCode: inviteCode,
-            }
-        }));
-    } catch (error) {
-        throw new ServerError(error as Error, "ListActions.findByInviteCode");
-    }
-}
+  } catch (error) {
+    throw new ServerError(error as Error, "ListActions.findByInviteCode");
+  }
+};
 
 /**
  * Return the requested List, with nested Categories and Items, if any.
@@ -119,38 +117,38 @@ export const findByInviteCode = async (inviteCode: string): Promise<List | null>
  *
  * @throws ServerError                  If a low level error occurs
  */
-export const findCategories = async (listId: string): Promise<ListWithCategoriesWithItems | null> => {
+export const findCategories = async (
+  listId: string,
+): Promise<ListWithCategoriesWithItems | null> => {
+  logger.info({
+    context: "ListActions.findCategories",
+    listId: listId,
+  });
 
-    logger.info({
-        context: "ListActions.findCategories",
-        listId: listId,
-    });
-
-    try {
-        return await db.list.findUnique(({
-            include: {
-                categories: {
-                    include: {
-                        items: {
-                            orderBy: {
-                                name: "asc",
-                            }
-                        }
-                    },
-                    orderBy: {
-                        name: "asc",
-                    },
-                }
+  try {
+    return await db.list.findUnique({
+      include: {
+        categories: {
+          include: {
+            items: {
+              orderBy: {
+                name: "asc",
+              },
             },
-            where: {
-                id: listId,
-            }
-        }));
-    } catch (error) {
-        throw new ServerError(error as Error, "ListActions.findCategories");
-    }
-
-}
+          },
+          orderBy: {
+            name: "asc",
+          },
+        },
+      },
+      where: {
+        id: listId,
+      },
+    });
+  } catch (error) {
+    throw new ServerError(error as Error, "ListActions.findCategories");
+  }
+};
 
 /**
  * Return the requested List, with nested Members and Profiles, if any.
@@ -160,31 +158,31 @@ export const findCategories = async (listId: string): Promise<ListWithCategories
  *
  * @throws ServerError                  If a low level error occurs
  */
-export const findMembers = async (listId: string): Promise<ListWithMembersWithProfiles | null> => {
+export const findMembers = async (
+  listId: string,
+): Promise<ListWithMembersWithProfiles | null> => {
+  logger.info({
+    context: "ListActions.find",
+    listId: listId,
+  });
 
-    logger.info({
-        context: "ListActions.find",
-        listId: listId,
+  try {
+    return await db.list.findUnique({
+      include: {
+        members: {
+          include: {
+            profile: true,
+          },
+        },
+      },
+      where: {
+        id: listId,
+      },
     });
-
-    try {
-        return await db.list.findUnique(({
-            include: {
-                members: {
-                    include: {
-                        profile: true,
-                    },
-                }
-            },
-            where: {
-                id: listId,
-            }
-        }));
-    } catch (error) {
-        throw new ServerError(error as Error, "ListActions.find");
-    }
-
-}
+  } catch (error) {
+    throw new ServerError(error as Error, "ListActions.find");
+  }
+};
 
 /**
  * Create and return a new List instance, if it satisfies validation.
@@ -197,33 +195,31 @@ export const findMembers = async (listId: string): Promise<ListWithMembersWithPr
  * @throws NotUnique                    If a unique key violation is attempted
  * @throws ServerError                  If some other error occurs
  */
-export const insert = async (list: Prisma.ListUncheckedCreateInput): Promise<List> => {
+export const insert = async (
+  list: Prisma.ListUncheckedCreateInput,
+): Promise<List> => {
+  logger.info({
+    context: "ListActions.insert",
+    list,
+  });
 
-    logger.info({
-        context: "ListActions.insert",
-        list,
+  // TODO - validations
+
+  try {
+    const result = await db.list.create({
+      data: {
+        ...list,
+        members: {
+          create: [{ profileId: list.profileId, role: MemberRole.ADMIN }],
+        },
+      },
     });
-
-    // TODO - validations
-
-    try {
-        const result = await db.list.create({
-            data: {
-                ...list,
-                members: {
-                    create: [
-                        {profileId: list.profileId, role: MemberRole.ADMIN}
-                    ],
-                }
-            }
-        });
-        await populate(result.id);
-        return result;
-    } catch (error) {
-        throw new ServerError(error as Error, "ListActions.insert");
-    }
-
-}
+    await populate(result.id);
+    return result;
+  } catch (error) {
+    throw new ServerError(error as Error, "ListActions.insert");
+  }
+};
 
 /**
  * Return the specified List, if the specified Profile is a Member.
@@ -234,36 +230,38 @@ export const insert = async (list: Prisma.ListUncheckedCreateInput): Promise<Lis
  *
  * @throws ServerError                  If a low level error occurs
  */
-export const member = async (profileId: string, listId: string): Promise<List | null> => {
-    logger.info({
-        context: "ListActions.member",
-        profileId: profileId,
-        listId: listId,
+export const member = async (
+  profileId: string,
+  listId: string,
+): Promise<List | null> => {
+  logger.info({
+    context: "ListActions.member",
+    profileId: profileId,
+    listId: listId,
+  });
+
+  try {
+    return await db.list.findUnique({
+      include: {
+        members: {
+          where: {
+            profileId: profileId,
+          },
+        },
+      },
+      where: {
+        id: listId,
+        members: {
+          some: {
+            profileId: profileId,
+          },
+        },
+      },
     });
-
-    try {
-        return await db.list.findUnique({
-            include: {
-                members: {
-                    where: {
-                        profileId: profileId,
-                    }
-                },
-            },
-            where: {
-                id: listId,
-                members: {
-                    some: {
-                        profileId: profileId,
-                    }
-                },
-            },
-        });
-    } catch (error) {
-        throw new ServerError(error as Error, "ListActions.member");
-    }
-
-}
+  } catch (error) {
+    throw new ServerError(error as Error, "ListActions.member");
+  }
+};
 
 /**
  * Populate the default Categories and Items for the specified List.
@@ -274,62 +272,55 @@ export const member = async (profileId: string, listId: string): Promise<List | 
  * @throws ServerError                  If a low level error occurs
  */
 export const populate = async (listId: string): Promise<void> => {
+  logger.info({
+    context: "ListActions.populate",
+    listId: listId,
+  });
 
-    logger.info({
-        context: "ListActions.populate",
+  const list = await find(listId);
+  if (!list) {
+    throw new NotFound(`Missing List '${listId}'`, "ListActions.populate");
+  }
+
+  try {
+    // Erase all current Items and Categories (via cascade) for this List
+    await db.category.deleteMany({
+      where: {
         listId: listId,
+      },
     });
 
-    const list = await find(listId);
-    if (!list) {
-        throw new NotFound(`Missing List '${listId}'`, "ListActions.populate");
+    // Create each defined Category, keeping them around for access to IDs
+    const categories: CategoryUncheckedCreateInput[] = [];
+    for (const element of InitialListData) {
+      const category = {
+        listId: listId,
+        name: element[0],
+      };
+      categories.push(await db.category.create({ data: category }));
     }
 
-    try {
-
-        // Erase all current Items and Categories (via cascade) for this List
-        await db.category.deleteMany({
-            where: {
-                listId: listId,
-            }
-        });
-
-        // Create each defined Category, keeping them around for access to IDs
-        const categories: CategoryUncheckedCreateInput[] = [];
-        for (const element of InitialListData) {
-            const category = {
-                listId: listId,
-                name: element[0],
-            };
-            categories.push(await db.category.create({ data: category }));
+    // For each created category, create the relevant Items
+    for (let i = 0; i < categories.length; i++) {
+      const element = InitialListData[i];
+      if (element.length > 1) {
+        for (let j = 1; j < element.length; j++) {
+          await db.item.create({
+            data: {
+              categoryId: categories[i].id!,
+              checked: false,
+              listId: listId,
+              name: element[j],
+              selected: false,
+            },
+          });
         }
-
-        // For each created category, create the relevant Items
-        for (let i = 0; i < categories.length; i++)  {
-            const element = InitialListData[i];
-            if (element.length > 1) {
-                for (let j = 1; j < element.length; j++) {
-                    await db.item.create({
-                        data : {
-                            categoryId: categories[i].id!,
-                            checked: false,
-                            listId: listId,
-                            name: element[j],
-                            selected: false,
-                        },
-                    });
-                }
-            }
-        }
-
-    } catch (error) {
-        throw new ServerError(
-            error as Error,
-            "ListActions.populate",
-        );
+      }
     }
-
-}
+  } catch (error) {
+    throw new ServerError(error as Error, "ListActions.populate");
+  }
+};
 
 /**
  * Remove an existing List (as well as it's children), if any, and return the
@@ -338,26 +329,24 @@ export const populate = async (listId: string): Promise<void> => {
  *
  */
 export const remove = async (listId: string): Promise<List> => {
+  logger.info({
+    context: "ListActions.remove",
+    listId,
+  });
 
-    logger.info({
-        context: "ListActions.remove",
-        listId,
+  // TODO - validations
+
+  try {
+    const result = await db.list.delete({
+      where: {
+        id: listId,
+      },
     });
-
-    // TODO - validations
-
-    try {
-        const result = await db.list.delete({
-            where: {
-                id: listId,
-            }
-        });
-        return result;
-    } catch (error) {
-        throw new ServerError(error as Error, "ListActions.remove");
-    }
-
-}
+    return result;
+  } catch (error) {
+    throw new ServerError(error as Error, "ListActions.remove");
+  }
+};
 
 /**
  * Update an existing List, and return the updated value.
@@ -369,26 +358,27 @@ export const remove = async (listId: string): Promise<List> => {
  * @throws NotUnique                    If a unique key violation is attempted
  * @throws ServerError                  If some other error occurs
  */
-export const update = async (listId: string, list: Prisma.ListUncheckedUpdateInput): Promise<List> => {
+export const update = async (
+  listId: string,
+  list: Prisma.ListUncheckedUpdateInput,
+): Promise<List> => {
+  logger.info({
+    context: "ListActions.update",
+    listId,
+    list,
+  });
 
-    logger.info({
-        context: "ListActions.update",
-        listId,
-        list,
+  // TODO - validations
+
+  try {
+    const result = await db.list.update({
+      data: list,
+      where: {
+        id: listId,
+      },
     });
-
-    // TODO - validations
-
-    try {
-        const result = await db.list.update({
-            data: list,
-            where: {
-                id: listId,
-            }
-        });
-        return result;
-    } catch (error) {
-        throw new ServerError(error as Error, "ListActions.update");
-    }
-
-}
+    return result;
+  } catch (error) {
+    throw new ServerError(error as Error, "ListActions.update");
+  }
+};
