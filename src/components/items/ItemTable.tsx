@@ -42,10 +42,9 @@ export const ItemTable = ({ category, items }: ItemTableProps) => {
           <TableRow>
             <TableHead>Item Name</TableHead>
             <TableHead>Item Notes</TableHead>
-            <TableHead>
-              <span className="p-1" />
+            <TableHead className="p-2">
               <ActionTooltip align="center" label="Add Item" side="right">
-                <button className="items-center justify-center">
+                <button className="flex h-[24px] w-[24px] items-center justify-center overflow-hidden rounded-[16px] bg-background text-xs transition-all group-hover:rounded-[16px] group-hover:bg-emerald-500 dark:bg-neutral-700">
                   <Icons.Add className="h-4 w-4 text-green-500" />
                 </button>
               </ActionTooltip>
@@ -59,13 +58,14 @@ export const ItemTable = ({ category, items }: ItemTableProps) => {
               <TableCell className="p-2">{item.notes}</TableCell>
               <TableCell className="p-2">
                 <ActionTooltip align="center" label="Edit Item" side="left">
-                  <button className="items-center justify-center">
+                  <button className="flex h-[24px] w-[24px] items-center justify-center overflow-hidden rounded-[16px] bg-background text-xs transition-all group-hover:rounded-[16px] group-hover:bg-emerald-500 dark:bg-neutral-700">
                     <Icons.Settings className="h-4 w-4" />
                   </button>
                 </ActionTooltip>
-                <span className="p-2" />
+              </TableCell>
+              <TableCell className="p-2">
                 <ActionTooltip align="center" label="Remove Item" side="right">
-                  <button className="items-center justify-center">
+                  <button className="flex h-[24px] w-[24px] items-center justify-center overflow-hidden rounded-[16px] bg-background text-xs transition-all group-hover:rounded-[16px] group-hover:bg-emerald-500 dark:bg-neutral-700">
                     <Icons.Remove className="h-4 w-4 text-rose-500" />
                   </button>
                 </ActionTooltip>

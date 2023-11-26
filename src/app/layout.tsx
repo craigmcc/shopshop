@@ -52,7 +52,7 @@ export default async function RootLayout({
         className={cn(
           //inter.className,
           GeistSans.className,
-          "bg-indigo-50 dark:bg-indigo-950",
+          "bg-indigo-50 dark:bg-indigo-800",
           "text-black dark:text-white",
         )}
         suppressHydrationWarning
