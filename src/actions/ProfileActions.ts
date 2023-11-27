@@ -1,4 +1,4 @@
-"use server"
+"use server";
 
 // @/actions/ProfileActions.ts
 
@@ -10,18 +10,26 @@
 
 // External Modules ----------------------------------------------------------
 
-import {Prisma, Profile} from "@prisma/client";
+import { Prisma, Profile } from "@prisma/client";
 const SECRET = process.env.RECAPTCHA_SECRET_KEY
-    ? process.env.RECAPTCHA_SECRET_KEY : "Unknown";
-const URL_PATTERN = "https://www.google.com/recaptcha/api/siteverify?secret=:secret&response=:token";
+  ? process.env.RECAPTCHA_SECRET_KEY
+  : "Unknown";
+const URL_PATTERN =
+  "https://www.google.com/recaptcha/api/siteverify?secret=:secret&response=:token";
 
 // Internal Modules ----------------------------------------------------------
 
-import {db} from "@/lib/db";
-import {hashPassword} from "@/lib/encryption";
-import {BadRequest, NotFound, NotUnique, ServerError, ServiceUnavailable} from "@/lib/HttpErrors";
-import {logger} from "@/lib/ServerLogger";
-import {ProfileUncheckedCreateInputWithToken} from "@/types/types";
+import { db } from "@/lib/db";
+import { hashPassword } from "@/lib/encryption";
+import {
+  BadRequest,
+  NotFound,
+  NotUnique,
+  ServerError,
+  ServiceUnavailable,
+} from "@/lib/HttpErrors";
+import { logger } from "@/lib/ServerLogger";
+import { ProfileUncheckedCreateInputWithToken } from "@/types/types";
 
 // Public Actions ------------------------------------------------------------
 
@@ -45,17 +53,18 @@ import {ProfileUncheckedCreateInputWithToken} from "@/types/types";
  * @throws ServerError                  If some other error occurs
  * @throws ServiceUnavailable           If validating the ReCAPTCHA token fails
  */
-export const create = async (profile: ProfileUncheckedCreateInputWithToken): Promise<Profile> => {
+export const create = async (
+  profile: ProfileUncheckedCreateInputWithToken,
+): Promise<Profile> => {
+  logger.info({
+    context: "ProfileActions.create",
+    profile: {
+      ...profile,
+      password: "*REDACTED*",
+    },
+  });
 
-    logger.info({
-        context: "ProfileActions.create",
-        profile: {
-            ...profile,
-            password: "*REDACTED*",
-        }
-    });
-
-/* TODO - ContentSecurityPolicy issue
+  /* TODO - ContentSecurityPolicy issue
     // Validate the ReCAPTCHA token
     const verifyTokenResponse = await verifyToken(profile.token);
     if (!verifyTokenResponse.success) {
@@ -65,13 +74,12 @@ export const create = async (profile: ProfileUncheckedCreateInputWithToken): Pro
     }
 */
 
-    try {
-        return await insert(profile);
-    } catch (error) {
-        throw new ServerError(error as Error, "ProfileActions.create");
-    }
-
-}
+  try {
+    return await insert(profile);
+  } catch (error) {
+    throw new ServerError(error as Error, "ProfileActions.create");
+  }
+};
 
 /**
  * Find and return the Profile by email (if any), otherwise return null.
@@ -81,27 +89,25 @@ export const create = async (profile: ProfileUncheckedCreateInputWithToken): Pro
  * @throws ServerError                  If an error occurs
  */
 export const email = async (email: string): Promise<Profile | null> => {
+  logger.info({
+    context: "ProfileActions.find",
+    email: email,
+  });
 
-    logger.info({
-        context: "ProfileActions.find",
+  try {
+    const result = await db.profile.findUnique({
+      where: {
         email: email,
+      },
     });
-
-    try {
-        const result = await db.profile.findUnique({
-            where: {
-                email: email,
-            }
-        });
-        if (result) {
-            result.password = "";
-        }
-        return result;
-    } catch (error) {
-        throw new ServerError(error as Error, "ProfileActions.email");
+    if (result) {
+      result.password = "";
     }
-
-}
+    return result;
+  } catch (error) {
+    throw new ServerError(error as Error, "ProfileActions.email");
+  }
+};
 
 /**
  * Find and return the Profile by ID (if any), otherwise return null.
@@ -111,27 +117,25 @@ export const email = async (email: string): Promise<Profile | null> => {
  * @throws ServerError                  If an error occurs
  */
 export const find = async (profileId: string): Promise<Profile | null> => {
+  logger.info({
+    context: "ProfileActions.find",
+    profileId: profileId,
+  });
 
-    logger.info({
-        context: "ProfileActions.find",
-        profileId: profileId,
+  try {
+    const result = await db.profile.findUnique({
+      where: {
+        id: profileId,
+      },
     });
-
-    try {
-        const result = await db.profile.findUnique({
-            where: {
-                id: profileId,
-            }
-        });
-        if (result) {
-            result.password = "";
-        }
-        return result;
-    } catch (error) {
-        throw new ServerError(error as Error, "ProfileActions.find");
+    if (result) {
+      result.password = "";
     }
-
-}
+    return result;
+  } catch (error) {
+    throw new ServerError(error as Error, "ProfileActions.find");
+  }
+};
 
 /**
  * Create and return a new Profile instance, if it satisfies validation.
@@ -142,36 +146,36 @@ export const find = async (profileId: string): Promise<Profile | null> => {
  * @throws NotUnique                    If a unique key violation is attempted
  * @throws ServerError                  If some other error occurs
  */
-export const insert = async (profile: Prisma.ProfileUncheckedCreateInput): Promise<Profile> => {
+export const insert = async (
+  profile: Prisma.ProfileUncheckedCreateInput,
+): Promise<Profile> => {
+  logger.info({
+    context: "ProfileActions.insert",
+    profile: {
+      ...profile,
+      password: "*REDACTED*",
+    },
+  });
 
-    logger.info({
-        context: "ProfileActions.insert",
-        profile: {
-            ...profile,
-            password: "*REDACTED*",
-        }
+  if ((await email(profile.email)) !== null) {
+    throw new NotUnique("That email address is already in use");
+  }
+
+  try {
+    const result = await db.profile.create({
+      data: {
+        ...profile,
+        password: await hashPassword(profile.password),
+      },
     });
-
-    if ((await email(profile.email)) !== null) {
-        throw new NotUnique("That email address is already in use");
+    if (result) {
+      result.password = "";
     }
-
-    try {
-        const result = await db.profile.create({
-            data: {
-                ...profile,
-                password: await hashPassword(profile.password),
-            }
-        });
-        if (result) {
-            result.password = "";
-        }
-        return result;
-    } catch (error) {
-        throw new ServerError(error as Error, "ProfileActions.insert");
-    }
-
-}
+    return result;
+  } catch (error) {
+    throw new ServerError(error as Error, "ProfileActions.insert");
+  }
+};
 
 /**
  * Update and return the specified Profile.
@@ -183,74 +187,75 @@ export const insert = async (profile: Prisma.ProfileUncheckedCreateInput): Promi
  * @throws NotFound                     If no such Profile is found
  * @throws ServerError                  If a low level error is thrown
  */
-export const update = async (profileId: string, profile: Prisma.ProfileUpdateInput): Promise<Profile> => {
+export const update = async (
+  profileId: string,
+  profile: Prisma.ProfileUpdateInput,
+): Promise<Profile> => {
+  logger.info({
+    context: "ProfileActions.update",
+    profile: {
+      ...profile,
+      password: profile.password ? "*REDACTED*" : undefined,
+    },
+  });
 
-    logger.info({
-        context: "ProfileActions.update",
-        profile: {
-            ...profile,
-            password: profile.password ? "*REDACTED*" : undefined,
-        }
+  if (!(await find(profileId))) {
+    throw new NotFound(
+      `Missing Profile '${profileId}'`,
+      "ProfileActions.update",
+    );
+  }
+
+  try {
+    const result = await db.profile.update({
+      data: {
+        ...profile,
+        password: profile.password
+          ? await hashPassword(String(profile.password))
+          : undefined,
+      },
+      where: {
+        id: profileId,
+      },
     });
-
-    if (!await find(profileId)) {
-        throw new NotFound(
-            `Missing Profile '${profileId}'`,
-            "ProfileActions.update"
-        );
+    if (result) {
+      result.password = "";
     }
-
-    try {
-        const result = await db.profile.update({
-            data: {
-                ...profile,
-                password: profile.password ? await hashPassword(String(profile.password)) : undefined,
-            },
-            where: {
-                id: profileId,
-            }
-        });
-        if (result) {
-            result.password = "";
-        }
-        return result;
-    } catch (error) {
-        throw new ServerError(error as Error, "ProfileActions.insert");
-    }
-
-}
+    return result;
+  } catch (error) {
+    throw new ServerError(error as Error, "ProfileActions.insert");
+  }
+};
 
 // Private Objects -----------------------------------------------------------
 
 export type VerifyTokenResponse = {
-    challenge_ts: string;               // ISO format timestamp of the challenge
-    "error-codes"?: string[];           // Error code(s) if challenge failed
-    hostname: string;                   // Hostname of the challenge
-    success: boolean;                   // Was confirmation successful?
-}
+  challenge_ts: string; // ISO format timestamp of the challenge
+  "error-codes"?: string[]; // Error code(s) if challenge failed
+  hostname: string; // Hostname of the challenge
+  success: boolean; // Was confirmation successful?
+};
 
 /**
  * Verify that the specified ReCAPTCHA token is valid.
  *
  * @token                               Token to be validated
  */
-export const verifyToken = async (token: string): Promise<VerifyTokenResponse> => {
-
-    const url = URL_PATTERN
-        .replace(":secret", SECRET)
-        .replace(":token", token);
-    try {
-        const response = await fetch(url, {
-            method: "POST",
-        });
-        return await response.json();
-    } catch (error) {
-        logger.error({
-            context: "ProfileActions.verifyToken",
-            token: token,
-            error: error,
-        });
-        throw error;
-    }
-
-}
+export const verifyToken = async (
+  token: string,
+): Promise<VerifyTokenResponse> => {
+  const url = URL_PATTERN.replace(":secret", SECRET).replace(":token", token);
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+    });
+    return await response.json();
+  } catch (error) {
+    logger.error({
+      context: "ProfileActions.verifyToken",
+      token: token,
+      error: error,
+    });
+    throw error;
+  }
+};

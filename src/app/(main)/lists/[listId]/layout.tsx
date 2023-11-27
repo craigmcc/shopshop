@@ -8,50 +8,39 @@
 
 // External Modules ----------------------------------------------------------
 
-import {redirect} from "next/navigation";
+import { redirect } from "next/navigation";
 
 // Internal Modules ----------------------------------------------------------
 
 import * as ListActions from "@/actions/ListActions";
-import {ListSidebar} from "@/components/lists/ListSidebar";
-import {currentProfile} from "@/lib/currentProfile";
+import { ListSidebar } from "@/components/lists/ListSidebar";
+import { currentProfile } from "@/lib/currentProfile";
 
 // Public Objects ------------------------------------------------------------
 
 interface ListIdLayoutProps {
-    children: React.ReactNode;
-    params: {listId: string};
+  children: React.ReactNode;
+  params: { listId: string };
 }
 
-const ListIdLayout = async ({
-    children,
-    params
-}: ListIdLayoutProps) => {
+const ListIdLayout = async ({ children, params }: ListIdLayoutProps) => {
+  const profile = await currentProfile();
+  if (!profile) {
+    return redirect("/");
+  }
+  const list = await ListActions.findMembers(params.listId);
+  if (!list) {
+    return redirect("/");
+  }
 
-    const profile = await currentProfile();
-    if (!profile) {
-        return redirect("/");
-    }
-    const list = await ListActions.findMembers(params.listId);
-    if (!list) {
-        return redirect("/");
-    }
-
-    return (
-        <div className="h-full">
-            <div
-                className="hidden md:flex h-full w-60 flex-col fixed">
-                <ListSidebar
-                    list={list}
-                    profile={profile}
-                 />
-            </div>
-            <main className="md:pl-60 h-full">
-                {children}
-            </main>
-        </div>
-    );
-
-}
+  return (
+    <div className="h-full">
+      <div className="fixed hidden h-full w-60 flex-col md:flex">
+        <ListSidebar list={list} profile={profile} />
+      </div>
+      <main className="h-full md:pl-60">{children}</main>
+    </div>
+  );
+};
 
 export default ListIdLayout;

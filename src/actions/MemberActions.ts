@@ -1,4 +1,4 @@
-"use server"
+"use server";
 
 // @/actions/MemberActions.ts
 
@@ -10,13 +10,13 @@
 
 // External Modules ----------------------------------------------------------
 
-import {Prisma, Member, MemberRole} from "@prisma/client";
+import { Prisma, Member, MemberRole } from "@prisma/client";
 
 // Internal Modules ----------------------------------------------------------
 
-import {db} from "@/lib/db";
-import {BadRequest, NotFound, NotUnique, ServerError} from "@/lib/HttpErrors";
-import {logger} from "@/lib/ServerLogger";
+import { db } from "@/lib/db";
+import { BadRequest, NotFound, NotUnique, ServerError } from "@/lib/HttpErrors";
+import { logger } from "@/lib/ServerLogger";
 
 // Public Actions ------------------------------------------------------------
 
@@ -29,25 +29,25 @@ import {logger} from "@/lib/ServerLogger";
  * @throws NotUnique                    If a unique key violation is attempted
  * @throws ServerError                  If some other error occurs
  */
-export const insert = async (member: Prisma.MemberUncheckedCreateInput): Promise<Member> => {
+export const insert = async (
+  member: Prisma.MemberUncheckedCreateInput,
+): Promise<Member> => {
+  logger.info({
+    context: "MemberActions.insert",
+    list: member,
+  });
 
-    logger.info({
-        context: "MemberActions.insert",
-        list: member,
+  // TODO - validations
+
+  try {
+    const result = await db.member.create({
+      data: member,
     });
-
-    // TODO - validations
-
-    try {
-        const result = await db.member.create({
-            data: member,
-        });
-        return result;
-    } catch (error) {
-        throw new ServerError(error as Error, "MemberActions.insert");
-    }
-
-}
+    return result;
+  } catch (error) {
+    throw new ServerError(error as Error, "MemberActions.insert");
+  }
+};
 
 /**
  * Cause the specified Member to leave.
@@ -57,26 +57,27 @@ export const insert = async (member: Prisma.MemberUncheckedCreateInput): Promise
  *
  * @throws ServerError                  If an error occurs
  */
-export const leave = async (profileId: string, listId: string): Promise<void> => {
+export const leave = async (
+  profileId: string,
+  listId: string,
+): Promise<void> => {
+  logger.info({
+    context: "MemberActions.leave",
+    profileId,
+    listId,
+  });
 
-    logger.info({
-        context: "MemberActions.leave",
+  try {
+    await db.member.deleteMany({
+      where: {
         profileId,
         listId,
+      },
     });
-
-    try {
-        await db.member.deleteMany({
-            where: {
-                profileId,
-                listId,
-            }
-        })
-    } catch (error) {
-        throw new ServerError(error as Error, "MemberActions.leave");
-    }
-
-}
+  } catch (error) {
+    throw new ServerError(error as Error, "MemberActions.leave");
+  }
+};
 
 /**
  * Cause the specified Member to be removed.
@@ -86,23 +87,21 @@ export const leave = async (profileId: string, listId: string): Promise<void> =>
  * @throws ServerError                  If an error occurs
  */
 export const remove = async (memberId: string): Promise<void> => {
+  logger.info({
+    context: "MemberActions.remove",
+    memberId,
+  });
 
-    logger.info({
-        context: "MemberActions.remove",
-        memberId,
+  try {
+    await db.member.delete({
+      where: {
+        id: memberId,
+      },
     });
-
-    try {
-        await db.member.delete({
-            where: {
-                id: memberId,
-            }
-        })
-    } catch (error) {
-        throw new ServerError(error as Error, "MemberActions.remove");
-    }
-
-}
+  } catch (error) {
+    throw new ServerError(error as Error, "MemberActions.remove");
+  }
+};
 
 /**
  * Update the role for the specified Member.
@@ -113,18 +112,16 @@ export const remove = async (memberId: string): Promise<void> => {
  * @throws ServerError                  If an error occurs
  */
 export const updateRole = async (memberId: string, role: MemberRole) => {
-
-    try {
-        await db.member.update({
-            data: {
-                role: role,
-            },
-            where: {
-                id: memberId,
-            }
-        });
-    } catch (error) {
-        throw new ServerError(error as Error, "MemberActions.updateRole");
-    }
-
-}
+  try {
+    await db.member.update({
+      data: {
+        role: role,
+      },
+      where: {
+        id: memberId,
+      },
+    });
+  } catch (error) {
+    throw new ServerError(error as Error, "MemberActions.updateRole");
+  }
+};

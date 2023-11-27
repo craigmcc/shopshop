@@ -1,4 +1,4 @@
-"use client"
+"use client";
 // @app/(auth)/signup/page.tsx
 
 /**
@@ -9,17 +9,13 @@
 
 // External Modules ----------------------------------------------------------
 
-
-
 // Internal Modules ---------------------------------------------------------
 
-import {ModalType, useModalStore} from "@/hooks/useModalStore";
+import { ModalType, useModalStore } from "@/hooks/useModalStore";
 
 // Public Objects -----------------------------------------------------------
 
 export default function SignUpPage() {
-
-    const {onOpen} = useModalStore();
-    onOpen(ModalType.PROFILE_SIGNUP, {});
-
+  const { onOpen } = useModalStore();
+  onOpen(ModalType.PROFILE_SIGNUP, {});
 }
