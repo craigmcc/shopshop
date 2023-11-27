@@ -16,7 +16,7 @@ import { getServerSession } from "next-auth";
 // Internal Modules ----------------------------------------------------------
 
 import "./globals.css";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 import { LayoutFooter } from "@/components/layout/LayoutFooter";
 import { LayoutHeader } from "@/components/layout/LayoutHeader";
 import { LayoutSidebar } from "@/components/layout/LayoutSidebar";

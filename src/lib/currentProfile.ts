@@ -14,7 +14,7 @@ import { Profile } from "@prisma/client";
 
 // Internal Modules ----------------------------------------------------------
 
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 
 // Public Objects ------------------------------------------------------------
 
