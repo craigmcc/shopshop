@@ -1,6 +1,5 @@
-"use client"
+"use client";
 // @/hooks/useCurrentProfile.tsx
-
 
 /**
  * Client side React hook to return the Profile of the currently signed in
@@ -11,18 +10,18 @@
 
 // External Modules ----------------------------------------------------------
 
-import {useSession} from "next-auth/react";
-import {Profile} from "@prisma/client";
+import { useSession } from "next-auth/react";
+import { Profile } from "@prisma/client";
 
 // Internal Modules ----------------------------------------------------------
 
 // Public Objects ------------------------------------------------------------
 
-export function useCurrentProfile (): Profile | null {
-    const {data: session} = useSession();
-    if (session) {
-        return session.user.profile;
-    } else {
-        return null;
-    }
+export function useCurrentProfile(): Profile | null {
+  const { data: session } = useSession();
+  if (session) {
+    return session.user.profile;
+  } else {
+    return null;
+  }
 }

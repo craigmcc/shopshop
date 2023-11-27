@@ -8,27 +8,26 @@
 
 // External Modules ----------------------------------------------------------
 
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 
 // Internal Modules ----------------------------------------------------------
 
 // Public Objects ------------------------------------------------------------
 
 export const useOrigin = () => {
+  const [mounted, setMounted] = useState<boolean>(false);
 
-    const [mounted, setMounted] = useState<boolean>(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
-    useEffect(() => {
-        setMounted(true);
-    }, []);
-
-    const origin = typeof window !== "undefined" && window.location.origin
-        ? window.location.origin
-        : "";
-    if (!mounted) {
-        return "";
-    } else {
-        return origin;
-    }
-
-}
+  const origin =
+    typeof window !== "undefined" && window.location.origin
+      ? window.location.origin
+      : "";
+  if (!mounted) {
+    return "";
+  } else {
+    return origin;
+  }
+};
