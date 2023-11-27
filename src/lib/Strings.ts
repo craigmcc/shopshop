@@ -19,10 +19,10 @@
  * @param value                         String of words to be parsed
  */
 export const initials = (value: string): string => {
-    const words = value.split(" ");
-    const results: string[] = [];
-    for (const word of words) {
-        results.push(word.charAt(0).toUpperCase());
-    }
-    return results.join("");
-}
+  const words = value.split(" ");
+  const results: string[] = [];
+  for (const word of words) {
+    results.push(word.charAt(0).toUpperCase());
+  }
+  return results.join("");
+};

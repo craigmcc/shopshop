@@ -9,20 +9,20 @@
 
 // External Modules ----------------------------------------------------------
 
-import {getServerSession} from "next-auth";
-import {Profile} from "@prisma/client";
+import { getServerSession } from "next-auth";
+import { Profile } from "@prisma/client";
 
 // Internal Modules ----------------------------------------------------------
 
-import {authOptions} from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 // Public Objects ------------------------------------------------------------
 
 export const currentProfile = async (): Promise<Profile | null> => {
-    const session = await getServerSession(authOptions);
-    if (session) {
-        return session.user.profile;
-    } else {
-        return null;
-    }
-}
+  const session = await getServerSession(authOptions);
+  if (session) {
+    return session.user.profile;
+  } else {
+    return null;
+  }
+};

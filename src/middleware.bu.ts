@@ -11,14 +11,14 @@
 
 // External Modules ----------------------------------------------------------
 
-import {NextRequest, NextResponse} from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 // Internal Modules ----------------------------------------------------------
 
 // Public Objects ------------------------------------------------------------
 
 export function middlewareBu(request: NextRequest) {
-/*
+  /*
     const nonce = Buffer.from(crypto.randomUUID()).toString('base64')
     // Removed example script-src, added new frame-src and script-src at the bottom
     const cspHeader = `
@@ -36,7 +36,7 @@ export function middlewareBu(request: NextRequest) {
     script-src 'self' 'recaptcha.net' 'www.gstatic.com' 'www.google.com';
 `
 */
-    const cspHeader = `
+  const cspHeader = `
     default-src 'self';
     base-uri 'self';
     font-src 'self' https: data:;
@@ -49,30 +49,30 @@ export function middlewareBu(request: NextRequest) {
     script-src-attr 'none';
     style-src 'self' https: 'unsafe-inline';
     upgrade-insecure-requests;
-`
+`;
 
-    // Replace newline characters and spaces
-    const contentSecurityPolicyHeaderValue = cspHeader
-        .replace(/\s{2,}/g, ' ')
-        .trim()
+  // Replace newline characters and spaces
+  const contentSecurityPolicyHeaderValue = cspHeader
+    .replace(/\s{2,}/g, " ")
+    .trim();
 
-    const requestHeaders = new Headers(request.headers)
-//    requestHeaders.set('x-nonce', nonce)
+  const requestHeaders = new Headers(request.headers);
+  //    requestHeaders.set('x-nonce', nonce)
 
-    requestHeaders.set(
-        'Content-Security-Policy',
-        contentSecurityPolicyHeaderValue
-    )
+  requestHeaders.set(
+    "Content-Security-Policy",
+    contentSecurityPolicyHeaderValue,
+  );
 
-    const response = NextResponse.next({
-        request: {
-            headers: requestHeaders,
-        },
-    })
-    response.headers.set(
-        'Content-Security-Policy',
-        contentSecurityPolicyHeaderValue
-    )
+  const response = NextResponse.next({
+    request: {
+      headers: requestHeaders,
+    },
+  });
+  response.headers.set(
+    "Content-Security-Policy",
+    contentSecurityPolicyHeaderValue,
+  );
 
-    return response
+  return response;
 }

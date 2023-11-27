@@ -8,27 +8,29 @@
 
 // External Modules ----------------------------------------------------------
 
-import {PrismaClient} from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 
 // Internal Modules ----------------------------------------------------------
 
-import {logger} from "@/lib/ServerLogger";
+import { logger } from "@/lib/ServerLogger";
 
 // Public Objects ------------------------------------------------------------
 
 declare global {
-    var prisma: PrismaClient | undefined;
+  var prisma: PrismaClient | undefined;
 }
 
 /**
  * A singleton instance of PrismaClient.
  */
 if (!globalThis.prisma) {
-    const segments = process.env.DATABASE_URL!.split("/");
-    logger.info({
-        context: "db",
-        message: `Initializing PrismaClient for database '${segments[segments.length - 1]}`,
-    });
-    globalThis.prisma = new PrismaClient();
+  const segments = process.env.DATABASE_URL!.split("/");
+  logger.info({
+    context: "db",
+    message: `Initializing PrismaClient for database '${
+      segments[segments.length - 1]
+    }`,
+  });
+  globalThis.prisma = new PrismaClient();
 }
 export const db = globalThis.prisma;

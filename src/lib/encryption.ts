@@ -24,12 +24,13 @@ const promisifiedRandomBytes = util.promisify(crypto.randomBytes);
  *
  * @param desiredSize Desired number of bytes (hex will be this * 4 in length)
  */
-export const generateRandomToken
-    = async (desiredSize: number = 32): Promise<string> =>
-{
-    const buffer: Buffer = await promisifiedRandomBytes(desiredSize);
-    return buffer.toString("hex");
-}
+
+export const generateRandomToken = async (
+  desiredSize: number = 32,
+): Promise<string> => {
+  const buffer: Buffer = await promisifiedRandomBytes(desiredSize);
+  return buffer.toString("hex");
+};
 
 /**
  * Perform a one-way hash on the specified password, and return the result
@@ -37,12 +38,10 @@ export const generateRandomToken
  *
  * @param password      Plain-text password to be hashed
  */
-export const hashPassword
-    = async (password: string): Promise<string> =>
-{
-    const SALT_ROUNDS: number = 10;
-    return bcrypt.hash(password, SALT_ROUNDS);
-}
+export const hashPassword = async (password: string): Promise<string> => {
+  const SALT_ROUNDS: number = 10;
+  return bcrypt.hash(password, SALT_ROUNDS);
+};
 
 /**
  * Verify that the specified plain-text password hashes to the specified
@@ -51,8 +50,9 @@ export const hashPassword
  * @param password      Plain-text password to be checked
  * @param hash          Hashed password previously calculated by hashPassword()
  */
-export const verifyPassword
-    = async (password: string, hash: string): Promise<boolean> =>
-{
-    return bcrypt.compare(password, hash);
-}
+export const verifyPassword = async (
+  password: string,
+  hash: string,
+): Promise<boolean> => {
+  return bcrypt.compare(password, hash);
+};
