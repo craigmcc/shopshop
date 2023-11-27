@@ -1,4 +1,4 @@
-"use client"
+"use client";
 // @/components/providers/ModalProvider.tsx
 
 /**
@@ -10,46 +10,44 @@
 
 // External Modules ----------------------------------------------------------
 
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 
 // Internal Modules ----------------------------------------------------------
 
 // TODO - imports of components that are modals go here.
-import {SignUpModal} from "@/components/auth/SignUpModal";
-import {ListFormModal} from "@/components/lists/ListFormModal";
-import {ListInviteModal} from "@/components/lists/ListInviteModal";
-import {ListLeaveModal} from "@/components/lists/ListLeaveModal";
-import {ListMembersModal} from "@/components/lists/ListMembersModal";
-import {ListRemoveModal} from "@/components/lists/ListRemoveModal";
-import {ProfilePasswordModal} from "@/components/profiles/ProfilePasswordModal";
-import {ProfileUpdateModal} from "@/components/profiles/ProfileUpdateModal";
+import { SignUpModal } from "@/components/auth/SignUpModal";
+import { ListFormModal } from "@/components/lists/ListFormModal";
+import { ListInviteModal } from "@/components/lists/ListInviteModal";
+import { ListLeaveModal } from "@/components/lists/ListLeaveModal";
+import { ListMembersModal } from "@/components/lists/ListMembersModal";
+import { ListRemoveModal } from "@/components/lists/ListRemoveModal";
+import { ProfilePasswordModal } from "@/components/profiles/ProfilePasswordModal";
+import { ProfileUpdateModal } from "@/components/profiles/ProfileUpdateModal";
 
 // Public Objects ------------------------------------------------------------
 
 export const ModalProvider = () => {
+  const [isMounted, setIsMounted] = useState<boolean>(false);
 
-    const [isMounted, setIsMounted] = useState<boolean>(false);
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
-    useEffect(() => {
-        setIsMounted(true);
-    }, []);
+  if (!isMounted) {
+    return null;
+  }
 
-    if (!isMounted) {
-        return null;
-    }
-
-    return (
-        <>
-            {/* TODO - instantiations of modal components go here */}
-            <ListFormModal/>
-            <ListInviteModal/>
-            <ListLeaveModal/>
-            <ListMembersModal/>
-            <ListRemoveModal/>
-            <ProfilePasswordModal/>
-            <ProfileUpdateModal/>
-            <SignUpModal/>
-        </>
-    )
-
-}
+  return (
+    <>
+      {/* TODO - instantiations of modal components go here */}
+      <ListFormModal />
+      <ListInviteModal />
+      <ListLeaveModal />
+      <ListMembersModal />
+      <ListRemoveModal />
+      <ProfilePasswordModal />
+      <ProfileUpdateModal />
+      <SignUpModal />
+    </>
+  );
+};

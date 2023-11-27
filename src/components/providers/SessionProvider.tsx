@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
- // @/app/components/providers/SessionProvider.tsx
+// @/app/components/providers/SessionProvider.tsx
 
 /**
  * Context provider for the next-auth session information.
@@ -10,11 +10,10 @@
 
 // External Modules ----------------------------------------------------------
 
-import {SessionProvider} from "next-auth/react";
+import { SessionProvider } from "next-auth/react";
 
 // Internal Modules ----------------------------------------------------------
 
 // Public Objects ------------------------------------------------------------
 
 export default SessionProvider;
-
