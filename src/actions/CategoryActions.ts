@@ -9,7 +9,7 @@
 
 // External Modules ----------------------------------------------------------
 
-import { Category, Item } from "@prisma/client";
+import { Category, Item, Prisma } from "@prisma/client";
 
 // Internal Modules ----------------------------------------------------------
 
@@ -51,5 +51,94 @@ export const all = async (listId: string): Promise<CategoryWithItems[]> => {
     });
   } catch (error) {
     throw new ServerError(error as Error, "CategoryActions.all");
+  }
+};
+
+/**
+ * Create and return a new Category instance.
+ *
+ * @param category                      Category to be created
+ *
+ * @throws BadRequest                   If validation fails
+ * @throws NotUnique                    If a unique key violation is attempted
+ * @throws ServerError                  If a low level error occurs
+ */
+export const insert = async (
+  category: Prisma.CategoryUncheckedCreateInput,
+): Promise<Category> => {
+  logger.info({
+    context: "CategoryActions.insert",
+    category: category,
+  });
+
+  // TODO - validations
+
+  try {
+    const result = await db.category.create({
+      data: category,
+    });
+    return result;
+  } catch (error) {
+    throw new ServerError(error as Error, "CategoryActions.insert");
+  }
+};
+
+/**
+ * Remove an existing Category (as well as it's children), if any, and return
+ * the removed Category object.
+ *
+ * @param categoryId                    ID of the Category to be removed
+ *
+ * @throws ServerError                  If a low level error occurs
+ */
+export const remove = async (categoryId: string): Promise<Category> => {
+  logger.info({
+    context: "CategoryActions.remove",
+    categoryId,
+  });
+
+  // TODO - validations
+
+  try {
+    const result = await db.category.delete({
+      where: {
+        id: categoryId,
+      },
+    });
+    return result;
+  } catch (error) {
+    throw new ServerError(error as Error, "CategoryActions.remove");
+  }
+};
+
+/**
+ * Update an existing Category, and return the updated value.
+ *
+ * @param category                      Category values to be updated (must include id)
+ *
+ * @throws BadRequest                   If validation fails
+ * @throws NotUnique                    If a unique key violation is attempted
+ * @throws ServerError                  If a low level error occurs
+ */
+export const update = async (
+  category: Prisma.CategoryUncheckedUpdateInput,
+): Promise<Category> => {
+  logger.info({
+    context: "CategoryActions.update",
+    category,
+  });
+
+  // TODO - validations
+
+  try {
+    const result = await db.category.update({
+      data: category,
+      where: {
+        id: String(category.id),
+      },
+    });
+    return result;
+  } catch (error) {
+    throw new ServerError(error as Error, "CategoryActions.update");
   }
 };
