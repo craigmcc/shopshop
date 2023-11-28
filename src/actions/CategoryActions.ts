@@ -115,7 +115,7 @@ export const remove = async (categoryId: string): Promise<Category> => {
  * Update an existing Category, and return the updated value.
  *
  * @param categoryId                    ID of the Category to be updated
- * @param category                      Category values to be updated (must include id)
+ * @param category                      Category values to be updated
  *
  * @throws BadRequest                   If validation fails
  * @throws NotUnique                    If a unique key violation is attempted

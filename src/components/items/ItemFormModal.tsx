@@ -1,12 +1,13 @@
 "use client";
-// @/components/categories/CategoryFormModal.tsx
+// @/components/items/ItemFormModal.tsx
 
 /**
- * Create a new Category.
+ * Create a new Item.
  *
  * Required ModalData:
+ * - category                           Currently selected Category
+ * - item                               Item (if editing) or null (if creating)
  * - list                               Currently selected List
- * - category                           Category (if editing) or null (if creating)
  *
  * @packageDocumentation
  */
@@ -21,7 +22,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 // Internal Modules ----------------------------------------------------------
 
-import * as CategoryActions from "@/actions/CategoryActions";
+import * as ItemActions from "@/actions/ItemActions";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -44,14 +45,14 @@ import { logger } from "@/lib/ClientLogger";
 
 // Public Objects ------------------------------------------------------------
 
-export const CategoryFormModal = () => {
+export const ItemFormModal = () => {
   const { data, isOpen, onClose, type } = useModalStore();
-  const isModalOpen = isOpen && type === ModalType.CATEGORY_FORM;
-  const { category, list } = data;
+  const isModalOpen = isOpen && type === ModalType.ITEM_FORM;
+  const { category, item, list } = data;
   const router = useRouter();
 
   logger.info({
-    context: "CategoryFormModal",
+    context: "ItemFormModal",
     data: data,
     isModalOpen: isModalOpen,
     type: type,
@@ -59,12 +60,14 @@ export const CategoryFormModal = () => {
 
   const formSchema = z.object({
     name: z.string().min(1, {
-      message: "Category name is required",
+      message: "Item name is required",
     }),
+    notes: z.string().optional(),
   });
 
   const defaultValues = {
     name: "",
+    notes: "",
   };
 
   const form = useForm({
@@ -73,10 +76,11 @@ export const CategoryFormModal = () => {
   });
 
   useEffect(() => {
-    if (category) {
-      form.setValue("name", category.name);
+    if (item) {
+      form.setValue("name", item.name);
+      form.setValue("notes", item.notes ? item.notes : "");
     }
-  }, [category, form]);
+  }, [form, item]);
 
   const isLoading = form.formState.isSubmitting;
 
@@ -88,17 +92,19 @@ export const CategoryFormModal = () => {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       logger.info({
-        context: "CategoryFormModal.onSubmit",
+        context: "ItemFormModal.onSubmit",
         values: values,
       });
-      if (category) {
-        await CategoryActions.update(category.id, {
+      if (item) {
+        await ItemActions.update(item.id, {
           ...values,
+          categoryId: category!.id,
           listId: list!.id,
         });
       } else {
-        await CategoryActions.insert({
+        await ItemActions.insert({
           ...values,
+          categoryId: category!.id,
           listId: list!.id,
         });
       }
@@ -121,10 +127,10 @@ export const CategoryFormModal = () => {
       <DialogContent className="overflow-hidden bg-white p-0 text-black">
         <DialogHeader>
           <DialogTitle className="text-center text-2xl font-bold">
-            {category ? (
-              <span>Edit Existing Category</span>
+            {item ? (
+              <span>Edit Existing Item</span>
             ) : (
-              <span>Create New Category</span>
+              <span>Create New Item</span>
             )}
           </DialogTitle>
         </DialogHeader>
@@ -137,14 +143,37 @@ export const CategoryFormModal = () => {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-xs font-bold text-zinc-500 dark:text-secondary/70">
-                      Category Name:
+                      Item Name:
                     </FormLabel>
                     <FormControl>
                       <Input
                         autoFocus
                         className="border-0 bg-zinc-300/50 text-black focus-visible:ring-0 focus-visible:ring-offset-0"
                         disabled={isLoading}
-                        placeholder="Enter category name"
+                        placeholder="Enter item name"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="space-y-8 px-6">
+              <FormField
+                control={form.control}
+                name="notes"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-xs font-bold text-zinc-500 dark:text-secondary/70">
+                      Item Notes:
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        className="border-0 bg-zinc-300/50 text-black focus-visible:ring-0 focus-visible:ring-offset-0"
+                        disabled={isLoading}
+                        placeholder="Enter item notes (if any)"
                         {...field}
                       />
                     </FormControl>

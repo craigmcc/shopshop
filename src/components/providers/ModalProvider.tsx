@@ -17,6 +17,8 @@ import { useEffect, useState } from "react";
 // TODO - imports of components that are modals go here.
 import { CategoryFormModal } from "@/components/categories/CategoryFormModal";
 import { CategoryRemoveModal } from "@/components/categories/CategoryRemoveModal";
+import { ItemFormModal } from "@/components/items/ItemFormModal";
+import { ItemRemoveModal } from "@/components/items/ItemRemoveModal";
 import { SignUpModal } from "@/components/auth/SignUpModal";
 import { ListFormModal } from "@/components/lists/ListFormModal";
 import { ListInviteModal } from "@/components/lists/ListInviteModal";
@@ -44,6 +46,8 @@ export const ModalProvider = () => {
       {/* TODO - instantiations of modal components go here */}
       <CategoryFormModal />
       <CategoryRemoveModal />
+      <ItemFormModal />
+      <ItemRemoveModal />
       <ListFormModal />
       <ListInviteModal />
       <ListLeaveModal />

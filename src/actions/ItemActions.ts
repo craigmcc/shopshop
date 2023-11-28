@@ -78,17 +78,20 @@ export const remove = async (itemId: string): Promise<Item> => {
 /**
  * Update an existing Item, and return the updated value.
  *
- * @param item                          Item values to be updated (must include id)
+ * @param itemId                        ID of the Item to be updated
+ * @param item                          Item values to be updated
  *
  * @throws BadRequest                   If validation fails
  * @throws NotUnique                    If a unique key violation is attempted
  * @throws ServerError                  If a low level error occurs
  */
 export const update = async (
+  itemId: string,
   item: Prisma.ItemUncheckedUpdateInput,
 ): Promise<Item> => {
   logger.info({
     context: "ItemActions.update",
+    itemId,
     item,
   });
 
@@ -98,7 +101,7 @@ export const update = async (
     const result = await db.item.update({
       data: item,
       where: {
-        id: String(item.id),
+        id: itemId,
       },
     });
     return result;
