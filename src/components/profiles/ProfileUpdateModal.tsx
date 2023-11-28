@@ -133,6 +133,10 @@ export const ProfileUpdateModal = () => {
     }
   };
 
+  if (!isModalOpen) {
+    return null;
+  }
+
   return (
     <Dialog open={isModalOpen} onOpenChange={handleClose}>
       <DialogContent className="overflow-hidden bg-white p-0 text-black">

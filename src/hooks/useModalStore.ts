@@ -23,12 +23,10 @@ import { Category, Item, List, Member, Profile } from "@prisma/client";
  * Identifiers for modals that can be managed.
  */
 export enum ModalType {
-  CATEGORY_INSERT = "CategoryInsert",
+  CATEGORY_FORM = "CategoryForm",
   CATEGORY_REMOVE = "CategoryRemove",
-  CATEGORY_UPDATE = "CategoryUpdate",
-  ITEM_INSERT = "ItemInsert",
+  ITEM_FORM = "ItemForm",
   ITEM_REMOVE = "ItemRemove",
-  ITEM_UPDATE = "ItemUpdate",
   LIST_FORM = "ListForm",
   LIST_INVITE = "ListInvite",
   LIST_LEAVE = "ListLeave",

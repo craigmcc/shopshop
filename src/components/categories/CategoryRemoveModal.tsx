@@ -1,11 +1,11 @@
 "use client";
-// @/components/lists/ListRemoveModal.tsx
+// @/components/categories/CategoryRemoveModal.tsx
 
 /**
- * Remove an existing List.
+ * Remove an existing Category.
  *
  * Required ModalData:
- * - list                               List to be removed
+ * - category                           Category to be removed
  *
  * @packageDocumentation
  */
@@ -16,7 +16,7 @@ import { useRouter } from "next/navigation";
 
 // Internal Modules ----------------------------------------------------------
 
-import * as ListActions from "@/actions/ListActions";
+import * as CategoryActions from "@/actions/CategoryActions";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -30,17 +30,17 @@ import { logger } from "@/lib/ClientLogger";
 
 // Public Objects ------------------------------------------------------------
 
-export const ListRemoveModal = () => {
+export const CategoryRemoveModal = () => {
   const router = useRouter();
   const { data, isOpen, onClose, type } = useModalStore();
-  const isModalOpen = isOpen && type === ModalType.LIST_REMOVE;
-  const list = data.list;
-  if (!list) {
+  const isModalOpen = isOpen && type === ModalType.CATEGORY_REMOVE;
+  const { category } = data;
+  if (!category) {
     return null;
   }
 
   logger.info({
-    context: "ListRemoveModal",
+    context: "CategoryRemoveModal",
     data: data,
     isModalOpen: isModalOpen,
     type: type,
@@ -49,17 +49,16 @@ export const ListRemoveModal = () => {
   const onRemove = async () => {
     try {
       logger.info({
-        context: "ListRemoveModal.onRemove",
-        list: list,
+        context: "CategoryRemoveModal.onRemove",
+        category: category,
       });
-      await ListActions.remove(list!.id);
+      await CategoryActions.remove(category.id);
       router.refresh();
     } catch (error) {
       // TODO - error handling
       console.log(error);
     } finally {
       onClose();
-      router.push("/");
     }
   };
 
@@ -72,18 +71,14 @@ export const ListRemoveModal = () => {
       <DialogContent className="overflow-hidden bg-white p-0 text-black">
         <DialogHeader>
           <DialogTitle className="text-center text-2xl font-bold">
-            Remove List
+            Remove Category
           </DialogTitle>
         </DialogHeader>
         <div className="space-y-3 px-6">
           <p>
-            Do you really want to remove list &nbsp;
-            <span className="font-bold">{list!.name}</span>? This will eliminate
-            it for all members!
-          </p>
-          <p>
-            If you just want to stop seeing this list yourself, use the &nbsp;
-            <span className="italic">Leave List</span>&nbsp; option instead.
+            Do you really want to remove Category &nbsp;
+            <span className="font-bold">{category.name}</span>? This will
+            eliminate all its Items!
           </p>
         </div>
         <DialogFooter className="bg-gray-100 px-6 py-4 dark:bg-gray-600">

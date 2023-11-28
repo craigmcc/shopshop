@@ -1,12 +1,13 @@
 "use client";
-// @/components/lists/ListFormModal.tsx
+// @/components/categories/CategoryFormModal.tsx
 
 /**
- * Create a new List.
+ * Create a new Category.
  *
  * Required ModalData:
  * - profile                            Profile of current user
- * - list                               List (if editing) or null (if creating)
+ * - list                               Currently selected List
+ * - category                           Category (if editing) or null (if creating)
  *
  * @packageDocumentation
  */
@@ -16,13 +17,12 @@
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { v4 as uuidv4 } from "uuid";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 // Internal Modules ----------------------------------------------------------
 
-import * as ListActions from "@/actions/ListActions";
+import * as CategoryActions from "@/actions/CategoryActions";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -45,15 +45,14 @@ import { logger } from "@/lib/ClientLogger";
 
 // Public Objects ------------------------------------------------------------
 
-export const ListFormModal = () => {
+export const CategoryFormModal = () => {
   const { data, isOpen, onClose, type } = useModalStore();
-  const isModalOpen = isOpen && type === ModalType.LIST_FORM;
-  const list = data.list;
-  const profile = data.profile;
+  const isModalOpen = isOpen && type === ModalType.CATEGORY_FORM;
+  const { category, list } = data;
   const router = useRouter();
 
   logger.info({
-    context: "ListFormModal",
+    context: "CategoryFormModal",
     data: data,
     isModalOpen: isModalOpen,
     type: type,
@@ -61,7 +60,7 @@ export const ListFormModal = () => {
 
   const formSchema = z.object({
     name: z.string().min(1, {
-      message: "List name is required",
+      message: "Category name is required",
     }),
   });
 
@@ -75,10 +74,10 @@ export const ListFormModal = () => {
   });
 
   useEffect(() => {
-    if (list) {
-      form.setValue("name", list.name);
+    if (category) {
+      form.setValue("name", category.name);
     }
-  }, [form, list]);
+  }, [category, form]);
 
   const isLoading = form.formState.isSubmitting;
 
@@ -90,17 +89,18 @@ export const ListFormModal = () => {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       logger.info({
-        context: "ListFormModal.onSubmit",
+        context: "CategoryFormModal.onSubmit",
         values: values,
-        list: list,
       });
-      if (list) {
-        await ListActions.update(list.id, values);
-      } else {
-        await ListActions.insert({
+      if (category) {
+        await CategoryActions.update(category.id, {
           ...values,
-          inviteCode: uuidv4(),
-          profileId: profile!.id,
+          listId: list!.id,
+        });
+      } else {
+        await CategoryActions.insert({
+          ...values,
+          listId: list!.id,
         });
       }
       router.refresh();
@@ -122,10 +122,10 @@ export const ListFormModal = () => {
       <DialogContent className="overflow-hidden bg-white p-0 text-black">
         <DialogHeader>
           <DialogTitle className="text-center text-2xl font-bold">
-            {list ? (
-              <span>Edit Existing List</span>
+            {category ? (
+              <span>Edit Existing Category</span>
             ) : (
-              <span>Create New List</span>
+              <span>Create New Category</span>
             )}
           </DialogTitle>
         </DialogHeader>
@@ -138,14 +138,14 @@ export const ListFormModal = () => {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-xs font-bold text-zinc-500 dark:text-secondary/70">
-                      List Name:
+                      Category Name:
                     </FormLabel>
                     <FormControl>
                       <Input
                         autoFocus
                         className="border-0 bg-zinc-300/50 text-black focus-visible:ring-0 focus-visible:ring-offset-0"
                         disabled={isLoading}
-                        placeholder="Enter list name"
+                        placeholder="Enter category name"
                         {...field}
                       />
                     </FormControl>

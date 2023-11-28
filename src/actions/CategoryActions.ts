@@ -114,6 +114,7 @@ export const remove = async (categoryId: string): Promise<Category> => {
 /**
  * Update an existing Category, and return the updated value.
  *
+ * @param categoryId                    ID of the Category to be updated
  * @param category                      Category values to be updated (must include id)
  *
  * @throws BadRequest                   If validation fails
@@ -121,10 +122,12 @@ export const remove = async (categoryId: string): Promise<Category> => {
  * @throws ServerError                  If a low level error occurs
  */
 export const update = async (
+  categoryId: string,
   category: Prisma.CategoryUncheckedUpdateInput,
 ): Promise<Category> => {
   logger.info({
     context: "CategoryActions.update",
+    categoryId: categoryId,
     category,
   });
 
@@ -134,7 +137,7 @@ export const update = async (
     const result = await db.category.update({
       data: category,
       where: {
-        id: String(category.id),
+        id: categoryId,
       },
     });
     return result;

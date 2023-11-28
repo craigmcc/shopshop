@@ -107,6 +107,10 @@ export const ListMembersModal = () => {
     }
   };
 
+  if (!isModalOpen) {
+    return null;
+  }
+
   return (
     <Dialog open={isModalOpen} onOpenChange={onClose}>
       <DialogContent className="overflow-hidden bg-white p-0 text-black">
