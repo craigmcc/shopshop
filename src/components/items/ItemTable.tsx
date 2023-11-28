@@ -9,7 +9,7 @@
 
 // External Modules ----------------------------------------------------------
 
-import { Category, Item } from "@prisma/client";
+import { Category, Item, List } from "@prisma/client";
 
 // Internal Modules ----------------------------------------------------------
 
@@ -33,11 +33,12 @@ interface ItemTableProps {
   category: Category;
   // The Items that are being managed
   items: Item[];
+  // The List this Category and these Items belong to
+  list: List;
 }
 
-export const ItemTable = ({ category, items }: ItemTableProps) => {
-  const { data, onOpen } = useModalStore();
-  const { item, list } = data;
+export const ItemTable = ({ category, items, list }: ItemTableProps) => {
+  const { onOpen } = useModalStore();
 
   return (
     <ScrollArea className="h-full rounded-md border border-2">

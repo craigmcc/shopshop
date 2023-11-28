@@ -99,13 +99,13 @@ export const ItemFormModal = () => {
         await ItemActions.update(item.id, {
           ...values,
           categoryId: category!.id,
-          listId: list!.id,
+          listId: category!.listId,
         });
       } else {
         await ItemActions.insert({
           ...values,
           categoryId: category!.id,
-          listId: list!.id,
+          listId: category!.listId,
         });
       }
       router.refresh();

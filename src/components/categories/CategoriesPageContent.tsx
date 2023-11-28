@@ -45,7 +45,7 @@ export const CategoriesPageContent = ({
     <div className="grid grid-cols-2 space-x-3 p-1">
       <CategoryTable categories={categories} list={list} onSelect={onSelect} />
       {selectedCategory ? (
-        <ItemTable category={selectedCategory} items={items} />
+        <ItemTable category={selectedCategory} items={items} list={list} />
       ) : null}
     </div>
   );
