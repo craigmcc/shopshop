@@ -12,7 +12,9 @@ import { redirect } from "next/navigation";
 
 // Internal Modules ----------------------------------------------------------
 
+import * as CategoryActions from "@/actions/CategoryActions";
 import * as ListActions from "@/actions/ListActions";
+import { ListIdPageContent } from "@/components/lists/ListIdPageContent";
 import { currentProfile } from "@/lib/currentProfile";
 
 // Public Objects ------------------------------------------------------------
@@ -36,11 +38,9 @@ const ListIdPage = async ({ params }: ListIdPageProps) => {
     return redirect("/");
   }
 
-  return (
-    <div>
-      ListIdPage for List {list.id} ({list.name}).
-    </div>
-  );
+  const categories = await CategoryActions.all(params.listId);
+
+  return <ListIdPageContent categories={categories} list={list} />;
 };
 
 export default ListIdPage;
