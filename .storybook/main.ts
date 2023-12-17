@@ -3,12 +3,7 @@ import remarkGfm from "remark-gfm";
 import { TsconfigPathsPlugin } from "tsconfig-paths-webpack-plugin";
 
 const config: StorybookConfig = {
-  stories: ["../src/**/*.mdx", "../src/**/*.stories.@(js|jsx|mjs|ts|tsx)"],
   addons: [
-    "@storybook/addon-links",
-    "@storybook/addon-essentials",
-    "@storybook/addon-onboarding",
-    "@storybook/addon-interactions",
     {
       name: "@storybook/addon-docs",
       options: {
@@ -17,16 +12,25 @@ const config: StorybookConfig = {
         },
       },
     },
+    "@storybook/addon-essentials",
+    "@storybook/addon-interactions",
+    "@storybook/addon-links",
+    "@storybook/addon-mdx-gfm",
+    "@storybook/addon-onboarding",
     "@storybook/addon-themes",
-    "@storybook/addon-mdx-gfm"
   ],
-  framework: {
-    name: "@storybook/nextjs",
-    options: {},
-  },
   docs: {
     autodocs: "tag",
   },
+  framework: {
+    name: "@storybook/nextjs",
+    options: {
+      builder: {
+        useSWC: true,
+      },
+    },
+  },
+  stories: ["../src/**/*.mdx", "../src/**/*.stories.@(js|jsx|mjs|ts|tsx)"],
   webpackFinal: async (config) => {
     if (config.resolve) {
       config.resolve.plugins = [
