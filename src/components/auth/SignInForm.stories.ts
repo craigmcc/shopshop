@@ -9,6 +9,7 @@
 // External Modules ----------------------------------------------------------
 
 import type { Meta, StoryObj } from "@storybook/react";
+import { userEvent, within } from "@storybook/testing-library";
 
 // Internal Modules ----------------------------------------------------------
 
@@ -25,4 +26,15 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {};
+// Press the "Close" button and verify that it worked
+export const Close: Story = {
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    // TODO: button[0] is "Save", button[1] is "Close" but not found - because of modal?
+    const buttons = canvas.getAllByRole("button");
+    console.log(buttons);
+  },
+};
+
+export const Display: Story = {};
