@@ -210,6 +210,7 @@ export const update = async (
     const result = await db.profile.update({
       data: {
         ...profile,
+        id: profileId, // No cheating
         password: profile.password
           ? await hashPassword(String(profile.password))
           : undefined,
