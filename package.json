@@ -12,7 +12,8 @@
     "start": "next start",
     "storybook": "storybook dev -p 6006",
     "test": "dotenv -e .env.test.local -- jest --watch",
-    "test:ci": "dotenv -e .env.test.local -- jest --ci --runInBand"
+    "test:ci": "dotenv -e .env.test.local -- jest --ci --runInBand",
+    "test:github": "jest --ci --runInBand"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.2",
