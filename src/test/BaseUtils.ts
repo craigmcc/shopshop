@@ -14,6 +14,7 @@ import { Prisma, Profile } from "@prisma/client";
 
 import * as SeedData from "./SeedData";
 import { db } from "@/lib/db";
+import { hashPassword } from "@/lib/encryption";
 
 // Public Objects ------------------------------------------------------------
 
@@ -45,13 +46,23 @@ export default BaseUtils;
 
 // Private Methods -----------------------------------------------------------
 
+const hashedPassword = async (
+  password: string | undefined,
+): Promise<string> => {
+  return hashPassword(password ? password : "");
+};
+
 const loadProfiles = async (
   profiles: Prisma.ProfileUncheckedCreateInput[],
 ): Promise<Profile[]> => {
   let results: Profile[] = [];
   try {
     for (const profile of profiles) {
-      results.push(await db.profile.create({ data: profile }));
+      const data = {
+        ...profile,
+        password: await hashedPassword(profile.password),
+      };
+      results.push(await db.profile.create({ data }));
     }
   } catch (error) {
     console.error("  Reloading Profiles ERROR", error);
