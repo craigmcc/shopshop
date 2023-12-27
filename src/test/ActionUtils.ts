@@ -25,3 +25,5 @@ export class ActionUtils extends BaseUtils {
     await super.loadData(options);
   }
 }
+
+export default ActionUtils;

@@ -90,7 +90,7 @@ export const create = async (
  */
 export const email = async (email: string): Promise<Profile | null> => {
   logger.info({
-    context: "ProfileActions.find",
+    context: "ProfileActions.email",
     email: email,
   });
 
