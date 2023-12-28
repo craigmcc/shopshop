@@ -8,7 +8,7 @@
 
 // External Modules ----------------------------------------------------------
 
-import { Prisma, Profile } from "@prisma/client";
+import { List, Member, MemberRole, Prisma, Profile } from "@prisma/client";
 
 // Internal Modules ----------------------------------------------------------
 
@@ -19,6 +19,8 @@ import { hashPassword } from "@/lib/encryption";
 // Public Objects ------------------------------------------------------------
 
 export type OPTIONS = {
+  withLists: boolean;
+  withMembers: boolean;
   withProfiles: boolean;
 };
 
@@ -34,10 +36,38 @@ export abstract class BaseUtils {
    */
   public async loadData(options: Partial<OPTIONS>): Promise<void> {
     await db.list.deleteMany({});
+    await db.member.deleteMany({});
     await db.profile.deleteMany({});
 
     if (options.withProfiles) {
-      /* const profiles = */ await loadProfiles(SeedData.PROFILES);
+      const profiles = await loadProfiles(SeedData.PROFILES);
+      if (options.withLists) {
+        const lists: List[] = [];
+        lists.push(await loadList(profiles[0].id, SeedData.LISTS[0]));
+        lists.push(await loadList(profiles[1].id, SeedData.LISTS[1]));
+        lists.push(await loadList(profiles[2].id, SeedData.LISTS[2]));
+        if (options.withMembers) {
+          const members: Member[] = [];
+          members.push(
+            await loadMember(profiles[0].id, lists[0].id, MemberRole.ADMIN),
+          );
+          members.push(
+            await loadMember(profiles[0].id, lists[1].id, MemberRole.GUEST),
+          );
+          members.push(
+            await loadMember(profiles[1].id, lists[1].id, MemberRole.ADMIN),
+          );
+          members.push(
+            await loadMember(profiles[1].id, lists[2].id, MemberRole.GUEST),
+          );
+          members.push(
+            await loadMember(profiles[2].id, lists[2].id, MemberRole.ADMIN),
+          );
+          members.push(
+            await loadMember(profiles[2].id, lists[0].id, MemberRole.GUEST),
+          );
+        }
+      }
     }
   }
 }
@@ -50,6 +80,25 @@ const hashedPassword = async (
   password: string | undefined,
 ): Promise<string> => {
   return hashPassword(password ? password : "");
+};
+
+const loadList = async (
+  profileId: string,
+  list: Prisma.ListUncheckedCreateInput,
+): Promise<List> => {
+  const data = {
+    ...list,
+    profileId,
+  };
+  return await db.list.create({ data });
+};
+
+const loadMember = async (
+  profileId: string,
+  listId: string,
+  role: MemberRole,
+): Promise<Member> => {
+  return await db.member.create({ data: { profileId, listId, role } });
 };
 
 const loadProfiles = async (

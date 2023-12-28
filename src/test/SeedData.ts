@@ -8,14 +8,38 @@
 
 // External Modules ----------------------------------------------------------
 
+import { v4 as uuidv4 } from "uuid";
 import { Prisma } from "@prisma/client";
 
 // Internal Modules ----------------------------------------------------------
 
-import { logger } from "@/lib/ServerLogger";
-import { ProfileUncheckedCreateInputWithToken } from "@/types/types";
-
 // Seed Data -----------------------------------------------------------------
+
+// ***** Lists *****
+
+export const LIST0_NAME = "List Zero";
+export const LIST1_NAME = "List One";
+export const LIST2_NAME = "List Two";
+
+export const LISTS: Prisma.ListUncheckedCreateInput[] = [
+  {
+    inviteCode: uuidv4(),
+    name: LIST0_NAME,
+    profileId: "TODO",
+  },
+  {
+    inviteCode: uuidv4(),
+    name: LIST1_NAME,
+    profileId: "TODO",
+  },
+  {
+    inviteCode: uuidv4(),
+    name: LIST2_NAME,
+    profileId: "TODO",
+  },
+];
+
+// ***** Profiles *****
 
 export const PROFILE0_EMAIL = "first@example.com";
 export const PROFILE0_NAME = "First Profile";
