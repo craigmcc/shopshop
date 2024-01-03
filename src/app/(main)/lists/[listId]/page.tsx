@@ -15,6 +15,8 @@ import { redirect } from "next/navigation";
 import * as CategoryActions from "@/actions/CategoryActions";
 import * as ListActions from "@/actions/ListActions";
 import { ListIdPageContent } from "@/components/lists/ListIdPageContent";
+import { NotAuthorized } from "@/components/shared/NotAuthorized";
+import { NotSignedIn } from "@/components/shared/NotSignedIn";
 import { currentProfile } from "@/lib/currentProfile";
 
 // Public Objects ------------------------------------------------------------
@@ -28,14 +30,14 @@ interface ListIdPageProps {
 const ListIdPage = async ({ params }: ListIdPageProps) => {
   const profile = await currentProfile();
   if (!profile) {
-    alert("Must be signed in to access this page"); // TODO - better formatting
-    return redirect("/"); // TODO - redirect to sign in page?
+    return <NotSignedIn />;
   }
 
   const list = await ListActions.member(profile.id, params.listId);
   if (!list) {
-    alert("You are not a Member of the specified List"); // TODO - better formatting
-    return redirect("/");
+    return (
+      <NotAuthorized message="You are not a Member of the specified List" />
+    );
   }
 
   const categories = await CategoryActions.all(params.listId);

@@ -15,6 +15,8 @@ import { MemberRole } from "@prisma/client";
 
 import * as ListActions from "@/actions/ListActions";
 import * as MemberActions from "@/actions/MemberActions";
+import { NotFound } from "@/components/shared/NotFound";
+import { NotSignedIn } from "@/components/shared/NotSignedIn";
 import { currentProfile } from "@/lib/currentProfile";
 import { logger } from "@/lib/ServerLogger";
 
@@ -35,14 +37,12 @@ const InviteCodePage = async ({ params }: InviteCodePageProps) => {
 
   const profile = await currentProfile();
   if (!profile) {
-    alert("Must be signed in to access this page"); // TODO - better formatting
-    return redirect("/");
+    return <NotSignedIn />;
   }
 
   const list = await ListActions.findByInviteCode(params.inviteCode);
   if (!list) {
-    alert("Unrecognized invite code"); // TODO - better formatting
-    return redirect("/");
+    return <NotFound message="Unrecognized invite code" />;
   }
 
   // If already a Member, just redirect to the page for this List
