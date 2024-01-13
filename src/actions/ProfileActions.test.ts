@@ -8,8 +8,6 @@
 
 // External Modules ----------------------------------------------------------
 
-import chai from "chai";
-const expect = chai.expect;
 import { Prisma } from "@prisma/client";
 
 // Internal Modules ----------------------------------------------------------
@@ -38,9 +36,9 @@ describe("ProfileActions Functional Tests", () => {
       const EMAIL = "invalid@nowhere.com";
       try {
         const OUTPUT = await ProfileActions.email(EMAIL);
-        expect(OUTPUT).to.be.null;
+        expect(OUTPUT).toBeNull();
       } catch (error) {
-        expect.fail(`Should not have thrown '${error}'`);
+        fail(`Should not have thrown '${error}'`);
       }
     });
 
@@ -48,10 +46,10 @@ describe("ProfileActions Functional Tests", () => {
       for (const INPUT of SeedData.PROFILES) {
         try {
           const OUTPUT = await ProfileActions.email(INPUT.email);
-          expect(OUTPUT).to.not.be.null;
-          expect(OUTPUT!.email).to.equal(INPUT.email);
+          expect(OUTPUT).not.toBeNull();
+          expect(OUTPUT!.email).toBe(INPUT.email);
         } catch (error) {
-          expect.fail(`Should not have thrown '${error}`);
+          fail(`Should not have thrown '${error}`);
         }
       }
     });
@@ -62,22 +60,22 @@ describe("ProfileActions Functional Tests", () => {
       const ID = "";
       try {
         const OUTPUT = await ProfileActions.find(ID);
-        expect(OUTPUT).to.be.null;
+        expect(OUTPUT).toBeNull();
       } catch (error) {
-        expect.fail(`Should not have thrown '${error}'`);
+        fail(`Should not have thrown '${error}'`);
       }
     });
 
     it("should pass on defined emails", async () => {
       const INPUTS = await db.profile.findMany();
-      expect(INPUTS.length).to.be.greaterThan(0);
+      expect(INPUTS.length).toBeGreaterThan(0);
       for (const INPUT of INPUTS) {
         try {
           const OUTPUT = await ProfileActions.find(INPUT.id);
-          expect(OUTPUT).to.not.be.null;
-          expect(OUTPUT!.id).to.equal(INPUT.id);
+          expect(OUTPUT).not.toBeNull();
+          expect(OUTPUT!.id).toBe(INPUT.id);
         } catch (error) {
-          expect.fail(`Should not have thrown '${error}'`);
+          fail(`Should not have thrown '${error}'`);
         }
       }
     });
@@ -86,17 +84,17 @@ describe("ProfileActions Functional Tests", () => {
   describe("ProfileActions.insert", () => {
     it("should fail on duplicate email", async () => {
       const INPUT = await ProfileActions.email(SeedData.PROFILE0_EMAIL);
-      expect(INPUT).to.not.be.null;
+      expect(INPUT).not.toBeNull();
       try {
         await ProfileActions.insert(INPUT!);
-        expect.fail("Should have thrown NotUnique");
+        fail("Should have thrown NotUnique");
       } catch (error) {
         if (error instanceof NotUnique) {
-          expect(error.message).to.include(
+          expect(error.message).toContain(
             "That email address is already in use",
           );
         } else {
-          expect.fail(`Should not have thrown '${error}'`);
+          fail(`Should not have thrown '${error}'`);
         }
       }
     });
@@ -109,12 +107,12 @@ describe("ProfileActions Functional Tests", () => {
       };
       try {
         const OUTPUT = await ProfileActions.insert(INPUT);
-        expect(OUTPUT.id).to.not.be.null;
-        expect(OUTPUT.email).to.equal(INPUT.email);
-        expect(OUTPUT.name).to.equal(INPUT.name);
-        expect(OUTPUT.password).to.not.equal(INPUT.password); // Will be hashed
+        expect(OUTPUT.id).not.toBeNull();
+        expect(OUTPUT.email).toBe(INPUT.email);
+        expect(OUTPUT.name).toBe(INPUT.name);
+        expect(OUTPUT.password).not.toBe(INPUT.password); // Will be hashed
       } catch (error) {
-        expect.fail(`Should not have thrown '${error}'`);
+        fail(`Should not have thrown '${error}'`);
       }
     });
   });
@@ -123,35 +121,35 @@ describe("ProfileActions Functional Tests", () => {
     it("should fail on invalid ID", async () => {
       const INVALID_ID = "123";
       const ORIGINAL = await ProfileActions.email(SeedData.PROFILE1_EMAIL);
-      expect(ORIGINAL).to.not.be.null;
+      expect(ORIGINAL).not.toBeNull();
       try {
         await ProfileActions.update(INVALID_ID, ORIGINAL!);
-        expect.fail("Should have thrown NotFound");
+        fail("Should have thrown NotFound");
       } catch (error) {
         if (error instanceof NotFound) {
-          expect(error.message).to.include(`Missing Profile '${INVALID_ID}'`);
+          expect(error.message).toContain(`Missing Profile '${INVALID_ID}'`);
         } else {
-          expect.fail(`Should not have thrown '${error}'`);
+          fail(`Should not have thrown '${error}'`);
         }
       }
     });
 
     it("should pass on valid data", async () => {
       const ORIGINAL = await ProfileActions.email(SeedData.PROFILE2_EMAIL);
-      expect(ORIGINAL).to.not.be.null;
+      expect(ORIGINAL).not.toBeNull();
       const UPDATED_NAME = `${ORIGINAL!.name} Updated`;
       try {
         const UPDATED = await ProfileActions.update(ORIGINAL!.id, {
           id: "ABC", // Bogus attempt to change the id
           name: UPDATED_NAME,
         });
-        expect(UPDATED).to.not.be.null;
-        expect(UPDATED!.id).to.equal(ORIGINAL!.id); // Should not be changed
-        expect(UPDATED!.name).to.equal(UPDATED_NAME);
-        expect(UPDATED!.password).to.equal(""); // Should be erased
-        expect(UPDATED!.scope).to.equal(ORIGINAL!.scope);
+        expect(UPDATED).not.toBeNull();
+        expect(UPDATED!.id).toBe(ORIGINAL!.id); // Should not be changed
+        expect(UPDATED!.name).toBe(UPDATED_NAME);
+        expect(UPDATED!.password).toBe(""); // Should be erased
+        expect(UPDATED!.scope).toBe(ORIGINAL!.scope);
       } catch (error) {
-        expect.fail(`Should not have thrown '${error}`);
+        fail(`Should not have thrown '${error}`);
       }
     });
   });
