@@ -10,7 +10,7 @@
 // External Modules ----------------------------------------------------------
 
 import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
+import { signIn, SignInResponse } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -79,13 +79,14 @@ export const SignInForm = () => {
   };
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    let response: SignInResponse | undefined = undefined;
     try {
       logger.trace({
         context: "SignInForm.onSubmit.request",
         email: values.email,
         password: "*REDACTED*",
       });
-      const response = await signIn("credentials", {
+      response = await signIn("credentials", {
         email: values.email,
         password: values.password,
         redirect: false,
@@ -94,18 +95,18 @@ export const SignInForm = () => {
         context: "SignInForm.onSubmit.response",
         response: response,
       });
-      if (!response?.error) {
-        router.push("/");
-        router.refresh();
-      } else {
-        alert("Invalid email address or password, please try again.");
-      }
     } catch (error) {
       // TODO - error handling
       logger.error({
         context: "SignInForm.onSubmit.error",
         message: (error as Error).message,
       });
+    }
+    if (response && response.ok) {
+      router.push("/");
+      router.refresh();
+    } else {
+      alert("Invalid email address or password, please try again.");
     }
   };
 
