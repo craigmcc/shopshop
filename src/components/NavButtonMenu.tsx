@@ -1,13 +1,15 @@
-import type { LucideIcon } from "lucide-react";
+// @/components/NavButtonMenu.tsx
 
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
+import type { LucideIcon } from "lucide-react";
+import Link from "next/link";
+
+import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 
 type Props = {
     icon: LucideIcon,

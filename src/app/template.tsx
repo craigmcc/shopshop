@@ -1,3 +1,5 @@
+// @/app/template.tsx
+
 export default async function Template({
                                          children,
                                        }: {

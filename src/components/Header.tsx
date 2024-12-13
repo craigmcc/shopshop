@@ -1,10 +1,13 @@
+// @/components/Header.tsx
+
 import { AlignJustify, /*File,*/ /*LogOut,*/ /*UsersRound*/ } from "lucide-react";
 import Link from "next/link";
-import { NavButton } from "@/components/NavButton";
+
 import { ModeToggle } from "@/components/ModeToggle";
-// import { LogoutLink} from "@kinde-oss/kinde-auth-nextjs/components";
-// import { Button } from "@/components/ui/button";
+import { NavButton } from "@/components/NavButton";
 // import { NavButtonMenu}  from "@/components/NavButtonMenu";
+// import { Button } from "@/components/ui/button";
+// import { LogoutLink} from "@kinde-oss/kinde-auth-nextjs/components";
 
 export function Header() {
   return (

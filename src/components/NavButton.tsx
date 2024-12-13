@@ -1,6 +1,9 @@
+// @/components/NavButton.tsx
+
 import { LucideIcon } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import Link from "next/link";
+
+import { Button } from "@/components/ui/button";
 
 type Props = {
   icon: LucideIcon,
@@ -13,6 +16,7 @@ export function NavButton({
   label,
   href,
 }: Props) {
+
   return (
     <Button
       aria-label={label}
