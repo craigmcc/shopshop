@@ -1,34 +1,56 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import localFont from "next/font/local";
+import { ThemeProvider } from "next-themes";
+
 import "./globals.css";
+import { Header } from "@/components/Header";
+import { Toaster } from '@/components/ui/toaster'
 
-const geistSans = Geist({
+const geistSans = localFont({
+  src: "./fonts/GeistVF.woff",
   variable: "--font-geist-sans",
-  subsets: ["latin"],
+  weight: "100 900",
 });
-
-const geistMono = Geist_Mono({
+const geistMono = localFont({
+  src: "./fonts/GeistMonoVF.woff",
   variable: "--font-geist-mono",
-  subsets: ["latin"],
+  weight: "100 900",
 });
 
 export const metadata: Metadata = {
-  title: "ShopShop",
-  description: "Shopping List app",
+  title: {
+    default: "ShopShop",
+    template: "%s | ShopShop",
+  },
+  description: "Shopping List App",
+  applicationName: "shopshop",
 };
 
 export default function RootLayout({
-  children,
-}: Readonly<{
+                                     children,
+                                   }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
-      </body>
+    <html lang="en" suppressHydrationWarning>
+    <body
+      className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+    >
+    <ThemeProvider
+      attribute="class"
+      defaultTheme="system"
+      enableSystem
+      disableTransitionOnChange
+    >
+      <div className="mx-auto w-full max-w-7xl">
+        <Header/>
+        <div className="px-4 py-2">
+          {children}
+        </div>
+      </div>
+      <Toaster/>
+    </ThemeProvider>
+    </body>
     </html>
   );
 }
