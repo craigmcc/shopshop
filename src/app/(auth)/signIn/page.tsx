@@ -6,7 +6,7 @@
  * @packageDocumentation
  */
 
-export default function SignUpPage() {
+export default function SignInPage() {
   return (
     <div>
       <main>
