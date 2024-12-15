@@ -28,7 +28,7 @@ if (!globalThis.prisma) {
   const nameSegment = segments[segments.length - 1].split("?");
   logger.info({
     context: "db",
-    message: `Initializing PrismaClient for database ${nameSegment[0]}`,
+    message: `Initializing PrismaClient for database "${nameSegment[0]}"`,
   });
   globalThis.prisma = new PrismaClient();
 }

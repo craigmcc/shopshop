@@ -18,19 +18,6 @@ import Timestamps from "@/lib/Timestamps";
 
 const NODE_ENV = process.env.NODE_ENV;
 
-/*
-export const logger = require("pino")(
-  {
-    base: null, // Remove "hostname", "name", and "pid"
-    level: NODE_ENV === "production" ? "info" : "debug",
-    timestamp: function (): string {
-      return ',"time":"' + Timestamps.iso() + '"';
-    },
-  },
-  process.stdout,
-);
-*/
-
 export const logger = pino({
   base: null, // Remove "hostname", "name", and "pid"
   level: NODE_ENV === "production" ? "info" : "debug",

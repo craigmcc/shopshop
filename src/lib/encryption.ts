@@ -8,30 +8,9 @@
 
 // External Modules ----------------------------------------------------------
 
-//import bcrypt from "bcrypt";
-//import * as crypto from "crypto";
-//import util from "util";
-
 // Internal Modules ----------------------------------------------------------
 
-//const promisifiedRandomBytes = util.promisify(crypto.randomBytes);
-
 // Public Objects ------------------------------------------------------------
-
-/**
- * Generate and return a random token, with an optional specified length
- * in bytes, converted to hex encoding.
- *
- * @param desiredSize Desired number of bytes (hex will be this * 4 in length)
- */
-/*
-export const generateRandomToken = async (
-  desiredSize: number = 32,
-): Promise<string> => {
-  const buffer: Buffer = await promisifiedRandomBytes(desiredSize);
-  return buffer.toString("hex");
-};
-*/
 
 /**
  * Perform a one-way hash on the specified password, and return the result
@@ -41,8 +20,6 @@ export const generateRandomToken = async (
  */
 export const hashPassword = async (password: string): Promise<string> => {
   return generateHash(password);
-//  const SALT_ROUNDS: number = 10;
-//  return bcrypt.hash(password, SALT_ROUNDS);
 };
 
 /**
@@ -56,7 +33,6 @@ export const verifyPassword = async (
   password: string,
   hash: string,
 ): Promise<boolean> => {
-//  return bcrypt.compare(password, hash);
   return (await generateHash(password)) === hash;
 };
 
