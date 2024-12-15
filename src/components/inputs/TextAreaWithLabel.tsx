@@ -1,5 +1,12 @@
 "use client"
 
+/**
+ * RHF input field for a textarea with a label.
+ *
+ * @packageDocumentation
+ */
+
+import { TextareaHTMLAttributes } from "react"
 import { useFormContext } from "react-hook-form"
 
 import {
@@ -9,9 +16,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form'
-
 import { Textarea } from "@/components/ui/textarea"
-import { TextareaHTMLAttributes } from "react"
 
 type Props<S> = {     // S = (Zod) Schema
   fieldTitle: string,

@@ -1,5 +1,11 @@
 // @/app/page.tsx
 
+/**
+ * Home page for the application.
+ *
+ * @packageDocumentation
+ */
+
 //import Link from 'next/link';
 
 export default function Home() {

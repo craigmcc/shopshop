@@ -1,5 +1,11 @@
 "use client"
 
+/**
+ * RHF input field for a select field with a label.
+ *
+ * @packageDocumentation
+ */
+
 import { useFormContext } from "react-hook-form"
 
 import {
@@ -9,7 +15,6 @@ import {
     FormLabel,
     FormMessage,
 } from '@/components/ui/form'
-
 import {
     Select,
     SelectContent,

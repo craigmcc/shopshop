@@ -1,5 +1,11 @@
 // @/app/template.tsx
 
+/**
+ * Template to provide animation for the header bar.
+ *
+ * @packageDocumentation
+ */
+
 export default async function Template({
                                          children,
                                        }: {

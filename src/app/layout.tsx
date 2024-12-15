@@ -1,5 +1,11 @@
 // @/app/layout.tsx
 
+/**
+ * Global application layout.
+ *
+ * @packageDocumentation
+ */
+
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { ThemeProvider } from "next-themes";

@@ -1,7 +1,14 @@
 "use client"
 
+/**
+ * RHF input field for checkboxes with a label.
+ *
+ * @packageDocumentation
+ */
+
 import { useFormContext } from "react-hook-form"
 
+import { Checkbox } from '@/components/ui/checkbox'
 import {
     FormControl,
     FormField,
@@ -9,8 +16,6 @@ import {
     FormLabel,
     FormMessage,
 } from '@/components/ui/form'
-
-import { Checkbox } from '@/components/ui/checkbox'
 
 type Props<S> = {     // S = (Zod) Schema
     fieldTitle: string,

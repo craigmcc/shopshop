@@ -1,5 +1,12 @@
 "use client"
 
+/**
+ * RHF input field for a text field with a label.
+ *
+ * @packageDocumentation
+ */
+
+import { InputHTMLAttributes } from "react"
 import { useFormContext } from "react-hook-form"
 
 import {
@@ -10,7 +17,6 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { InputHTMLAttributes } from "react"
 
 type Props<S> = {     // S = (Zod) Schema
   fieldTitle: string,

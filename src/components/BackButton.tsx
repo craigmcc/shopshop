@@ -1,8 +1,15 @@
 "use client"
 
+/**
+ * Generic "back" button that backtracks in the browser history.
+ *
+ * @packageDocumentation
+ */
+
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
 import { ButtonHTMLAttributes} from "react";
+
+import { Button } from "@/components/ui/button";
 
 type Props = {
   className?: string,

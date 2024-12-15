@@ -14,7 +14,7 @@ import Credentials from "@auth/core/providers/credentials";
 import { db } from "@/lib/db";
 import { verifyPassword} from "@/lib/encryption";
 import { logger } from "@/lib/ServerLogger";
-import { signInSchema } from "@/lib/signInSchema";
+import { signInSchema } from "@/zod-schemas/signInSchema";
 
 export const { auth, handlers, signIn, signOut } = NextAuth({
   providers: [

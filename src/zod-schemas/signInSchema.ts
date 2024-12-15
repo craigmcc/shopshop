@@ -1,7 +1,7 @@
-// @/lib/signInSchema.ts
+// @/zod-schemas/signInSchema.ts
 
 /**
- * Zod schema for the signIn form.
+ * Zod schema for SignInForm.
  *
  * @packageDocumentation
  */
