@@ -8,12 +8,15 @@
 
 // External Modules ----------------------------------------------------------
 
+import pino from "pino";
+
 // Internal Modules ----------------------------------------------------------
 
 import Timestamps from "@/lib/Timestamps";
 
 // Public Objects -----------------------------------------------------------
 
+/*
 export const logger = require("pino")(
   {
     base: null, // Remove "hostname", "name", and "pid"
@@ -24,3 +27,12 @@ export const logger = require("pino")(
   },
   process.stdout,
 );
+*/
+
+export const logger = pino({
+  base: null, // Remove "hostname", "name", and "pid"
+  level: "info",
+  timestamp: function (): string {
+    return ',"time":"' + Timestamps.iso() + '"';
+  },
+});

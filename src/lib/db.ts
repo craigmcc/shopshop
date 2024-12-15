@@ -25,11 +25,10 @@ declare global {
  */
 if (!globalThis.prisma) {
   const segments = process.env.DATABASE_URL!.split("/");
+  const nameSegment = segments[segments.length - 1].split("?");
   logger.info({
     context: "db",
-    message: `Initializing PrismaClient for database '${
-      segments[segments.length - 1]
-    }`,
+    message: `Initializing PrismaClient for database ${nameSegment[0]}`,
   });
   globalThis.prisma = new PrismaClient();
 }
