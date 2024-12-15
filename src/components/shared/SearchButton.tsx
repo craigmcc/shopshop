@@ -1,7 +1,7 @@
 "use client"
 
 /**
- * Generic search button.
+ * Generic "search" button.
  *
  * @packageDocumentation
  */

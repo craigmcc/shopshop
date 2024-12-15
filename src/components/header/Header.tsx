@@ -1,11 +1,17 @@
-// @/components/Header.tsx
+// @/components/header/Header.tsx
+
+/**
+ * Page header component.
+ *
+ * @packageDocumentation
+ */
 
 import { AlignJustify, /*File,*/ /*LogOut,*/ /*UsersRound*/ } from "lucide-react";
 import Link from "next/link";
 
-import { ModeToggle } from "@/components/ModeToggle";
-import { NavButton } from "@/components/NavButton";
-// import { NavButtonMenu}  from "@/components/NavButtonMenu";
+import { ModeToggle } from "@/components/header/ModeToggle";
+import { NavButton } from "@/components/header/NavButton";
+// import { NavButtonMenu}  from "@/components/header/NavButtonMenu";
 // import { Button } from "@/components/ui/button";
 // import { LogoutLink} from "@kinde-oss/kinde-auth-nextjs/components";
 
@@ -15,7 +21,7 @@ export function Header() {
       <div className="flex h-8 items-centered justify-between w-full">
         <div className="flex items-center gap-2">
           <NavButton href="/" icon={AlignJustify} label="Home"/>
-          <Link href="/" className="flex justify-center items-center gap-2 ml-0" title="Home">
+          <Link href="/public" className="flex justify-center items-center gap-2 ml-0" title="Home">
             <h1 className="hidden sm:block txt-xl font-bold m-0 mt-1">
               ShopShop
             </h1>
