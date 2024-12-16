@@ -6,13 +6,17 @@
  * @packageDocumentation
  */
 
+// Internal Modules ----------------------------------------------------------
+
+import SignUpForm from "@/components/forms/SignUpForm";
+
+// Public Objects ------------------------------------------------------------
+
 export default function SignUpPage() {
   return (
     <div>
       <main>
-        <div>
-          <h1>TODO - Sign Up page</h1>
-        </div>
+        <SignUpForm />
       </main>
     </div>
   )

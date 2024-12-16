@@ -15,3 +15,5 @@ export const signInSchema = object({
   password: string({ required_error: "Password is required" })
     .min(1, "Password is required"),
 });
+
+export type signInSchemaType = typeof signInSchema._type;

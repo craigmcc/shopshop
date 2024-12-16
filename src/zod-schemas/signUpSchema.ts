@@ -24,3 +24,4 @@ export const signUpSchema = object({
     path: ["confirmPassword"],
   });
 
+export type signUpSchemaType = typeof signUpSchema._type;
