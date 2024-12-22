@@ -16,7 +16,9 @@ export default function SignUpPage() {
   return (
     <div>
       <main>
-        <SignUpForm />
+        <div className="flex flex-col justify-center text-center max-w-5xl mx-auto h-dvh">
+          <SignUpForm />
+        </div>
       </main>
     </div>
   )

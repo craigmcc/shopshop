@@ -66,6 +66,7 @@ export default function SignUpForm() {
         >
           <div className="flex flex-col gap-4 w-full max-w-xs">
             <InputWithLabel<signUpSchemaType>
+              autoFocus
               fieldTitle="Email Address:"
               nameInSchema="email"
             />
