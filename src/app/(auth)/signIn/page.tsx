@@ -6,12 +6,18 @@
  * @packageDocumentation
  */
 
+// Internal Modules ----------------------------------------------------------
+
+import SignInForm from "@/components/forms/SignInForm";
+
+// Public Objects ------------------------------------------------------------
+
 export default function SignInPage() {
   return (
     <div>
       <main>
-        <div>
-          <h1>TODO - Sign In page</h1>
+        <div className="flex flex-col  max-w-5xl mx-auto h-dvh">
+          <SignInForm/>
         </div>
       </main>
     </div>

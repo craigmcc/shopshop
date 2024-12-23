@@ -1,6 +1,26 @@
 // @/auth.ts
 
 /**
+ * Configuration for authjs (née next-auth) 5 beta.
+ *
+ * @packageDocumentation
+ */
+
+// External Modules ----------------------------------------------------------
+
+import Credentials from "@auth/core/providers/credentials";
+import NextAuth from "next-auth";
+
+// Internal Modules ----------------------------------------------------------
+
+import { db } from "@/lib/db";
+import { verifyPassword } from "@/lib/encryption";
+import { logger } from "@/lib/ServerLogger";
+import { signInSchema } from "@/zod-schemas/signInSchema";
+
+// Public Objects ------------------------------------------------------------
+
+/**
  * Authentication options for auth.js.
  *
  * TODO: Sessions are not yet supported.
@@ -8,19 +28,21 @@
  * @packageDocumentation
  */
 
-import NextAuth from "next-auth";
-import Credentials from "@auth/core/providers/credentials";
-
-import { db } from "@/lib/db";
-import { verifyPassword} from "@/lib/encryption";
-import { logger } from "@/lib/ServerLogger";
-import { signInSchema } from "@/zod-schemas/signInSchema";
-
 export const { auth, handlers, signIn, signOut } = NextAuth({
+
+  pages: {
+    signIn: "/signIn",
+  },
+
   providers: [
 
     Credentials({
 
+      /**
+       * Authenticate the profile based on the specified credentials.
+       *
+       * @param credentials
+       */
       async authorize(credentials) {
 
         logger.trace({
@@ -30,7 +52,6 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
 
         try {
           const { email, password } = await signInSchema.parseAsync(credentials);
-          // Do this ourselves because ProfileActions.email() redacts the password
           const profile = await db.profile.findUnique({
             where: {
               email: email,
@@ -41,6 +62,8 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
               profile.password = ""; // Redact the hashed password
               return profile;
             }
+          } else {
+            throw new Error("Invalid credentials");
           }
         } catch (error) {
           logger.error({
@@ -60,4 +83,5 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
     }),
 
   ],
+
 });
