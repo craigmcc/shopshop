@@ -1,4 +1,4 @@
-// @/components/NavButtonMenu.tsx
+// @/components/header/NavButtonMenu.tsx
 
 import type { LucideIcon } from "lucide-react";
 import Link from "next/link";

@@ -8,7 +8,7 @@
 
 // Internal Modules ----------------------------------------------------------
 
-import SignUpForm from "@/components/forms/SignUpForm";
+import SignUpForm from "@/components/auth/SignUpForm";
 
 // Public Objects ------------------------------------------------------------
 

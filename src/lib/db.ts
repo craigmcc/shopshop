@@ -17,6 +17,7 @@ import { logger } from "@/lib/ServerLogger";
 // Public Objects ------------------------------------------------------------
 
 declare global {
+  // eslint-disable-next-line no-var
   var prisma: PrismaClient | undefined;
 }
 

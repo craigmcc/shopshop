@@ -1,9 +1,15 @@
-// @/components/NavButton.tsx
+// @/components/header/NavButton.tsx
+
+// External Modules ----------------------------------------------------------
 
 import { LucideIcon } from "lucide-react";
 import Link from "next/link";
 
+// Internal Modules ----------------------------------------------------------
+
 import { Button } from "@/components/ui/button";
+
+// Public Objects ------------------------------------------------------------
 
 type Props = {
   icon: LucideIcon,

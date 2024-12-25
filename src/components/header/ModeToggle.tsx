@@ -1,10 +1,20 @@
 "use client"
 
-// @/components/ModeToggle.tsx
+// @/components/header/ModeToggle.tsx
+
+/**
+ * Toggle to switch light/dark/system mode.
+ *
+ * @packageDocumntation
+ */
+
+// External Modules ----------------------------------------------------------
 
 import { Moon, Sun } from "lucide-react"
 import { useTheme } from "next-themes"
 import * as React from "react"
+
+// Internal Modules ----------------------------------------------------------
 
 import { Button } from "@/components/ui/button"
 import {
@@ -13,6 +23,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+
+// Public Objects ------------------------------------------------------------
 
 export function ModeToggle() {
 
@@ -40,4 +52,5 @@ export function ModeToggle() {
       </DropdownMenuContent>
     </DropdownMenu>
   )
+
 }

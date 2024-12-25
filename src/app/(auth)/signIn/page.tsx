@@ -1,14 +1,14 @@
-// @/app/(auth)/signUp/page.tsx
+// @/app/(auth)/signIn/page.tsx
 
 /**
- * Sign up to authenticate an existing profile.
+ * Sign in with a registered email address and password.
  *
  * @packageDocumentation
  */
 
 // Internal Modules ----------------------------------------------------------
 
-import SignInForm from "@/components/forms/SignInForm";
+import SignInForm from "@/components/auth/SignInForm";
 
 // Public Objects ------------------------------------------------------------
 

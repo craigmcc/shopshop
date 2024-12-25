@@ -1,9 +1,9 @@
-// @/components/forms/SignInForm.tsx
+// @/components/forms/SignUpForm.tsx
 
 "use client"
 
 /**
- * Form for the Sign In page.
+ * Form for the Sign Up page.
  *
  * @packageDocumentation
  */
@@ -18,31 +18,33 @@ import { useForm } from "react-hook-form";
 
 // Internal Modules ----------------------------------------------------------
 
-import { saveSignInAction } from "@/actions/saveSignInAction";
+import { saveSignUpAction } from "@/actions/saveSignUpAction";
 import { InputWithLabel } from "@/components/inputs/InputWithLabel";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { DisplayServerActionResponse } from "@/components/shared/DisplayServerActionResponse";
 import { useToast } from "@/hooks/use-toast";
 import { logger } from "@/lib/ClientLogger"
-import { signInSchema, type signInSchemaType } from "@/zod-schemas/signInSchema";
+import { signUpSchema, type signUpSchemaType } from "@/zod-schemas/signUpSchema";
 
 // Public Objects ------------------------------------------------------------
 
-export default function SignInForm() {
+export default function SignUpForm() {
 
   const router = useRouter();
   const { toast } = useToast();
 
-  const defaultValues: signInSchemaType = {
+  const defaultValues: signUpSchemaType = {
+    confirmPassword: "",
     email: "",
+    name: "",
     password: "",
   }
 
-  const form = useForm({
+  const form = useForm<signUpSchemaType>({
     defaultValues,
     mode: "onBlur",
-    resolver: zodResolver(signInSchema),
+    resolver: zodResolver(signUpSchema),
   });
 
   const {
@@ -50,35 +52,36 @@ export default function SignInForm() {
     isPending: isSaving,
     reset: resetSaveAction,
     result: saveResult,
-  } = useAction(saveSignInAction, {
-      onSuccess({ data }) {
-        if (data?.message) {
-          toast({
-            description: data.message,
-            title: "Success! 🎉",
-            variant: "default",
-          });
-        }
-        router.push("/"); // TODO - probably needs to go to table of lists
-      },
+  } = useAction(saveSignUpAction, {
+    onSuccess({ data }) {
+      if (data?.message) {
+        toast({
+          description: data.message,
+          title: "Success! 🎉",
+          variant: "default",
+        });
+      }
+      router.push("/");
+    },
     onError({ error }) {
       toast({
-        description: "Login Failed",
+        description: "Incorrect credentials",
         title: "Error",
         variant: "destructive",
       });
       logger.error({
-        context: "SignInForm.onError",
+        context: "SignUpForm.onError",
         error: error,
       });
-    },
+    }
   });
 
-  async function submitForm(data: signInSchemaType) {
+  async function submitForm(data: signUpSchemaType) {
     logger.info({
-      context: "SignInForm.submitForm",
+      context: "SignUpForm.submitForm",
       data: {
         ...data,
+        confirmPassword: "*REDACTED*",
         password: "*REDACTED*",
       }
     });
@@ -90,7 +93,7 @@ export default function SignInForm() {
       <DisplayServerActionResponse result={saveResult} />
       <div>
         <h2 className="text-2xl font-bold">
-          Sign In To ShopShop
+          Sign Up for ShopShop
         </h2>
       </div>
       <Form {...form}>
@@ -100,15 +103,26 @@ export default function SignInForm() {
         >
           <div className="flex flex-col gap-4 w-full max-w-xs">
 
-            <InputWithLabel<signInSchemaType>
+            <InputWithLabel<signUpSchemaType>
               autoFocus
               fieldTitle="Email Address:"
               nameInSchema="email"
             />
 
-            <InputWithLabel<signInSchemaType>
+            <InputWithLabel<signUpSchemaType>
+              fieldTitle="Name:"
+              nameInSchema="name"
+            />
+
+            <InputWithLabel<signUpSchemaType>
               fieldTitle="Password:"
               nameInSchema="password"
+              type="password"
+            />
+
+            <InputWithLabel<signUpSchemaType>
+              fieldTitle="Confirm Password:"
+              nameInSchema="confirmPassword"
               type="password"
             />
 
@@ -117,15 +131,15 @@ export default function SignInForm() {
               <Button
                 className="w-3/4"
                 disabled={isSaving}
-                title="Sign In"
+                title="Save"
                 type="submit"
                 variant="default"
               >
                 {isSaving ? (
                   <>
-                    <LoaderCircle className="animate-spin"/> Signing In
+                    <LoaderCircle className="animate-spin"/> Saving
                   </>
-                ) : "Sign In"}
+                ) : "Save"}
               </Button>
 
               <Button

@@ -14,12 +14,25 @@ import { flattenValidationErrors } from "next-safe-action";
 
 // Internal Modules ----------------------------------------------------------
 
-import { signIn } from "@/auth";
+import { signIn, signOut } from "@/auth";
 import { actionClient } from "@/lib/safe-action";
 //import { logger } from "@/lib/ServerLogger";
 import { signInSchema, signInSchemaType } from "@/zod-schemas/signInSchema";
 
 // Public Objects ------------------------------------------------------------
+
+export async function doSignIn(formData: signInSchemaType) {
+  const response = await signIn("credentials", {
+    email: formData.email,
+    password: formData.password,
+    redirect: false,
+  });
+  return response;
+}
+
+export async function doSignOut() {
+  await signOut({ redirectTo: "/" });
+}
 
 export const saveSignInAction = actionClient
 

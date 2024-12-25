@@ -8,7 +8,7 @@
 
 // External Modules ----------------------------------------------------------
 
-import Credentials from "@auth/core/providers/credentials";
+import CredentialsProvider from "next-auth/providers/credentials";
 import NextAuth from "next-auth";
 
 // Internal Modules ----------------------------------------------------------
@@ -16,72 +16,75 @@ import NextAuth from "next-auth";
 import { db } from "@/lib/db";
 import { verifyPassword } from "@/lib/encryption";
 import { logger } from "@/lib/ServerLogger";
-import { signInSchema } from "@/zod-schemas/signInSchema";
+import { signInSchemaType } from "@/zod-schemas/signInSchema";
 
 // Public Objects ------------------------------------------------------------
 
 /**
  * Authentication options for auth.js.
  *
- * TODO: Sessions are not yet supported.
- *
  * @packageDocumentation
  */
 
 export const { auth, handlers, signIn, signOut } = NextAuth({
 
+/*
   pages: {
     signIn: "/signIn",
+    signOut: "/signOut",
   },
+*/
 
   providers: [
 
-    Credentials({
+    CredentialsProvider({
 
-      /**
-       * Authenticate the profile based on the specified credentials.
-       *
-       * @param credentials
-       */
-      async authorize(credentials) {
-
-        logger.trace({
-          context: "CredentialsProvider.authorize",
-          credentials: credentials,
+      // @ts-expect-error ESLint does not like the type of credentials
+      async authorize(credentials: signInSchemaType) {
+        logger.info({
+          context: "auth.authorize",
+          credentials: {
+            ...credentials,
+            password: "*REDACTED*",
+          },
         });
-
-        try {
-          const { email, password } = await signInSchema.parseAsync(credentials);
-          const profile = await db.profile.findUnique({
-            where: {
-              email: email,
-            },
-          });
-          if (profile) {
-            if (await verifyPassword(password, profile.password)) {
-              profile.password = ""; // Redact the hashed password
-              return profile;
-            }
+        const profile = await db.profile.findUnique({
+          where: {
+            email: credentials.email,
+          },
+        });
+        if (profile) {
+          if (await verifyPassword(credentials.password, profile.password)) {
+            profile.password = ""; // Redact the hashed password
+            return {
+              email: profile.email,
+              image: profile.imageUrl,
+              name: profile.name,
+              profile: profile,
+            };
           } else {
-            throw new Error("Invalid credentials");
+            return null;
           }
-        } catch (error) {
-          logger.error({
-            context: "CredentialsProvider.authorize",
-            error: error as Error,
-          });
+        } else {
+//          throw new Error("Invalid credentials");
+          return null;
         }
-        return null;
+
       },
 
-      // Fields that will be submitted for authentication
       credentials: {
         email: { label: "Email Address", type: "text" },
         password: { label: "Password", type: "password" },
       },
 
+      name: "Credentials",
+
     }),
 
   ],
+
+  session: {
+    strategy: "jwt",
+  },
 
 });
