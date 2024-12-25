@@ -1,4 +1,4 @@
-// @/components/forms/SignUpForm.tsx
+// @/components/auth/SignUpForm.tsx
 
 "use client"
 

@@ -28,12 +28,10 @@ import { signInSchemaType } from "@/zod-schemas/signInSchema";
 
 export const { auth, handlers, signIn, signOut } = NextAuth({
 
-/*
   pages: {
-    signIn: "/signIn",
-    signOut: "/signOut",
+    signIn: "/logIn",
+    signOut: "/logOut",
   },
-*/
 
   providers: [
 

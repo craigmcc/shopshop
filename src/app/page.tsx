@@ -30,15 +30,15 @@ export default function Home() {
               title="Sign In"
               variant="default"
             >
-              <Link href="/signIn">
+              <Link href="/logIn">
                 <Key />&nbsp;Sign In
               </Link>
             </Button>
             <Button
-              aria-label="Sign In"
+              aria-label="Sign Up"
               asChild
               className="rounded-full"
-              title="Sign In"
+              title="Sign Up"
               variant="default"
             >
               <Link href="/signUp">

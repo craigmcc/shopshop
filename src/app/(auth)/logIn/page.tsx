@@ -1,4 +1,4 @@
-// @/app/(auth)/signIn/page.tsx
+// @/app/(auth)/logIn/page.tsx
 
 /**
  * Sign in with a registered email address and password.

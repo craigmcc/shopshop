@@ -24,7 +24,7 @@ import { initials } from "@/lib/strings";
 export async function Header() {
 
   const session = await auth();
-  console.log("Session: ", session);
+//  console.log("Session: ", session);
 
   return (
     <header className="animate-slide bg-background h-12 p-2 border-b sticky top-0 z-20">
@@ -32,7 +32,7 @@ export async function Header() {
 
         <div className="flex items-center gap-2">
           <NavButton href="/" icon={AlignJustify} label="Home"/>
-          <Link href="/public" className="flex justify-center items-center gap-2 ml-0" title="Home">
+          <Link href="/" className="flex justify-center items-center gap-2 ml-0" title="Home">
             <h1 className="hidden sm:block txt-xl font-bold m-0 mt-1">
               ShopShop
             </h1>
@@ -44,7 +44,7 @@ export async function Header() {
             <NavButtonMenu
               choices={[
                 { title: "Edit Profile", href: "/profile" },
-                { title: "Sign Out", href: "/signOut" },
+                { title: "Sign Out", href: "/logOut" },
               ]}
               icon={UserRound}
               label={initials(session.user.name)}

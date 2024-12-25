@@ -1,0 +1,46 @@
+// @/components/auth/SignOutForm.tsx
+
+"use client"
+
+/**
+ * Form for the Sign Out page.
+ *
+ * @packageDocumentation
+ */
+
+// External Modules ----------------------------------------------------------
+
+import { useRouter } from "next/navigation";
+
+// Internal Modules ----------------------------------------------------------
+
+import { Button } from "@/components/ui/button";
+import { doSignOut } from "@/lib/authUtils";
+
+// Public Objects ------------------------------------------------------------
+
+export default function SignOutForm() {
+
+  const router = useRouter();
+
+  async function performSignOut() {
+    await doSignOut();
+    router.push("/");
+  }
+
+  return (
+    <div className="flex flex-col gap-1 justify-center items-center sm:px-8">
+      <h5>Are you sure you want to sign out?</h5>
+      <form action={performSignOut}>
+        <Button
+          title="Sign Out"
+          type="submit"
+          variant="default"
+        >
+          Sign Out
+        </Button>
+      </form>
+    </div>
+  )
+
+}

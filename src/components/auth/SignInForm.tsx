@@ -1,4 +1,4 @@
-// @/components/forms/SignInForm.tsx
+// @/components/auth/SignInForm.tsx
 
 "use client"
 
@@ -11,19 +11,15 @@
 // External Modules ----------------------------------------------------------
 
 import { zodResolver } from "@hookform/resolvers/zod";
-//import { LoaderCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
-//import { useAction } from "next-safe-action/hooks";
 import { useForm } from "react-hook-form";
 
 // Internal Modules ----------------------------------------------------------
 
-import { doSignIn, /*doSignOut,*/ /*saveSignInAction*/ } from "@/actions/saveSignInAction";
 import { InputWithLabel } from "@/components/inputs/InputWithLabel";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
-//import { DisplayServerActionResponse } from "@/components/shared/DisplayServerActionResponse";
-//import { useToast } from "@/hooks/use-toast";
+import { doSignIn } from "@/lib/authUtils";
 import { logger } from "@/lib/ClientLogger"
 import { signInSchema, type signInSchemaType } from "@/zod-schemas/signInSchema";
 
@@ -32,7 +28,7 @@ import { signInSchema, type signInSchemaType } from "@/zod-schemas/signInSchema"
 export default function SignInForm() {
 
   const router = useRouter();
-//  const { toast } = useToast();
+  //  const { toast } = useToast();
 
   const defaultValues: signInSchemaType = {
     email: "",
@@ -45,54 +41,34 @@ export default function SignInForm() {
     resolver: zodResolver(signInSchema),
   });
 
-/*
-  const {
-    execute: executeSave,
-    isPending: isSaving,
-    reset: resetSaveAction,
-    result: saveResult,
-  } = useAction(saveSignInAction, {
-      onSuccess({ data }) {
-        if (data?.message) {
-          toast({
-            description: data.message,
-            title: "Success! 🎉",
-            variant: "default",
-          });
-        }
-        router.push("/"); // TODO - probably needs to go to table of lists
-      },
-    onError({ error }) {
-      toast({
-        description: "Login Failed",
-        title: "Error",
-        variant: "destructive",
-      });
-      logger.error({
-        context: "SignInForm.onError",
-        error: error,
-      });
-    },
-  });
-*/
-
-  async function submitForm(formData: signInSchemaType) {
-    logger.info({
-      context: "SignInForm.submitForm",
-      formData: {
-        ...formData,
-        password: "*REDACTED*",
-      }
-    });
+  async function performSignIn(formData: signInSchemaType) {
     const response = await doSignIn(formData);
-//    executeSave(data);
-    if (!!response.error) {
-      // Display local error???
-    } else {
-      router.push("/");  // TODO - to lists page?
+    logger.info({
+      context: "SignInForm.performSignIn.output",
+      response: response,
+    });
+    router.push("/"); // TODO - probably go to lists page when it exists
+  }
+
+/*
+  async function submitForm(formData: signInSchemaType) {
+    try {
+      const response = await doSignIn(formData);
+      logger.info({
+        context: "SignInForm.submitForm.output",
+        response: response,
+      });
+      redirect("/"); // TODO - probably go to lists page when it exists
+    } catch (error) {
+      logger.info({
+        context: "SignInForm.submitForm.error",
+        error: error,
+      })
+      alert("Incorrect credentials");
     }
 
   }
+*/
 
   return (
     <div className={"flex flex-col gap-1 sm:px-8"}>
@@ -105,7 +81,7 @@ export default function SignInForm() {
       <Form {...form}>
         <form
           className="flex flex-col md:flex-row gap-4 md:gap-8"
-          onSubmit={form.handleSubmit(submitForm)}
+          onSubmit={form.handleSubmit(performSignIn)}
         >
           <div className="flex flex-col gap-4 w-full max-w-xs">
 
@@ -130,23 +106,12 @@ export default function SignInForm() {
                 type="submit"
                 variant="default"
               >
-{/*
-                {isSaving ? (
-                  <>
-                    <LoaderCircle className="animate-spin"/> Signing In
-                  </>
-                ) :
-*/}
                   Sign In
-{/*
-                }
-*/}
               </Button>
 
               <Button
                 onClick={() => {
                   form.reset(defaultValues)
-//                  resetSaveAction();
                 }}
                 title="Reset"
                 type="button"
@@ -162,4 +127,5 @@ export default function SignInForm() {
     </div>
 
   )
+
 }
