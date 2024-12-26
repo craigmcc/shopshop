@@ -20,9 +20,17 @@ import { useForm } from "react-hook-form";
 
 import { saveSignUpAction } from "@/actions/saveSignUpAction";
 import { InputWithLabel } from "@/components/inputs/InputWithLabel";
-import { Button } from "@/components/ui/button";
-import { Form } from "@/components/ui/form";
 import { DisplayServerActionResponse } from "@/components/shared/DisplayServerActionResponse";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+//  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import { Form } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { logger } from "@/lib/ClientLogger"
 import { signUpSchema, type signUpSchemaType } from "@/zod-schemas/signUpSchema";
@@ -89,76 +97,98 @@ export default function SignUpForm() {
   }
 
   return (
-    <div className={"flex flex-col gap-1 sm:px-8"}>
-      <DisplayServerActionResponse result={saveResult} />
-      <div>
-        <h2 className="text-2xl font-bold">
-          Sign Up for ShopShop
-        </h2>
-      </div>
-      <Form {...form}>
-        <form
-          className="flex flex-col md:flex-row gap-4 md:gap-8"
-          onSubmit={form.handleSubmit(submitForm)}
-        >
-          <div className="flex flex-col gap-4 w-full max-w-xs">
 
-            <InputWithLabel<signUpSchemaType>
-              autoFocus
-              fieldTitle="Email Address:"
-              nameInSchema="email"
-            />
+    <Card className="max-w-4xl items-center justify-center">
 
-            <InputWithLabel<signUpSchemaType>
-              fieldTitle="Name:"
-              nameInSchema="name"
-            />
+      <CardHeader>
+        <CardTitle>Sign Up for ShopShop</CardTitle>
+        <CardDescription>
+          <DisplayServerActionResponse result={saveResult}/>
+        </CardDescription>
+      </CardHeader>
 
-            <InputWithLabel<signUpSchemaType>
-              fieldTitle="Password:"
-              nameInSchema="password"
-              type="password"
-            />
+      <CardContent>
+        <div className={"flex flex-col gap-1 sm:px-8"}>
 
-            <InputWithLabel<signUpSchemaType>
-              fieldTitle="Confirm Password:"
-              nameInSchema="confirmPassword"
-              type="password"
-            />
+          <Form {...form}>
+            <form
+              className="flex flex-col md:flex-row gap-4 md:gap-8"
+              onSubmit={form.handleSubmit(submitForm)}
+            >
+              <div className="flex flex-col gap-4 w-full max-w-xs">
 
-            <div className="flex gap-2">
+                <InputWithLabel<signUpSchemaType>
+                  autoFocus
+                  fieldTitle="Email Address:"
+                  nameInSchema="email"
+                />
 
-              <Button
-                className="w-3/4"
-                disabled={isSaving}
-                title="Save"
-                type="submit"
-                variant="default"
-              >
-                {isSaving ? (
-                  <>
-                    <LoaderCircle className="animate-spin"/> Saving
-                  </>
-                ) : "Save"}
-              </Button>
+                <InputWithLabel<signUpSchemaType>
+                  fieldTitle="Name:"
+                  nameInSchema="name"
+                />
 
-              <Button
-                onClick={() => {
-                  form.reset(defaultValues)
-                  resetSaveAction();
-                }}
-                title="Reset"
-                type="button"
-                variant="destructive"
-              >
-                Reset
-              </Button>
+              </div>
 
-            </div>
-          </div>
-        </form>
-      </Form>
-    </div>
+              <div className="flex flex-col gap-4 w-full max-w-xs">
+
+                <InputWithLabel<signUpSchemaType>
+                  fieldTitle="Password:"
+                  nameInSchema="password"
+                  type="password"
+                />
+
+                <InputWithLabel<signUpSchemaType>
+                  fieldTitle="Confirm Password:"
+                  nameInSchema="confirmPassword"
+                  type="password"
+                />
+
+                <div className="flex gap-2">
+
+                  <Button
+                    className="w-3/4"
+                    disabled={isSaving}
+                    title="Save"
+                    type="submit"
+                    variant="default"
+                  >
+                    {isSaving ? (
+                      <>
+                        <LoaderCircle className="animate-spin"/> Saving
+                      </>
+                    ) : "Save"}
+                  </Button>
+
+                  <Button
+                    onClick={() => {
+                      form.reset(defaultValues)
+                      resetSaveAction();
+                    }}
+                    title="Reset"
+                    type="button"
+                    variant="destructive"
+                  >
+                    Reset
+                  </Button>
+
+                </div>
+
+              </div>
+
+            </form>
+
+          </Form>
+
+        </div>
+      </CardContent>
+
+      {/*
+      <CardFooter>
+        <p>Card Footer</p>
+      </CardFooter>
+      */}
+    </Card>
 
   )
 }
