@@ -30,7 +30,7 @@ export default function Home() {
               title="Sign In"
               variant="default"
             >
-              <Link href="/logIn">
+              <Link href="/auth/signIn">
                 <Key />&nbsp;Sign In
               </Link>
             </Button>
@@ -41,7 +41,7 @@ export default function Home() {
               title="Sign Up"
               variant="default"
             >
-              <Link href="/signUp">
+              <Link href="/auth/signUp">
                 <GitBranchPlus />&nbsp;Sign Up
               </Link>
             </Button>

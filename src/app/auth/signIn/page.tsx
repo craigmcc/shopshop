@@ -1,24 +1,23 @@
-// @/app/(auth)/logOut/page.tsx
+// @/app/auth/signIn/page.tsx
 
 /**
- * Sign out after confirmation
+ * Sign in with a registered email address and password.
  *
  * @packageDocumentation
  */
 
 // Internal Modules ----------------------------------------------------------
 
-import SignOutForm from "@/components/auth/SignOutForm";
+import SignInForm from "@/components/auth/SignInForm";
 
 // Public Objects ------------------------------------------------------------
 
-export default function SignOutPage() {
-
+export default function SignInPage() {
   return (
     <div>
       <main>
         <div className="flex flex-col  max-w-5xl mx-auto h-dvh">
-          <SignOutForm/>
+          <SignInForm/>
         </div>
       </main>
     </div>

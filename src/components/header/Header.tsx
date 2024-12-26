@@ -44,7 +44,7 @@ export async function Header() {
             <NavButtonMenu
               choices={[
                 { title: "Edit Profile", href: "/profile" },
-                { title: "Sign Out", href: "/logOut" },
+                { title: "Sign Out", href: "/auth/signOut" },
               ]}
               icon={UserRound}
               label={initials(session.user.name)}

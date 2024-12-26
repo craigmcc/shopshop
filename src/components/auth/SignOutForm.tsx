@@ -15,7 +15,7 @@ import { useRouter } from "next/navigation";
 // Internal Modules ----------------------------------------------------------
 
 import { Button } from "@/components/ui/button";
-import { doSignOut } from "@/lib/authUtils";
+import { doSignOut } from "@/actions/authActions";
 
 // Public Objects ------------------------------------------------------------
 

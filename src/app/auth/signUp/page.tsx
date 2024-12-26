@@ -1,4 +1,4 @@
-// @/app/(auth)/signUp/page.tsx
+// @/app/auth/signUp/page.tsx
 
 /**
  * Sign up to create a new profile page.

@@ -19,7 +19,7 @@ import { useForm } from "react-hook-form";
 import { InputWithLabel } from "@/components/inputs/InputWithLabel";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
-import { doSignIn } from "@/lib/authUtils";
+import { doSignIn } from "@/actions/authActions";
 import { logger } from "@/lib/ClientLogger"
 import { signInSchema, type signInSchemaType } from "@/zod-schemas/signInSchema";
 
