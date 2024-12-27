@@ -98,7 +98,7 @@ export default function SignUpForm() {
 
   return (
 
-    <Card className="max-w-4xl items-center justify-center">
+    <Card className="items-center justify-center">
 
       <CardHeader>
         <CardTitle>Sign Up for ShopShop</CardTitle>
