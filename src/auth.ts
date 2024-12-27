@@ -9,7 +9,7 @@
 // External Modules ----------------------------------------------------------
 
 import CredentialsProvider from "next-auth/providers/credentials";
-import NextAuth from "next-auth";
+import NextAuth, { CredentialsSignin } from "next-auth";
 
 // Internal Modules ----------------------------------------------------------
 
@@ -54,6 +54,10 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         if (profile) {
           if (await verifyPassword(credentials.password, profile.password)) {
             profile.password = ""; // Redact the hashed password
+            logger.info({
+              context: "auth.authorize.success",
+              email: profile.email,
+            });
             return {
               email: profile.email,
               image: profile.imageUrl,
@@ -61,11 +65,18 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
               profile: profile,
             };
           } else {
+            logger.info({
+              context: "auth.authorize.failure.password",
+              email: profile.email,
+            });
             return null;
           }
         } else {
-//          throw new Error("Invalid credentials");
-          return null;
+          logger.info({
+            context: "auth.authorize.failure.email",
+            email: credentials.email,
+          });
+          throw new CredentialsSignin("Invalid Credentials");
         }
 
       },

@@ -42,8 +42,7 @@ export async function doSignIn(formData: signInSchemaType) {
     logger.info({
       context: "doSignIn.error",
       error: error,
-    })
-    alert("Incorrect credentials");
+    });
     throw error;
   }
 }

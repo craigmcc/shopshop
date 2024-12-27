@@ -2,7 +2,7 @@
 
 // Component Properties ------------------------------------------------------
 
-type Props = {
+export type DisplayServerActionResponseProps = {
     result: {
         data?: {
             message?: string,
@@ -14,7 +14,7 @@ type Props = {
 
 // Public Objects ------------------------------------------------------------
 
-export function DisplayServerActionResponse({ result }: Props) {
+export function DisplayServerActionResponse({ result }: DisplayServerActionResponseProps) {
 
     const { data, serverError, validationErrors } = result
 

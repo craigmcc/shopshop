@@ -12,20 +12,25 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 // Internal Modules ----------------------------------------------------------
 
+import { doSignIn } from "@/actions/authActions";
 import { InputWithLabel } from "@/components/inputs/InputWithLabel";
+import MessageBox, { MessageBoxProps } from "@/components/shared/MessageBox";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
-import { doSignIn } from "@/actions/authActions";
 import { logger } from "@/lib/ClientLogger"
 import { signInSchema, type signInSchemaType } from "@/zod-schemas/signInSchema";
+import {CredentialsSignin} from "next-auth";
 
 // Public Objects ------------------------------------------------------------
 
 export default function SignInForm() {
+
+  const [result, setResult] = useState<MessageBoxProps | null>(null);
 
   const router = useRouter();
   //  const { toast } = useToast();
@@ -42,12 +47,27 @@ export default function SignInForm() {
   });
 
   async function performSignIn(formData: signInSchemaType) {
-    const response = await doSignIn(formData);
-    logger.info({
-      context: "SignInForm.performSignIn.output",
-      response: response,
-    });
-    router.push("/"); // TODO - probably go to lists page when it exists
+    try {
+      const response = await doSignIn(formData);
+      logger.info({
+        context: "SignInForm.performSignIn.output",
+        response: response,
+      });
+      setResult({content: "Successful sign in", type: "success"})
+      router.push("/"); // TODO - probably go to lists page when it exists
+    } catch (e) {
+      logger.info({
+        context: "SignInForm.performSignIn.error",
+        error: e,
+      });
+      if ((e instanceof CredentialsSignin)) {
+        setResult({content: "Invalid Credentials (CSI)", type: "error"});
+      } else if (e instanceof Error) {
+        setResult({ content: e.message.split(".")[0], type: "error" });
+      } else {
+        setResult({content: "Unknown error occurred", type: "error" });
+      }
+    }
   }
 
 /*
@@ -72,7 +92,9 @@ export default function SignInForm() {
 
   return (
     <div className={"flex flex-col gap-1 sm:px-8"}>
-      {/*<DisplayServerActionResponse result={saveResult} />*/}
+      { result && (
+        <MessageBox content={result.content} type={result.type}/>
+      )}
       <div>
         <h2 className="text-2xl font-bold">
           Sign In To ShopShop
