@@ -8,6 +8,7 @@
 
 // External Modules ----------------------------------------------------------
 
+import { Profile } from "@prisma/client";
 import CredentialsProvider from "next-auth/providers/credentials";
 import NextAuth, { CredentialsSignin } from "next-auth";
 
@@ -27,6 +28,48 @@ import { signInSchemaType } from "@/zod-schemas/signInSchema";
  */
 
 export const { auth, handlers, signIn, signOut } = NextAuth({
+
+  callbacks: {
+
+    /**
+     * Add our local Profile o the JWT token when it is created.
+     */
+    async jwt({ token, user, profile }) {
+      logger.info({
+        context: "auth.jwt.input",
+        profile: profile,
+        token: token,
+        user: user,
+      });
+      if (user) {
+        token.profile = user;
+      }
+      logger.info({
+        context: "auth.jwt.output",
+        token: token,
+      });
+      return token;
+    },
+
+    /**
+     * Note that the session is being requested.
+     */
+  async session({ session, token, user }) {
+      logger.info({
+        context: "auth.session.input",
+        session: session,
+        token: token,
+        user: user,
+      });
+      session.user.profile = token.profile as Profile;
+      logger.info({
+        context: "auth.session.output",
+        session: session,
+      });
+      return session;
+    },
+
+  },
 
   pages: {
     signIn: "/auth/signIn",

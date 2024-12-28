@@ -17,6 +17,7 @@ import { auth } from "@/auth";
 import { ModeToggle } from "@/components/header/ModeToggle";
 import { NavButton } from "@/components/header/NavButton";
 import { NavButtonMenu}  from "@/components/header/NavButtonMenu";
+import { logger } from "@/lib/ServerLogger";
 import { initials } from "@/lib/strings";
 
 // Public Objects ------------------------------------------------------------
@@ -24,7 +25,13 @@ import { initials } from "@/lib/strings";
 export async function Header() {
 
   const session = await auth();
-//  console.log("Session: ", session);
+  logger.info({
+    context: "Header",
+    session: session,
+//    user: session?.user,
+//    profile: session?.user.profile,
+//    profileId: session?.user.profile?.id,
+  });
 
   return (
     <header className="animate-slide bg-background h-12 p-2 border-b sticky top-0 z-20">
