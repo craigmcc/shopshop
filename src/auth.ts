@@ -34,6 +34,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
     /**
      * Add our local Profile o the JWT token when it is created.
      */
+/*
     async jwt({ token, user, profile }) {
       logger.info({
         context: "auth.jwt.input",
@@ -50,10 +51,12 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
       });
       return token;
     },
+*/
 
     /**
      * Note that the session is being requested.
      */
+/*
   async session({ session, token, user }) {
       logger.info({
         context: "auth.session.input",
@@ -68,6 +71,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
       });
       return session;
     },
+*/
 
   },
 
