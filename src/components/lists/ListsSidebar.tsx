@@ -1,19 +1,20 @@
 // @/components/lists/ListsSidebar.tsx
 
 /**
- * The lists that the current user is a member of, with controls to select actions.
+ * The Lists that the current user is a Member of, with controls to
+ * select various actions.
  *
  * @packageDocumentation
  */
 
 // External Modules ----------------------------------------------------------
 
-import { List, Member, Prisma, Profile } from "@prisma/client";
-import { auth } from "@/auth";
+import { List } from "@prisma/client";
 import { redirect } from "next/navigation";
 
 // Internal Modules ----------------------------------------------------------
 
+import { findProfile } from "@/actions/authActions";
 import { db } from "@/lib/db";
 import { logger } from "@/lib/ServerLogger";
 
@@ -22,40 +23,55 @@ import { logger } from "@/lib/ServerLogger";
 export async function ListsSidebar() {
 
   // Check sign in status
-  const session = await auth();
-  logger.info({
-    context: "ListsLayout",
-    session: session,
-  });
-  if (!session) {
+  const profile = await findProfile();
+  if (!profile) {
     redirect("/auth/signIn");
   }
+  logger.info({
+    context: "ListsSidebar.findProfile",
+    profile: {
+      ...profile,
+      password: "*REDACTED*",
+    },
+  });
 
-  // Select the Profile and associated Lists this Profile is a Member of
-  const profile = await db.profile.findUnique({
+  // Select Lists this Profile is a Member of
+  const members = await db.member.findMany({
     include: {
-      members: {
-        include: {
-          list: true,
-        }
-      }
+      list: true,
     },
-/*
-    omit: {
-      password: true,
-    },
-*/
     where: {
-      email: session.user.email!,
+      profileId: profile.id,
     }
   });
-  logger.info({
-    context: "ListsSidebar.find",
-    profile: profile,
-  });
+  const lists: List[] = [];
+  for (const member of members) {
+    lists.push(member.list);
+  }
+  lists.sort( compareListNames )
 
   return (
-    <span>ListsSidebar</span>
+    <>
+      <div>ListsSidebar Start</div>
+      <ul>
+        {lists.map((list) => (
+          <li key={list.id}>{list.name}</li>
+        ))}
+      </ul>
+      <div>ListsSidebar End</div>
+    </>
   )
 
+}
+
+// Private Objects -----------------------------------------------------------
+
+function compareListNames(a: List, b:List): number {
+  if (a.name < b.name) {
+    return -1;
+  } else if (a.name > b.name) {
+    return +1;
+  } else {
+    return 0;
+  }
 }

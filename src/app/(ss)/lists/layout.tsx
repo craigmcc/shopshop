@@ -18,15 +18,17 @@ type Props = {
   children: React.ReactNode;
 }
 
-export async function ListsLayout(props: Props) {
+export default async function ListsLayout(props: Props) {
 
   return (
-    <div className="h-full">
+    // <div className="h-full">
+    <>
       <div className="fixed h-full w-60 flex-col">
         <ListsSidebar />
       </div>
       <main className="h-full">{props.children}</main>
-    </div>
+    </>
+    // </div>
   )
 
 }

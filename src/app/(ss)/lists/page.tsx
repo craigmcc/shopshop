@@ -10,11 +10,7 @@
 export default function ListsPage() {
   return (
     <div>
-      <main>
-        <div>
-          <h1>TODO - Lists page</h1>
-        </div>
-      </main>
+          <h1>TODO - Lists page will go here</h1>
     </div>
   )
 }
