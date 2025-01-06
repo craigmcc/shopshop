@@ -21,14 +21,59 @@ import { actionClient } from "@/lib/safe-action";
 import { db } from "@/lib/db";
 import { InitialListData } from "@/lib/InitialListData";
 import { logger } from "@/lib/ServerLogger";
-import { listSchema, type listSchemaType } from "@/zod-schemas/listSchema";
+import {
+  listSchema,
+  type listSchemaType,
+  removeListSchema,
+  removeListSchemaType,
+} from "@/zod-schemas/listSchema";
 
 // Public Objects ------------------------------------------------------------
 
 /**
  * Handle remove requests for List models.
  */
-// TODO
+export const removeListAction = actionClient
+  .metadata({ actionName: "removeListAction" })
+  .schema(removeListSchema, {
+    handleValidationErrorsShape: async (ve) => flattenValidationErrors(ve).fieldErrors,
+  }).action(async ({
+    parsedInput: list
+  }: { parsedInput: removeListSchemaType }) => {
+
+    // Check sign in status
+    const profile = await findProfile();
+    if (!profile) {
+      redirect("/auth/signIn");
+    }
+    logger.info({
+      context: "listActions.removeListAction.findProfile",
+      profile: {
+        ...profile,
+        password: "*REDACTED",
+      }
+    });
+
+    // Validate that this List was created by this Profile
+    const member = await db.member.findFirst({
+      where: {
+        listId: list.id,
+        profileId: profile.id,
+      }
+    });
+    if (!member) {
+      return { message: `List ID ${list.id} was not created by you, so you cannot remove it`}
+    }
+
+    // Perform the requested removal
+    await db.list.delete({
+      where: {
+        id: list.id,
+      }
+    });
+    return ( { message: `List ID ${list.id} was successfully removed`})
+
+  });
 
 /**
  * Handle create and update requests for List models.
@@ -48,10 +93,10 @@ export const saveListAction = actionClient
       redirect("/auth/signIn");
     }
     logger.info({
-      context: "listActions.findProfile",
+      context: "listActions.saveListAction.findProfile",
       profile: {
         ...profile,
-        password: "*REDACTED",
+        password: "*REDACTED*",
       }
     });
 

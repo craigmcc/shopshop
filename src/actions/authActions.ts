@@ -80,7 +80,10 @@ export async function findProfile(): Promise<Profile | null> {
     }
   });
   if (profile) {
-    return profile;
+    return {
+      ...profile,
+      password: "*REDACTED*",
+    };
   } else {
     logger.error({
       context: "authActions.findProfile",

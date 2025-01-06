@@ -20,3 +20,9 @@ export const listSchema = object({
 });
 
 export type listSchemaType = typeof listSchema._type;
+
+export const removeListSchema = object({
+  id: string(),
+});
+
+export type removeListSchemaType = typeof removeListSchema._type;
