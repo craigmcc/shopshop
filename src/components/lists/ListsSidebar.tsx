@@ -10,6 +10,8 @@
 // External Modules ----------------------------------------------------------
 
 import { List } from "@prisma/client";
+import { SquarePlus} from "lucide-react";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 
 // Internal Modules ----------------------------------------------------------
@@ -52,7 +54,14 @@ export async function ListsSidebar() {
 
   return (
     <>
-      <div>ListsSidebar Start</div>
+      <div className="flex h-8 items-centered justify-between w-full">
+        <div>Shopping Lists</div>
+        <div>
+          <Link href="/lists/new/settings">
+            <SquarePlus/>
+          </Link>
+        </div>
+      </div>
       <ul>
         {lists.map((list) => (
           <li key={list.id}>{list.name}</li>

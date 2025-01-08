@@ -110,9 +110,17 @@ export const saveListAction = actionClient
           profileId: profile.id,
         }
       });
-      // (2) Populate it with Categories and Items
+      // (2) Add Members row for ownership of the new list
+      await db.member.create({
+        data: {
+          listId: result.id,
+          profileId: profile.id,
+          role: "ADMIN",
+        }
+      });
+      // (3) Populate the List with Categories and Items
       await populate(result.id);
-      // (3) Return success message
+      // (4) Return success message
       return { message: `List ID ${result.id} created successfully`}
     }
 

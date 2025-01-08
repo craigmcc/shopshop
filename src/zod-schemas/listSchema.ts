@@ -16,7 +16,8 @@ export const listSchema = object({
   id: string().optional(),
   name: string({ required_error: "Name is required" })
     .min(1, "Name is required"),
-  // profileId must be validated server side
+  profileId: string({ required_error: "Profile ID is required"})
+    .min(1, "Profile ID is required"),
 });
 
 export type listSchemaType = typeof listSchema._type;
