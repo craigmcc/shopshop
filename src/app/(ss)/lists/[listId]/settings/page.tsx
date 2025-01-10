@@ -36,6 +36,8 @@ interface Props {
 
 export default async function ListSettingsPage({ params }: Props) {
 
+  const { listId } = await params;
+
   // Check sign in status
   const profile = await findProfile();
   if (!profile) {
@@ -43,17 +45,16 @@ export default async function ListSettingsPage({ params }: Props) {
   }
   logger.info({
     context: "ListSettingsPage",
-    listId: params.listId,
+    listId: listId,
     profile: profile,
   });
 
   // Create an empty List (if creating) or look up an existing List (if editing)
   let list: List | null;
-  if (params.listId === "new") {
+  if (listId === "new") {
     list = {
       id: "",
       imageUrl: "",
-      inviteCode: "",
       name: "",
       profileId: profile.id,
       createdAt: new Date(),
@@ -62,7 +63,7 @@ export default async function ListSettingsPage({ params }: Props) {
   } else {
     list = await db.list.findUnique({
       where: {
-        id: params.listId,
+        id: listId,
         profileId: profile.id,
       }
     })

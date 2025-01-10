@@ -77,8 +77,6 @@ model List {
   id         String  @id @default(uuid())
   /// Optional avatar image URL for this List
   imageUrl   String? @db.Text
-  /// Invite code sent to invite a different Profile to this List
-  inviteCode String  @unique @db.Text
   /// List's name
   name       String  @db.Text
 

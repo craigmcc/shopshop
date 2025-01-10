@@ -105,7 +105,6 @@ export const saveListAction = actionClient
       // (1) Create the requested List
       const result = await db.list.create({
         data: {
-          inviteCode: "", // TODO - get rid of this
           name: list.name,
           profileId: profile.id,
         }
