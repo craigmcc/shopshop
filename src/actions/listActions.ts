@@ -46,7 +46,7 @@ export const removeListAction = actionClient
     if (!profile) {
       redirect("/auth/signIn");
     }
-    logger.info({
+    logger.trace({
       context: "listActions.removeListAction.findProfile",
       profile: {
         ...profile,
@@ -92,7 +92,7 @@ export const saveListAction = actionClient
     if (!profile) {
       redirect("/auth/signIn");
     }
-    logger.info({
+    logger.trace({
       context: "listActions.saveListAction.findProfile",
       profile: {
         ...profile,
@@ -101,13 +101,18 @@ export const saveListAction = actionClient
     });
 
     // New List
-    if (!list.id) {
+    if (list.id === "") {
+      const data = {
+        name: list.name,
+        profileId: profile.id,
+      }
+      logger.trace({
+        context: "listActions.saveListAction.create",
+        data: data,
+      });
       // (1) Create the requested List
       const result = await db.list.create({
-        data: {
-          name: list.name,
-          profileId: profile.id,
-        }
+        data: data,
       });
       // (2) Add Members row for ownership of the new list
       await db.member.create({
@@ -135,10 +140,17 @@ export const saveListAction = actionClient
       return { message: `List ID ${list.id} was not created by you, so you cannot update it`}
     }
     // (2) Perform the requested update
+    const data = {
+      name: list.name,
+    }
+    logger.trace({
+      context: "listActions.saveListAction.update",
+      data: data,
+      id: list.id,
+      list: list,
+    });
     const result = await db.list.update({
-      data: {
-        name: list.name,
-      },
+      data: data,
       where: {
         id: list.id,
       }

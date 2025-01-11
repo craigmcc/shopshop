@@ -44,7 +44,7 @@ export default async function ListSettingsPage(props: Props) {
   if (!profile) {
     redirect("/auth/signIn");
   }
-  logger.info({
+  logger.trace({
     context: "ListSettingsPage",
     listId: listId,
     profile: profile,

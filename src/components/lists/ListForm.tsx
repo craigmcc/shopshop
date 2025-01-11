@@ -38,9 +38,16 @@ type Props = {
 export default function ListForm({ list, profile }: Props ) {
 
   const defaultValues: listSchemaType = {
+    id: list?.id ?? undefined,
     name: list?.name ?? "",
     profileId: list?.profileId ?? profile.id,
   }
+  logger.trace({
+    context: "ListForm",
+    list,
+    profile,
+    defaultValues,
+  });
   const form = useForm<listSchemaType>({
     defaultValues,
     mode: "onBlur",
@@ -95,6 +102,7 @@ export default function ListForm({ list, profile }: Props ) {
               fieldTitle="List Name:"
               nameInSchema="name"
             />
+            <input id="id" type="hidden" value={list.id}/>
             <input id="profileId" type="hidden" value={list.profileId}/>
           </div>
           <div className="flex gap-2">
