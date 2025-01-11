@@ -13,7 +13,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Profile } from "@prisma/client";
 import { LoaderCircle } from "lucide-react";
-//import {redirect} from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { useAction } from "next-safe-action/hooks";
 
@@ -36,6 +36,8 @@ type Props = {
 }
 
 export default function ListForm({ list, profile }: Props ) {
+
+  const router = useRouter();
 
   const defaultValues: listSchemaType = {
     id: list?.id ?? undefined,
@@ -69,7 +71,7 @@ export default function ListForm({ list, profile }: Props ) {
           variant: "default",
         });
       }
-//      redirect("/lists"); // TODO - doesn't work, may not be needed
+      router.push("/lists");
     },
     onError({ error }) {
       logger.error({
