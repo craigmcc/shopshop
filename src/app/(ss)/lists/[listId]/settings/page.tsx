@@ -29,13 +29,14 @@ import { logger } from "@/lib/ServerLogger";
 // Public Objects ------------------------------------------------------------
 
 interface Props {
-  params: {
+  params: Promise<{
     listId: string,
-  }
+  }>
 }
 
-export default async function ListSettingsPage({ params }: Props) {
+export default async function ListSettingsPage(props: Props) {
 
+  const params = await props.params;
   const listId = params.listId;
 
   // Check sign in status
@@ -91,5 +92,4 @@ export default async function ListSettingsPage({ params }: Props) {
 
     </Card>
   )
-
 }
