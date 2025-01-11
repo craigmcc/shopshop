@@ -36,7 +36,7 @@ interface Props {
 
 export default async function ListSettingsPage({ params }: Props) {
 
-  const { listId } = await params;
+  const listId = params.listId;
 
   // Check sign in status
   const profile = await findProfile();
