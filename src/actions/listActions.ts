@@ -41,31 +41,38 @@ export const removeListAction = actionClient
     parsedInput: list
   }: { parsedInput: removeListSchemaType }) => {
 
+    // Determine if an error message was already supplied
+    if (list.message) {
+      throw new Error(list.message);
+    }
+
     // Check sign in status
     const profile = await findProfile();
     if (!profile) {
-      redirect("/auth/signIn");
+      throw new Error("You must be signed in to perform this action");
     }
     logger.trace({
       context: "listActions.removeListAction.findProfile",
-      profile: {
-        ...profile,
-        password: "*REDACTED",
-      }
+      profile,
     });
 
-    // Validate that this List was created by this Profile
+    // Check admin status of the signed in Profile for this List
     const member = await db.member.findFirst({
       where: {
         listId: list.id,
         profileId: profile.id,
+        role: "ADMIN",
       }
     });
     if (!member) {
-      return { message: `List ID ${list.id} was not created by you, so you cannot remove it`}
+      throw new Error("You are not an admin for this List, so you cannot remove it");
     }
 
     // Perform the requested removal
+    logger.trace({
+      context: "listActions.removeListAction",
+      list: list,
+    });
     await db.list.delete({
       where: {
         id: list.id,

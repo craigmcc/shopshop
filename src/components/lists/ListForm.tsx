@@ -77,7 +77,7 @@ export default function ListForm({ list, profile }: Props ) {
       logger.error({
         context: "ListForm.onError",
         error,
-      })
+      });
       toast({
         description: "Save Failed",
         title: "Error",

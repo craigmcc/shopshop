@@ -24,6 +24,7 @@ export type listSchemaType = typeof listSchema._type;
 
 export const removeListSchema = object({
   id: string(),
+  message: string().optional(),
 });
 
 export type removeListSchemaType = typeof removeListSchema._type;
