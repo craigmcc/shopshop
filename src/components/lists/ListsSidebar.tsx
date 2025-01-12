@@ -17,6 +17,8 @@ import { redirect } from "next/navigation";
 // Internal Modules ----------------------------------------------------------
 
 import { findProfile } from "@/actions/authActions";
+//import { DataTableDemo } from "@/components/lists/DataTableDemo";
+import { ListSidebarTable } from "@/components/lists/ListSidebarTable";
 import { db } from "@/lib/db";
 import { logger } from "@/lib/ServerLogger";
 
@@ -62,12 +64,19 @@ export async function ListsSidebar() {
           </Link>
         </div>
       </div>
+{/*
       <ul>
         {lists.map((list) => (
           <li key={list.id}>{list.name}</li>
         ))}
       </ul>
       <div>ListsSidebar End</div>
+*/}
+      <ListSidebarTable
+        lists={lists}
+        profile={profile}
+      />
+      {/*<DataTableDemo/>*/}
     </>
   )
 
