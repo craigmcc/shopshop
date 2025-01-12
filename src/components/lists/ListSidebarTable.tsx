@@ -11,7 +11,15 @@
 // External Modules ----------------------------------------------------------
 
 import { List, Profile } from "@prisma/client";
+import {
+  createColumnHelper,
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
+import { MoreHorizontal, TableOfContents } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
 
 // Internal Modules ---------------------------------------------------------
 
@@ -32,8 +40,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {MoreHorizontal, TableOfContents} from "lucide-react";
-import * as React from "react";
 
 // Public Objects ------------------------------------------------------------
 
@@ -44,60 +50,119 @@ type Props = {
 
 export function ListSidebarTable({ lists /*, profile */ }: Props) {
 
-  return (
-    <div className="mt-6 rounded=lg overflow-hidden border border-border">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>LIST NAME</TableHead>
-            <TableHead><TableOfContents /></TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {lists.map((list) => (
-            <TableRow key={list.id}>
-              <TableCell>{list.name}</TableCell>
-              <TableCell>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      className="h-8 w-8 p-0"
-                    >
-                      <span className="sr-only">Open menu</span>
-                      <MoreHorizontal className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem>
-                      <Link
-                        href={`/lists/${list.id}/settings`}
-                        className="w-full"
-                        prefetch={false}
-                      >
-                        Edit Settings
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <Link
-                        href={`/lists/${list.id}/remove`}
-                        className="w-full"
-                        prefetch={false}
-                      >
-                        Remove List
-                      </Link>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+  const [data] = useState<List[]>(lists);
 
-              </TableCell>
+  const table = useReactTable({
+    data,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+  });
+
+  return (
+    <div className="mt-6 rounded-lg overflow-hidden border border-border">
+      <Table className="border">
+        <TableHeader>
+          {table.getHeaderGroups().map((headerGroup) => (
+            <TableRow key={headerGroup.id}>
+              {headerGroup.headers.map((header) => {
+                return (
+                  <TableHead key={header.id}>
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )}
+                  </TableHead>
+                )
+              })}
             </TableRow>
           ))}
+        </TableHeader>
+        <TableBody>
+          {table.getRowModel().rows?.length ? (
+            table.getRowModel().rows.map((row) => (
+              <TableRow
+                key={row.id}
+                data-state={row.getIsSelected() && "selected"}
+              >
+                {row.getVisibleCells().map((cell) => (
+                  <TableCell key={cell.id}>
+                    {flexRender(
+                      cell.column.columnDef.cell,
+                      cell.getContext()
+                    )}
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell
+                colSpan={columns.length}
+                className="h-24 text-center"
+              >
+                No results.
+              </TableCell>
+            </TableRow>
+          )}
         </TableBody>
       </Table>
     </div>
   )
 
 }
+
+// Private Objects -----------------------------------------------------------
+
+const columnHelper = createColumnHelper<List>();
+
+const columns = [
+  columnHelper.accessor("name", {
+    cell: info => info.getValue(),
+    header: "List Name",
+  }),
+  columnHelper.display( {
+    cell: ({ row }) => {
+      const list = row.original;
+      return (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              className="h-8 w-8 p-0"
+            >
+              <span className="sr-only">Open menu</span>
+              <MoreHorizontal className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem>
+              <Link
+                href={`/lists/${list.id}/settings`}
+                className="w-full"
+                prefetch={false}
+              >
+                Edit Settings
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <Link
+                href={`/lists/${list.id}/remove`}
+                className="w-full"
+                prefetch={false}
+              >
+                Remove List
+              </Link>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )
+    },
+    header: () => <TableOfContents />,
+    id: "actions",
+  })
+];
+
