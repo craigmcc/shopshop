@@ -118,9 +118,17 @@ export function ListSidebarTable({ lists /*, profile */ }: Props) {
 const columnHelper = createColumnHelper<List>();
 
 const columns = [
-  columnHelper.accessor("name", {
-    cell: info => info.getValue(),
+  columnHelper.display( {
+    cell: ({ row }) => {
+      const list = row.original;
+      return (
+        <Link href={`/lists/${list.id}/items`}>
+          {list.name}
+        </Link>
+      )
+    },
     header: "List Name",
+    id: "name",
   }),
   columnHelper.display( {
     cell: ({ row }) => {
@@ -163,6 +171,6 @@ const columns = [
     },
     header: () => <TableOfContents />,
     id: "actions",
-  })
+  }),
 ];
 
