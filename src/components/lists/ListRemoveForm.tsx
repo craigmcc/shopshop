@@ -36,6 +36,16 @@ export function ListRemoveForm({ listId, message/*, profile*/ }: Props) {
   const { toast } = useToast();
   const id = listId;
 
+  function performListRemove() {
+    executeRemove({ id, message });
+    logger.info({
+      context: "ListRemoveForm.performListRemove",
+      listId: listId,
+      message: "Successful list removal",
+    });
+    router.push("/");
+  }
+
   const {
 //    isPending: isRemoving,
     execute: executeRemove,
@@ -68,20 +78,23 @@ export function ListRemoveForm({ listId, message/*, profile*/ }: Props) {
     <div className="flex flex-col gap-4 justify-center items-center sm:px-8">
       <DisplayServerActionResponse result={removeResult}/>
       <h5>Are you sure you want to remove this List?</h5>
-      <Button
-        onClick={() => executeRemove({ id, message })}
-        title="Remove List"
-        variant="destructive"
-      >
-        Remove
-      </Button>
-      <Button
-        onClick={() => router.push("/lists")}
-        title="Back"
-        variant="default"
-      >
-        Back
-      </Button>
+      <form action={performListRemove}>
+        <Button
+          className="mr-4"
+          title="Remove List"
+          type="submit"
+          variant="destructive"
+        >
+          Remove List
+        </Button>
+        <Button
+          onClick={() => router.push("/lists")}
+          title="Back"
+          variant="default"
+        >
+          Back
+        </Button>
+      </form>
     </div>
   );
 

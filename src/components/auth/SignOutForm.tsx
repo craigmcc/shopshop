@@ -34,7 +34,7 @@ export default function SignOutForm() {
   }
 
   return (
-    <div className="flex flex-col gap-1 justify-center items-center sm:px-8">
+    <div className="flex flex-col gap-4 justify-center items-center sm:px-8">
       <h5>Are you sure you want to sign out?</h5>
       <form action={performSignOut}>
         <Button
