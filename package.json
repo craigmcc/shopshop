@@ -22,6 +22,7 @@
     "@radix-ui/react-toast": "^1.2.2",
     "@sentry/nextjs": "^8.47.0",
     "@tanstack/react-table": "^8.20.6",
+    "bcrypt-edge": "^0.1.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "dotenv-cli": "^7.4.4",

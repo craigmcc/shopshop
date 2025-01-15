@@ -8,7 +8,10 @@
 
 // External Modules ----------------------------------------------------------
 
-import { sha256 } from "js-sha256";
+import {
+  hashSync,
+  compareSync,
+} from 'bcrypt-edge';
 
 // Internal Modules ----------------------------------------------------------
 
@@ -20,7 +23,7 @@ import { sha256 } from "js-sha256";
  *
  * @param password      Plain-text password to be hashed
  */
-export const hashPassword = async (password: string): Promise<string> => {
+export const hashPassword = (password: string): string => {
   return generateHash(password);
 };
 
@@ -31,29 +34,20 @@ export const hashPassword = async (password: string): Promise<string> => {
  * @param password      Plain-text password to be checked
  * @param hash          Hashed password previously calculated by hashPassword()
  */
-export const verifyPassword = async (
+export const verifyPassword = (
   password: string,
   hash: string,
-): Promise<boolean> => {
-  return (await generateHash(password)) === hash;
+): boolean => {
+//  return (await generateHash(password)) === hash;
+  return compareSync(password, hash);
 };
 
 // Private Objects -----------------------------------------------------------
 
 /**
  * Edge-compatible way to generate hashes.
- *
- * https://www.google.com/search?q=replace+crypto+for+edge+nextjs+runtime&sca_esv=0c3a6d1f3aa5848b&sxsrf=ADLYWILcUOzoz0JB-tLtFq6L2EsO2o6APA%3A1734229502608&ei=_j1eZ6fsJPni0PEPurmm-QQ&ved=0ahUKEwin49ir3KiKAxV5MTQIHbqcKU8Q4dUDCBA&uact=5&oq=replace+crypto+for+edge+nextjs+runtime&gs_lp=Egxnd3Mtd2l6LXNlcnAiJnJlcGxhY2UgY3J5cHRvIGZvciBlZGdlIG5leHRqcyBydW50aW1lMgcQIRigARgKMgcQIRigARgKMgcQIRigARgKMgcQIRigARgKMgcQIRigARgKMgUQIRifBUj1J1DJBliOJnABeAGQAQCYAXigAf8FqgEDNi4yuAEDyAEA-AEBmAIJoAKjBsICChAAGLADGNYEGEfCAgUQIRigAcICBRAhGKsCmAMAiAYBkAYIkgcDNi4zoAfZKA&sclient=gws-wiz-serp
  */
-async function generateHash(data: string) {
-/*
-  const encoder = new TextEncoder();
-  const dataBuffer = encoder.encode(data);
-  const hashBuffer = await window.crypto.subtle.digest("SHA-256", dataBuffer);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  const hashHex = hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
-  return hashHex;
-*/
-  return sha256(data);
+function generateHash(data: string) {
+  return hashSync(data, 10); // Salt for this many rounds
 
 }

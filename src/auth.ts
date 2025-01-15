@@ -86,7 +86,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
 
       // @ts-expect-error ESLint does not like the type of credentials
       async authorize(credentials: signInSchemaType) {
-        logger.info({
+        logger.trace({
           context: "auth.authorize",
           credentials: {
             ...credentials,
@@ -99,7 +99,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
           },
         });
         if (profile) {
-          if (await verifyPassword(credentials.password, profile.password)) {
+          if (verifyPassword(credentials.password, profile.password)) {
             profile.password = ""; // Redact the hashed password
             logger.info({
               context: "auth.authorize.success",

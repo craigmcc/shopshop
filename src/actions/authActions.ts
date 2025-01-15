@@ -29,7 +29,7 @@ import { signInSchemaType } from "@/zod-schemas/signInSchema";
  */
 export async function doSignIn(formData: signInSchemaType) {
   try {
-    logger.info({
+    logger.trace({
       context: "doSignIn.input",
       email: formData.email,
       password: "*REDACTED*",
@@ -45,7 +45,7 @@ export async function doSignIn(formData: signInSchemaType) {
     });
     return response;
   } catch (error) {
-    logger.info({
+    logger.error({
       context: "doSignIn.error",
       error: error,
     });
