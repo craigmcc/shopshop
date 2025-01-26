@@ -1,17 +1,27 @@
+// @/app/layout.tsx
+
+/**
+ * Global layout for this application.
+ *
+ * @packageDocumentation
+ */
+
+// External Modules ----------------------------------------------------------
+
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+// Internal Modules ----------------------------------------------------------
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import "./globals.css";
+import { NavBar } from "@/components/layout/NavBar";
+import { ThemeWrapper } from "@/components/layout/ThemeWrapper";
+import { ThemeContextProvider } from "@/contexts/ThemeContext";
 
+// Public Objects ------------------------------------------------------------
+
+const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "ShopShop",
   description: "Shopping list app",
@@ -24,11 +34,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+    <body className={inter.className}>
+    <ThemeContextProvider>
+      <ThemeWrapper>
+        <NavBar />
         {children}
-      </body>
+      </ThemeWrapper>
+    </ThemeContextProvider>
+    </body>
     </html>
   );
 }
