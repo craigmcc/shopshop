@@ -15,7 +15,7 @@ import { FormProvider, useForm } from "react-hook-form";
 
 // Internal Modules ----------------------------------------------------------
 
-import { InputField } from "@/components/fields/InputField";
+import { InputField } from "@/components/daisyui/InputField";
 import { logger } from "@/lib/ClientLogger";
 import {signUpSchema, signUpSchemaType} from "@/zod-schemas/signUpSchema";
 
