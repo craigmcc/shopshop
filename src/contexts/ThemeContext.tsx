@@ -25,6 +25,7 @@ type ThemeContextType = {
 }
 
 export const ThemeContext = createContext<ThemeContextType>({
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   changeTheme: (theme) => {},
   theme: "",
 });

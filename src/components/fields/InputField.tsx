@@ -44,13 +44,13 @@ export function InputField({
         {...register(name)}
         {...props}
       />
-        {message &&
+        {message && (typeof message === "string") && (message.length > 0) && (
           <div className="label">
             <span className="label-text-alt text-error">
               {message}
             </span>
           </div>
-        }
+        )}
     </label>
   )
 
