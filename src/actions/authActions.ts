@@ -1,6 +1,6 @@
-// @/actions/authActions.ts
-
 "use server"
+
+// @/actions/authActions.ts
 
 /**
  * Utility methods to interact with AuthJS.

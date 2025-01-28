@@ -1,6 +1,6 @@
-"use client"
-
 // @/components/auth/SignUpForm.tsx
+
+"use client"
 
 /**
  * Form for the Sign Up page.

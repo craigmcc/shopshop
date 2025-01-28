@@ -1,6 +1,6 @@
-// @/components/auth/SignOutForm.tsx
-
 "use client"
+
+// @/components/auth/SignOutForm.tsx
 
 /**
  * Form for the Sign Out page.
