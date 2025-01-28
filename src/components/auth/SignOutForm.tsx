@@ -16,7 +16,7 @@ import { useRouter } from "next/navigation";
 
 //import { doSignOut } from "@/actions/authActions";
 //import { Button } from "@/components/ui/button";
-//import { logger } from "@/lib/ClientLogger";
+import { logger } from "@/lib/ClientLogger";
 
 // Public Objects ------------------------------------------------------------
 
@@ -24,13 +24,13 @@ export function SignOutForm() {
 
   const router = useRouter();
 
-  async function performSignOut() {
+  async function submitForm() {
+    logger.info({
+      context: "SignOutForm.submitForm",
+      message: "Performing sign out",
+    })
 /*
     await doSignOut();
-    logger.info({
-      context: "SignOutForm.performSignOut",
-      message: "Successful sign out",
-    });
 */
     router.push("/");
   }
@@ -38,16 +38,13 @@ export function SignOutForm() {
   return (
     <div className="flex flex-col gap-4 justify-center items-center sm:px-8">
       <h5>Are you sure you want to sign out?</h5>
-      <form action={performSignOut}>
-{/*
-        <Button
-          title="Sign Out"
+      <form action={submitForm}>
+        <button
+          className="btn btn-primary"
           type="submit"
-          variant="default"
         >
           Sign Out
-        </Button>
-*/}
+        </button>
       </form>
     </div>
   )
