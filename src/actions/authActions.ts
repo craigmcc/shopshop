@@ -1,4 +1,4 @@
-"use server"
+"use server";
 
 // @/actions/authActions.ts
 
@@ -11,14 +11,18 @@
 // External Modules ----------------------------------------------------------
 
 import { Profile } from "@prisma/client";
+import { flattenValidationErrors } from "next-safe-action";
 
 // Internal Modules ----------------------------------------------------------
 
 import { auth } from "@/auth";
 import { signIn, signOut } from "@/auth";
 import { db } from "@/lib/db";
+import { actionClient } from "@/lib/safe-action";
+import { hashPassword } from "@/lib/encryption";
 import { logger } from "@/lib/ServerLogger";
-import { signInSchemaType } from "@/zod-schemas/signInSchema";
+import { type signInSchemaType } from "@/zod-schemas/signInSchema";
+import { signUpSchema, type signUpSchemaType } from "@/zod-schemas/signUpSchema";
 
 // Public Objects ------------------------------------------------------------
 
@@ -93,3 +97,38 @@ export async function findProfile(): Promise<Profile | null> {
   }
 
 }
+
+/**
+ * Action to create a new Profile and store it in the database.
+ */
+export const saveSignUpAction = actionClient
+
+  .metadata({ actionName: "saveSignUpAction" })
+
+  .schema(signUpSchema, {
+    handleValidationErrorsShape: async (ve) => flattenValidationErrors(ve).fieldErrors,
+  })
+
+  .action(async ({
+    parsedInput: profile
+  }: { parsedInput: signUpSchemaType }) => {
+
+    logger.info({
+      context: "saveSignUpSchema.action",
+      profile: {
+        email: profile.email,
+        name: profile.name,
+        password: "*REDACTED*",
+      }
+    });
+
+    const result = await db.profile.create({
+      data: {
+        email: profile.email,
+        name: profile.name,
+        password: hashPassword(profile.password),
+      },
+    });
+    return { message: `Profile ID ${result.id} created successfully`}
+
+  });

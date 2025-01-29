@@ -1,6 +1,6 @@
-// @/components/auth/SignUpForm.tsx
+"use client";
 
-"use client"
+// @/components/auth/SignUpForm.tsx
 
 /**
  * Form for the Sign Up page.
@@ -11,17 +11,24 @@
 // External Modules ----------------------------------------------------------
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { LoaderCircle } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useAction } from "next-safe-action/hooks";
 import { FormProvider, useForm } from "react-hook-form";
 
 // Internal Modules ----------------------------------------------------------
 
+import { saveSignUpAction } from "@/actions/authActions";
 import { InputField } from "@/components/daisyui/InputField";
+import { DisplayServerActionResponse } from "@/components/shared/DisplayServerActionResponse";
 import { logger } from "@/lib/ClientLogger";
 import {signUpSchema, signUpSchemaType} from "@/zod-schemas/signUpSchema";
 
 // Public Objects ------------------------------------------------------------
 
 export function SignUpForm() {
+
+  const router = useRouter();
 
   const defaultValues: signUpSchemaType = {
     confirmPassword: "",
@@ -41,7 +48,36 @@ export function SignUpForm() {
     errors
   });
 
+  const {
+    execute: executeSave,
+    isPending: isSaving,
+//    reset: resetSaveAction,
+    result: saveResult,
+  } = useAction(saveSignUpAction, {
+
+    onError({ error }) {
+      // TODO - toast(error.message)?
+      logger.error({
+        context: "SignUpForm.onError",
+        error: error.serverError,
+      });
+    },
+
+    onSuccess({ data }) {
+      if (data?.message) {
+        // TODO - toast(data.message)?
+        logger.info({
+          context: "SignUpForm.onSuccess",
+          message: data.message,
+        })
+      }
+      router.push("/")
+    }
+
+  });
+
   async function submitForm(formData: signUpSchemaType) {
+
     logger.info({
       context: "SignUpForm.submitForm",
       formData: {
@@ -50,13 +86,14 @@ export function SignUpForm() {
         password:"*REDACTED*",
       }
     });
-    // TODO - actually submit the form
+    executeSave(formData);
   }
 
   return (
     <div className="card bg-base-100 shadow-xl">
       <div className="card-body">
         <h2 className="card-title justify-center">Sign Up for ShopShop</h2>
+        <DisplayServerActionResponse result={saveResult} />
         <FormProvider {...methods}>
           <form className="flex flex-row gap-2" onSubmit={methods.handleSubmit(submitForm)}>
             <div className="w-full">
@@ -92,7 +129,11 @@ export function SignUpForm() {
                 disabled={Object.keys(errors).length > 0}
                 type="submit"
               >
-                Sign Up
+                {isSaving ? (
+                  <>
+                    <LoaderCircle className="animate-spin"/> Saving
+                  </>
+                ) : "Sign Up"}
               </button>
             </div>
           </form>

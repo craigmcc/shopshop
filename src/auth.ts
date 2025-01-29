@@ -114,7 +114,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
           } else {
             logger.info({
               context: "auth.authorize.failure.password",
-              email: profile.email,
+              email: credentials.email,
             });
             return null;
           }

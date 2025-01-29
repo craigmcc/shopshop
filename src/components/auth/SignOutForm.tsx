@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 // @/components/auth/SignOutForm.tsx
 

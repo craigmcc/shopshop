@@ -15,7 +15,7 @@ import "./globals.css";
 // Internal Modules ----------------------------------------------------------
 
 import "./globals.css";
-import { NavBar } from "@/components/layout/NavBar";
+import { Header } from "@/components/layout/Header";
 import { ThemeWrapper } from "@/components/layout/ThemeWrapper";
 import { ThemeContextProvider } from "@/contexts/ThemeContext";
 
@@ -37,7 +37,7 @@ export default function RootLayout({
     <body className={inter.className}>
     <ThemeContextProvider>
       <ThemeWrapper>
-        <NavBar />
+        <Header />
         {children}
       </ThemeWrapper>
     </ThemeContextProvider>
