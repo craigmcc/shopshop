@@ -7,6 +7,7 @@ export default {
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
+/*
   // Initially from "https://daisyui.com/docs/config"
   daisyui: {
     base: true, // applies background color and foreground color for root element by default
@@ -53,6 +54,7 @@ export default {
     // false: only light + dark | true: all themes | array: specific themes like this ["light", "dark", "cupcake"]
     utils: true, // adds responsive and modifier utility classes
   },
+*/
   theme: {
     extend: {
       colors: {
@@ -61,7 +63,9 @@ export default {
       },
     },
   },
+/*
   plugins: [
     daisyui,
   ],
+*/
 } satisfies Config;
