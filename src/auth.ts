@@ -10,7 +10,7 @@
 
 //import { Profile } from "@prisma/client";
 import CredentialsProvider from "next-auth/providers/credentials";
-import NextAuth, { CredentialsSignin } from "next-auth";
+import NextAuth, { AuthError } from "next-auth";
 
 // Internal Modules ----------------------------------------------------------
 
@@ -84,6 +84,15 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
 
     CredentialsProvider({
 
+      /**
+       * Authorize a user based on credentials.
+       *
+       * @param credentials             The credentials to be verified
+       *
+       * @returns                       The user profile if the credentials valid
+       *
+       * @throws AuthError              If the credentials are invalid
+       */
       // @ts-expect-error ESLint does not like the type of credentials
       async authorize(credentials: signInSchemaType) {
         logger.trace({
@@ -116,14 +125,14 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
               context: "auth.authorize.failure.password",
               email: credentials.email,
             });
-            return null;
+            throw new AuthError("Invalid Credentials");
           }
         } else {
           logger.info({
             context: "auth.authorize.failure.email",
             email: credentials.email,
           });
-          throw new CredentialsSignin("Invalid Credentials");
+          throw new AuthError("Invalid Credentials");
         }
 
       },

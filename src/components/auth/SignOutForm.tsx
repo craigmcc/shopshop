@@ -14,8 +14,7 @@ import { useRouter } from "next/navigation";
 
 // Internal Modules ----------------------------------------------------------
 
-//import { doSignOut } from "@/actions/authActions";
-//import { Button } from "@/components/ui/button";
+import { doSignOut } from "@/actions/authActions";
 import { logger } from "@/lib/ClientLogger";
 
 // Public Objects ------------------------------------------------------------
@@ -29,9 +28,8 @@ export function SignOutForm() {
       context: "SignOutForm.submitForm",
       message: "Performing sign out",
     })
-/*
     await doSignOut();
-*/
+    // TODO - toast(success)
     router.push("/");
   }
 

@@ -17,6 +17,7 @@ import { FormProvider, useForm } from "react-hook-form";
 
 // Internal Modules ----------------------------------------------------------
 
+import { doSignIn } from "@/actions/authActions";
 import { InputField } from "@/components/daisyui/InputField";
 //import { MessageBox } from "@/components/shared/MessageBox";
 import { logger } from "@/lib/ClientLogger"
@@ -52,7 +53,18 @@ export function SignInForm() {
         password: "*REDACTED*",
       }
     });
-    // TODO - actually submit the form
+    try {
+      await doSignIn(formData);
+      // TODO - toast(success)
+      router.push("/lists");
+    } catch (error) {
+      logger.error({
+        context: "SignInForm.submitForm.error",
+        email: formData.email,
+        error: error,
+      });
+      // TODO - toast(error.message)
+    }
   }
 
   /*

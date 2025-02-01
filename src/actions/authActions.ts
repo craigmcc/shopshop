@@ -11,6 +11,7 @@
 // External Modules ----------------------------------------------------------
 
 import { Profile } from "@prisma/client";
+import { AuthError } from "next-auth";
 import { flattenValidationErrors } from "next-safe-action";
 
 // Internal Modules ----------------------------------------------------------
@@ -30,6 +31,8 @@ import { signUpSchema, type signUpSchemaType } from "@/zod-schemas/signUpSchema"
  * Perform the AuthJS sign in action.
  *
  * @param formData                      Sign in form data
+ *
+ * @throws AuthError                    If the sign in fails
  */
 export async function doSignIn(formData: signInSchemaType) {
   try {
@@ -53,7 +56,11 @@ export async function doSignIn(formData: signInSchemaType) {
       context: "doSignIn.error",
       error: error,
     });
-    throw error;
+    if (error instanceof Error) {
+      throw new AuthError(error.message);
+    } else {
+      throw new AuthError("Sign In failed");
+    }
   }
 }
 
