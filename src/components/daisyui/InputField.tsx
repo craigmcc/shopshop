@@ -32,7 +32,7 @@ export function InputField({
   const message = errors[name] ? errors[name].message : undefined;
 
   return (
-    <label className="form-control w-full pb-2">
+    <label className="form-control w-full pb-2 flex flex-col">
       <div className="label">
         <label className="label-text" htmlFor={name}>{label}</label>
         {/*<span className="label-text-alt">Optional Right Label</span>*/}

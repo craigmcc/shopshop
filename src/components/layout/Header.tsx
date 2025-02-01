@@ -25,7 +25,7 @@ export async function Header() {
 
   return (
     <div className="navbar justify-between mb-2 px-2 py-2 items-center bg-base-200">
-      <div>
+      <div className="flex flex-row">
         <Link href="/" className="mr-2">
           <AlignJustify/>
         </Link>
@@ -33,7 +33,7 @@ export async function Header() {
           <span className="font-semibold">ShopShop</span>
         </Link>
       </div>
-      <div className="gap-4">
+      <div className="flex flex-row">
         {session?.user?.email ? (
           <SignedInMenu />
         ) : null }

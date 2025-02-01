@@ -86,7 +86,7 @@ export function SignInForm() {
       <div className="card-body">
         <h2 className="card-title justify-center">Sign In to ShopShop</h2>
         <FormProvider {...methods}>
-          <form onSubmit={methods.handleSubmit(submitForm)}>
+          <form onSubmit={methods.handleSubmit(submitForm)} className="flex flex-col gap-2">
               <InputField
                 autoFocus
                 label="Email"

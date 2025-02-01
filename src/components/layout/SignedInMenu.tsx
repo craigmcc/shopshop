@@ -28,7 +28,7 @@ export const SignedInMenu = () => {
     <div className="dropdown dropdown-end">
       <details>
         <summary>User Options</summary>
-        <ul tabIndex={0} className="menu dropdown-content z-[1] mt-6 shadow bg-base-300 rounded-box mt-2">
+        <ul tabIndex={0} className="menu dropdown-content z-1 mt-6 shadow-sm bg-base-300 rounded-box mt-2">
           {CHOICES.map((CHOICE) => (
             <Link
               href={CHOICE.href}

@@ -96,7 +96,7 @@ export function SignUpForm() {
         <DisplayServerActionResponse result={saveResult} />
         <FormProvider {...methods}>
           <form className="flex flex-row gap-2" onSubmit={methods.handleSubmit(submitForm)}>
-            <div className="w-full">
+            <div className="flex flex-col w-full gap-2">
               <InputField
                 autoFocus
                 label="Name"
@@ -111,7 +111,7 @@ export function SignUpForm() {
                 type="email"
               />
             </div>
-            <div className="w-full">
+            <div className=" flex flex-col w-full gap-2">
               <InputField
                 label="Password"
                 name="password"
