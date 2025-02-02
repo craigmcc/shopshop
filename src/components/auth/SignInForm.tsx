@@ -14,6 +14,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 //import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
+import { toast } from "react-toastify";
 
 // Internal Modules ----------------------------------------------------------
 
@@ -29,9 +30,7 @@ export function SignInForm() {
 
 //  const [result, setResult] = useState<MessageBoxProps | null>(null);
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const router = useRouter();
-  //  const { toast } = useToast();
 
   const defaultValues: signInSchemaType = {
     email: "",
@@ -55,7 +54,13 @@ export function SignInForm() {
     });
     try {
       await doSignIn(formData);
-      // TODO - toast(success)
+      logger.info({
+        context: "SignInForm.submitForm.success",
+        email: formData.email,
+      })
+      toast("Welcome back to ShopShop!", {
+        type: "success",
+      })
       router.push("/lists");
     } catch (error) {
       logger.error({
@@ -63,7 +68,10 @@ export function SignInForm() {
         email: formData.email,
         error: error,
       });
-      // TODO - toast(error.message)
+      const message = error instanceof Error ? error.message : `${error}`;
+      toast(message, {
+        type: "error",
+      });
     }
   }
 

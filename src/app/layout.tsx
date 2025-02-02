@@ -10,6 +10,7 @@
 
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import { ToastContainer } from "react-toastify";
 import "./globals.css";
 
 // Internal Modules ----------------------------------------------------------
@@ -40,6 +41,11 @@ export default function RootLayout({
         <Header />
         {children}
       </ThemeWrapper>
+      <ToastContainer
+        autoClose={5000}
+        hideProgressBar={true}
+        position="bottom-right"
+      />
     </ThemeContextProvider>
     </body>
     </html>

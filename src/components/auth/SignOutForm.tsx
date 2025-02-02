@@ -11,6 +11,7 @@
 // External Modules ----------------------------------------------------------
 
 import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 
 // Internal Modules ----------------------------------------------------------
 
@@ -29,7 +30,9 @@ export function SignOutForm() {
       message: "Performing sign out",
     })
     await doSignOut();
-    // TODO - toast(success)
+    toast("Sign out successful", {
+      type: "success",
+    });
     router.push("/");
   }
 

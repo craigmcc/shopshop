@@ -15,6 +15,7 @@ import { LoaderCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAction } from "next-safe-action/hooks";
 import { FormProvider, useForm } from "react-hook-form";
+import { toast } from "react-toastify";
 
 // Internal Modules ----------------------------------------------------------
 
@@ -56,20 +57,25 @@ export function SignUpForm() {
   } = useAction(saveSignUpAction, {
 
     onError({ error }) {
-      // TODO - toast(error.message)?
       logger.error({
         context: "SignUpForm.onError",
         error: error.serverError,
+      });
+      const message = error instanceof Error ? error.message : `${error}`;
+      toast(message, {
+        type: "error",
       });
     },
 
     onSuccess({ data }) {
       if (data?.message) {
-        // TODO - toast(data.message)?
         logger.info({
           context: "SignUpForm.onSuccess",
           message: data.message,
-        })
+        });
+        toast(data.message, {
+          type: "success",
+        });
       }
       router.push("/")
     }

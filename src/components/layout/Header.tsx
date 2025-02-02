@@ -33,7 +33,7 @@ export async function Header() {
           <span className="font-semibold">ShopShop</span>
         </Link>
       </div>
-      <div className="flex flex-row">
+      <div className="flex flex-row gap-2">
         {session?.user?.email ? (
           <SignedInMenu />
         ) : null }
