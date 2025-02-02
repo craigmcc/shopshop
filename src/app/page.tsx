@@ -8,7 +8,7 @@
 
 // External Modules ----------------------------------------------------------
 
-import { GitBranchPlus, Key } from "lucide-react"
+//import { GitBranchPlus, Key } from "lucide-react"
 import Link from "next/link";
 
 // Public Objects ------------------------------------------------------------
@@ -23,12 +23,14 @@ export default function Home() {
           <div className="flex flex-row justify-center text-center gap-6">
             <button className="btn btn-info">
               <Link className="flex flex-row gap-2" href="/auth/signUp">
-                <GitBranchPlus /><span>Sign Up</span>
+                {/*<GitBranchPlus />*/}
+                <span>Sign Up</span>
               </Link>
             </button>
             <button className="btn btn-primary">
               <Link className="flex flex-row gap-2" href="/auth/signIn">
-                <Key /><span>Sign In</span>
+                {/*<Key />*/}
+                <span>Sign In</span>
               </Link>
             </button>
           </div>
