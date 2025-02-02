@@ -15,7 +15,7 @@ import { toast } from "react-toastify";
 
 // Internal Modules ----------------------------------------------------------
 
-import { doSignOut } from "@/actions/authActions";
+import { doSignOutAction } from "@/actions/authActions";
 import { logger } from "@/lib/ClientLogger";
 
 // Public Objects ------------------------------------------------------------
@@ -29,7 +29,7 @@ export function SignOutForm() {
       context: "SignOutForm.submitForm",
       message: "Performing sign out",
     })
-    await doSignOut();
+    await doSignOutAction();
     toast("Sign out successful", {
       type: "success",
     });

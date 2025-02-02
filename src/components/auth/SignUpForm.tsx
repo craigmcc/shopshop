@@ -13,15 +13,14 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LoaderCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useAction } from "next-safe-action/hooks";
+import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 
 // Internal Modules ----------------------------------------------------------
 
-import { saveSignUpAction } from "@/actions/authActions";
+import { doSignUpAction } from "@/actions/authActions";
 import { InputField } from "@/components/daisyui/InputField";
-import { DisplayServerActionResponse } from "@/components/shared/DisplayServerActionResponse";
 import { logger } from "@/lib/ClientLogger";
 import {signUpSchema, signUpSchemaType} from "@/zod-schemas/signUpSchema";
 
@@ -30,6 +29,7 @@ import {signUpSchema, signUpSchemaType} from "@/zod-schemas/signUpSchema";
 export function SignUpForm() {
 
   const router = useRouter();
+  const [isSaving, setisSaving] = useState<boolean>(false);
 
   const defaultValues: signUpSchemaType = {
     confirmPassword: "",
@@ -49,39 +49,6 @@ export function SignUpForm() {
     errors
   });
 
-  const {
-    execute: executeSave,
-    isPending: isSaving,
-//    reset: resetSaveAction,
-    result: saveResult,
-  } = useAction(saveSignUpAction, {
-
-    onError({ error }) {
-      logger.error({
-        context: "SignUpForm.onError",
-        error: error.serverError,
-      });
-      const message = error instanceof Error ? error.message : `${error}`;
-      toast(message, {
-        type: "error",
-      });
-    },
-
-    onSuccess({ data }) {
-      if (data?.message) {
-        logger.info({
-          context: "SignUpForm.onSuccess",
-          message: data.message,
-        });
-        toast(data.message, {
-          type: "success",
-        });
-      }
-      router.push("/")
-    }
-
-  });
-
   async function submitForm(formData: signUpSchemaType) {
 
     logger.info({
@@ -92,14 +59,43 @@ export function SignUpForm() {
         password:"*REDACTED*",
       }
     });
-    executeSave(formData);
+
+    try {
+
+      setisSaving(true);
+      const profile = await doSignUpAction(formData);
+      setisSaving(false);
+      logger.info({
+        context: "SignUpForm.submitForm.success",
+        profile: {
+          email: profile.email,
+          name: profile.name,
+        }
+      });
+      toast(`Profile for '${profile.name}' was successfully created`, {
+        type: "success",
+      });
+      router.push("/");
+
+    } catch (error) {
+
+      setisSaving(false);
+      logger.info({
+        context: "SignUpForm.submitForm.error",
+        error: error,
+      });
+      const message = error instanceof Error ? error.message : `${error}`;
+      toast(message, {
+        type: "error",
+      });
+
+    }
   }
 
   return (
     <div className="card bg-base-100 shadow-xl">
       <div className="card-body">
         <h2 className="card-title justify-center">Sign Up for ShopShop</h2>
-        <DisplayServerActionResponse result={saveResult} />
         <FormProvider {...methods}>
           <form className="flex flex-row gap-2" onSubmit={methods.handleSubmit(submitForm)}>
             <div className="flex flex-col w-full gap-2">
@@ -137,7 +133,7 @@ export function SignUpForm() {
               >
                 {isSaving ? (
                   <>
-                    <LoaderCircle className="animate-spin"/> Saving
+                    <LoaderCircle className="animate-spin"/>Saving
                   </>
                 ) : "Sign Up"}
               </button>

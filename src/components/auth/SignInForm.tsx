@@ -18,7 +18,7 @@ import { toast } from "react-toastify";
 
 // Internal Modules ----------------------------------------------------------
 
-import { doSignIn } from "@/actions/authActions";
+import { doSignInAction } from "@/actions/authActions";
 import { InputField } from "@/components/daisyui/InputField";
 //import { MessageBox } from "@/components/shared/MessageBox";
 import { logger } from "@/lib/ClientLogger"
@@ -53,7 +53,7 @@ export function SignInForm() {
       }
     });
     try {
-      await doSignIn(formData);
+      await doSignInAction(formData);
       logger.info({
         context: "SignInForm.submitForm.success",
         email: formData.email,

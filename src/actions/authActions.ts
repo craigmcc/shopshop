@@ -3,23 +3,23 @@
 // @/actions/authActions.ts
 
 /**
- * Utility methods to interact with AuthJS.
+ * Utility methods to interact with AuthJS, and to set up a new Profile.
  *
  * @packageDocumentation
  */
 
 // External Modules ----------------------------------------------------------
 
-import { Profile } from "@prisma/client";
+import { Prisma, Profile } from "@prisma/client";
 import { AuthError } from "next-auth";
-import { flattenValidationErrors } from "next-safe-action";
+import { ZodError } from "zod";
 
 // Internal Modules ----------------------------------------------------------
 
 import { auth } from "@/auth";
 import { signIn, signOut } from "@/auth";
+import { UniqueConstraintViolation, ValidationViolation } from "@/errors/DatabaseErrors";
 import { db } from "@/lib/db";
-import { actionClient } from "@/lib/safe-action";
 import { hashPassword } from "@/lib/encryption";
 import { logger } from "@/lib/ServerLogger";
 import { type signInSchemaType } from "@/zod-schemas/signInSchema";
@@ -34,7 +34,7 @@ import { signUpSchema, type signUpSchemaType } from "@/zod-schemas/signUpSchema"
  *
  * @throws AuthError                    If the sign in fails
  */
-export async function doSignIn(formData: signInSchemaType) {
+export async function doSignInAction(formData: signInSchemaType) {
   try {
     logger.trace({
       context: "doSignIn.input",
@@ -67,7 +67,7 @@ export async function doSignIn(formData: signInSchemaType) {
 /**
  * Perform the AuthJS sign out action.
  */
-export async function doSignOut() {
+export async function doSignOutAction() {
   logger.info({
     context: "doSignOut.input",
   });
@@ -107,35 +107,57 @@ export async function findProfile(): Promise<Profile | null> {
 
 /**
  * Action to create a new Profile and store it in the database.
+ *
+ * @param formData                      Sign up form data
+ *
+ * @returns                             The new Profile on success
+ *
+ * @throws UniqueConstraintError        If the email address is already in use
+ * @throws ValidationViolation          If the data is invalid per the schema
  */
-export const saveSignUpAction = actionClient
+export async function doSignUpAction(formData: signUpSchemaType): Promise<Profile> {
 
-  .metadata({ actionName: "saveSignUpAction" })
+  logger.info({
+    context: "doSignUpAction.input",
+    formData: {
+      ...formData,
+      confirmPassword: "*REDACTED*",
+      password: "*REDACTED*",
+    }
+  });
 
-  .schema(signUpSchema, {
-    handleValidationErrorsShape: async (ve) => flattenValidationErrors(ve).fieldErrors,
-  })
+  // Rerun the validation to ensure that the data is still valid.
+  try {
+    signUpSchema.parse(formData);
+  } catch (error) {
+    if (error instanceof ZodError) {
+      throw new ValidationViolation(error);
+    } else {
 
-  .action(async ({
-    parsedInput: profile
-  }: { parsedInput: signUpSchemaType }) => {
+    }
+  }
 
-    logger.info({
-      context: "saveSignUpSchema.action",
-      profile: {
-        email: profile.email,
-        name: profile.name,
-        password: "*REDACTED*",
-      }
-    });
-
+  // Attempt to create the new Profile in the database.
+  try {
     const result = await db.profile.create({
       data: {
-        email: profile.email,
-        name: profile.name,
-        password: hashPassword(profile.password),
+        email: formData.email,
+        name: formData.name,
+        password: await hashPassword(formData.password),
       },
     });
-    return { message: `Profile ID ${result.id} created successfully`}
+    return result;
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      switch (error.code) {
+        case "P2002":
+          throw new UniqueConstraintViolation(`Email '${formData.email}' is already in use`);
+        default:
+          throw error;
+      }
+    } else {
+      throw error;
+    }
+  }
 
-  });
+}
