@@ -1,4 +1,4 @@
-"use client"; // TEMPORARY!
+//"use client"; // Only for when using toast()
 
 // @/app/(auth)/lists/page.tsx
 
