@@ -29,7 +29,7 @@ import {signUpSchema, signUpSchemaType} from "@/zod-schemas/signUpSchema";
 export function SignUpForm() {
 
   const router = useRouter();
-  const [isSaving, setisSaving] = useState<boolean>(false);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
 
   const defaultValues: signUpSchemaType = {
     confirmPassword: "",
@@ -62,9 +62,9 @@ export function SignUpForm() {
 
     try {
 
-      setisSaving(true);
+      setIsSaving(true);
       const profile = await doSignUpAction(formData);
-      setisSaving(false);
+      setIsSaving(false);
       logger.info({
         context: "SignUpForm.submitForm.success",
         profile: {
@@ -72,24 +72,21 @@ export function SignUpForm() {
           name: profile.name,
         }
       });
-      toast(`Profile for '${profile.name}' was successfully created`, {
-        type: "success",
-      });
+      toast.success(`Profile for '${profile.name}' was successfully created`);
       router.push("/");
 
     } catch (error) {
 
-      setisSaving(false);
+      setIsSaving(false);
       logger.info({
         context: "SignUpForm.submitForm.error",
         error: error,
       });
       const message = error instanceof Error ? error.message : `${error}`;
-      toast(message, {
-        type: "error",
-      });
+      toast.error(message);
 
     }
+  
   }
 
   return (

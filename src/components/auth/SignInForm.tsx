@@ -12,7 +12,6 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-//import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 
@@ -20,15 +19,12 @@ import { toast } from "react-toastify";
 
 import { doSignInAction } from "@/actions/authActions";
 import { InputField } from "@/components/daisyui/InputField";
-//import { MessageBox } from "@/components/shared/MessageBox";
 import { logger } from "@/lib/ClientLogger"
 import { signInSchema, type signInSchemaType } from "@/zod-schemas/signInSchema";
 
 // Public Objects ------------------------------------------------------------
 
 export function SignInForm() {
-
-//  const [result, setResult] = useState<MessageBoxProps | null>(null);
 
   const router = useRouter();
 
@@ -58,9 +54,7 @@ export function SignInForm() {
         context: "SignInForm.submitForm.success",
         email: formData.email,
       })
-      toast("Welcome back to ShopShop!", {
-        type: "success",
-      })
+      toast.success("Welcome back to ShopShop!");
       router.push("/lists");
     } catch (error) {
       logger.error({
@@ -69,37 +63,9 @@ export function SignInForm() {
         error: error,
       });
       const message = error instanceof Error ? error.message : `${error}`;
-      toast(message, {
-        type: "error",
-      });
+      toast.error(message);
     }
   }
-
-  /*
-    async function performSignIn(formData: signInSchemaType) {
-      try {
-        const response = await doSignIn(formData);
-        logger.info({
-          context: "SignInForm.performSignIn.output",
-          response: response,
-        });
-        setResult({content: "Successful sign in", type: "success"})
-        router.push("/lists");
-      } catch (e) {
-        logger.info({
-          context: "SignInForm.performSignIn.error",
-          error: e,
-        });
-        if ((e instanceof CredentialsSignin)) {
-          setResult({content: "Invalid Credentials (CSI)", type: "error"});
-        } else if (e instanceof Error) {
-          setResult({ content: e.message.split(".")[0], type: "error" });
-        } else {
-          setResult({content: "Unknown error occurred", type: "error" });
-        }
-      }
-  }
-  */
 
   return (
     <div className="card bg-base-100 shadow-xl">

@@ -36,6 +36,7 @@ export default function ListsPage() {
         <li>Click on the name of a list to enter items on that list.</li>
         <li>Click on the &apos;...&apos; icon to open a menu of available options.</li>
       </ul>
+{/*
       <div className="justify-center">DaisyUI Theme Colors</div>
       <div className="flex flex-row gap-2">
         <button className="btn btn-accent">
@@ -60,6 +61,7 @@ export default function ListsPage() {
           <span className="warning-content">Warning</span>
         </button>
       </div>
+*/}
 {/*
       <div className="justify-center">React-Toastify Theme Colors</div>
       <div className="flex flex-row justify-center gap-2">
