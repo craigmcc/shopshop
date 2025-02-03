@@ -44,6 +44,7 @@ export default function RootLayout({
         autoClose={5000}
         hideProgressBar={true}
         position="bottom-right"
+        theme="colored"
       />
     </ThemeContextProvider>
     </body>

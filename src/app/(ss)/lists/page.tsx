@@ -20,11 +20,11 @@
 export default function ListsPage() {
 
 /*
-  toast.dismiss()
-  toast.error("error", {position: "bottom-right", autoClose: false, theme: "colored"});
-  toast.info("info", {position: "bottom-right", autoClose: false, theme: "colored"});
-  toast.success("success", {position: "bottom-right", autoClose: false, theme: "colored"});
-  toast.warning("warning", {position: "bottom-right", autoClose: false, theme: "colored"});
+  toast.dismiss();
+  toast.error("error", {autoClose: false});
+  toast.info("info", {autoClose: false});
+  toast.success("success", {autoClose: false});
+  toast.warning("warning", {autoClose: false});
 */
 
   return (
