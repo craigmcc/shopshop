@@ -28,7 +28,7 @@ export default function ListsPage() {
 */
 
   return (
-    <div className="flex flex-col justify-center text-center max-w-5xl mx-auto h-dvh gap-6">
+    <div className="flex flex-col justify-center text-center max-w-5xl mx-auto gap-6">
       <h1 className="text-5xl">Shopping List Management</h1>
       <div>Select one of the following options:</div>
       <ul>

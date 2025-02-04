@@ -55,7 +55,7 @@ export async function ListsSidebar() {
 
   return (
     <>
-      <div className="flex flex-col h-screen">
+      <div className="flex flex-col h-[calc(100vh-80px)]">
       <div className="flex items-centered justify-between w-full">
         <div>Shopping Lists</div>
         <div>

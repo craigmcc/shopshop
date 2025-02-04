@@ -24,7 +24,7 @@ export async function Header() {
   const session = await auth();
 
   return (
-    <div className="navbar justify-between mb-2 px-2 py-2 items-center bg-base-200">
+    <div className="navbar justify-between items-center bg-base-200">
       <div className="flex flex-row">
         <Link href="/" className="mr-2">
           <AlignJustify/>
