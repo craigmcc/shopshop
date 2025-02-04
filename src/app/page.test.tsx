@@ -2,7 +2,6 @@
 
 // External Modules ----------------------------------------------------------
 
-import "@testing-library/jest-dom";
 import { render, screen } from "@testing-library/react";
 
 // Internal Modules ----------------------------------------------------------
@@ -18,7 +17,7 @@ describe("Home", () => {
     render(<Home/>);
 
     const main = screen.getByRole("main");
-    expect(main).toBeInTheDocument();
+    expect(main).toBeDefined();
 
   });
 
