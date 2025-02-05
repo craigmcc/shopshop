@@ -9,8 +9,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "vitest",
-    "test:ci": "vitest run"
+    "test": "dotenv -e .env.test.local -- vitest",
+    "test:ci": "dotenv -e .env.test.local -- vitest run"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
