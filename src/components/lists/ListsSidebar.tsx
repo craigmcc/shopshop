@@ -16,9 +16,9 @@ import { redirect } from "next/navigation";
 
 // Internal Modules ----------------------------------------------------------
 
-import { findProfile } from "@/actions/authActions";
 //import { ListSidebarTable } from "@/components/lists/ListSidebarTable";
 import { db } from "@/lib/db";
+import { findProfile } from "@/lib/profileHelpers";
 import { logger } from "@/lib/ServerLogger";
 
 // Public Objects ------------------------------------------------------------

@@ -78,6 +78,7 @@ export async function doSignOutAction() {
  * If a user is currently signed in, look up and return the Profile associated
  * with that user's email address.  Otherwise, return null.
  */
+/*
 export async function findProfile(): Promise<Profile | null> {
 
   const session = await auth();
@@ -104,6 +105,7 @@ export async function findProfile(): Promise<Profile | null> {
   }
 
 }
+*/
 
 /**
  * Action to create a new Profile and store it in the database.
