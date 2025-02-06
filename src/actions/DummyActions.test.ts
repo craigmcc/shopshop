@@ -4,7 +4,7 @@
 
 // Internal Modules ----------------------------------------------------------
 
-import { doAdd, doSubtract } from "@/actions/dummyActions";
+import { doAdd, doSubtract } from "@/actions/DummyActions";
 
 // Test Objects --------------------------------------------------------------
 

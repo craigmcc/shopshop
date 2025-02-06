@@ -15,9 +15,9 @@ import NextAuth, { AuthError } from "next-auth";
 // Internal Modules ----------------------------------------------------------
 
 import { db } from "@/lib/db";
-import { verifyPassword } from "@/lib/encryption";
+import { verifyPassword } from "@/lib/Encryption";
 import { logger } from "@/lib/ServerLogger";
-import { signInSchemaType } from "@/zod-schemas/signInSchema";
+import { SignInSchemaType } from "@/zod-schemas/signInSchema";
 
 // Public Objects ------------------------------------------------------------
 
@@ -94,7 +94,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
        * @throws AuthError              If the credentials are invalid
        */
       // @ts-expect-error ESLint does not like the type of credentials
-      async authorize(credentials: signInSchemaType) {
+      async authorize(credentials: SignInSchemaType) {
         logger.trace({
           context: "auth.authorize",
           credentials: {

@@ -16,14 +16,13 @@ import { ZodError } from "zod";
 
 // Internal Modules ----------------------------------------------------------
 
-import { auth } from "@/auth";
 import { signIn, signOut } from "@/auth";
 import { UniqueConstraintViolation, ValidationViolation } from "@/errors/DatabaseErrors";
 import { db } from "@/lib/db";
-import { hashPassword } from "@/lib/encryption";
+import { hashPassword } from "@/lib/Encryption";
 import { logger } from "@/lib/ServerLogger";
-import { type signInSchemaType } from "@/zod-schemas/signInSchema";
-import { signUpSchema, type signUpSchemaType } from "@/zod-schemas/signUpSchema";
+import { type SignInSchemaType } from "@/zod-schemas/SignInSchema";
+import { SignUpSchema, type SignUpSchemaType } from "@/zod-schemas/SignUpSchema";
 
 // Public Objects ------------------------------------------------------------
 
@@ -34,7 +33,7 @@ import { signUpSchema, type signUpSchemaType } from "@/zod-schemas/signUpSchema"
  *
  * @throws AuthError                    If the sign in fails
  */
-export async function doSignInAction(formData: signInSchemaType) {
+export async function doSignInAction(formData: SignInSchemaType) {
   try {
     logger.trace({
       context: "doSignIn.input",
@@ -75,39 +74,6 @@ export async function doSignOutAction() {
 }
 
 /**
- * If a user is currently signed in, look up and return the Profile associated
- * with that user's email address.  Otherwise, return null.
- */
-/*
-export async function findProfile(): Promise<Profile | null> {
-
-  const session = await auth();
-  if (!session || !session.user || !session.user.email) {
-    return null;
-  }
-
-  const profile = await db.profile.findUnique({
-    where: {
-      email: session.user.email,
-    }
-  });
-  if (profile) {
-    return {
-      ...profile,
-      password: "*REDACTED*",
-    };
-  } else {
-    logger.error({
-      context: "authActions.findProfile",
-      message: `Session has email '${session.user.email}' but there is no matching profile`,
-    });
-    return null;
-  }
-
-}
-*/
-
-/**
  * Action to create a new Profile and store it in the database.
  *
  * @param formData                      Sign up form data
@@ -117,7 +83,7 @@ export async function findProfile(): Promise<Profile | null> {
  * @throws UniqueConstraintError        If the email address is already in use
  * @throws ValidationViolation          If the data is invalid per the schema
  */
-export async function doSignUpAction(formData: signUpSchemaType): Promise<Profile> {
+export async function doSignUpAction(formData: SignUpSchemaType): Promise<Profile> {
 
   logger.info({
     context: "doSignUpAction.input",
@@ -130,7 +96,7 @@ export async function doSignUpAction(formData: signUpSchemaType): Promise<Profil
 
   // Rerun the validation to ensure that the data is still valid.
   try {
-    signUpSchema.parse(formData);
+    SignUpSchema.parse(formData);
   } catch (error) {
     if (error instanceof ZodError) {
       throw new ValidationViolation(error);

@@ -18,7 +18,7 @@ import { redirect } from "next/navigation";
 
 //import { ListSidebarTable } from "@/components/lists/ListSidebarTable";
 import { db } from "@/lib/db";
-import { findProfile } from "@/lib/profileHelpers";
+import { findProfile } from "@/lib/ProfileHelpers";
 import { logger } from "@/lib/ServerLogger";
 
 // Public Objects ------------------------------------------------------------

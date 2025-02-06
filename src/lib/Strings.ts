@@ -1,4 +1,4 @@
-// @/lib/strings.ts
+// @/lib/Strings.ts
 
 /**
  * Generic utility functions for manipulating strings.

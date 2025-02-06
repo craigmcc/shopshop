@@ -1,4 +1,4 @@
-// @/zod-schemas/signUpSchema.ts
+// @/zod-schemas/SignUpSchema.ts
 
 /**
  * Zod schema for SignUpForm.
@@ -8,7 +8,7 @@
 
 import { object, string } from "zod";
 
-export const signUpSchema = object({
+export const SignUpSchema = object({
   confirmPassword: string({ required_error: "Confirm Password is required" })
     .min(1, "Confirm Password is required"),
   email: string({ required_error: "Email is required" })
@@ -24,4 +24,4 @@ export const signUpSchema = object({
     path: ["confirmPassword"],
   });
 
-export type signUpSchemaType = typeof signUpSchema._type;
+export type SignUpSchemaType = typeof SignUpSchema._type;

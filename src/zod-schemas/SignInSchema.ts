@@ -1,4 +1,4 @@
-// @/zod-schemas/signInSchema.ts
+// @/zod-schemas/SignInSchema.ts
 
 /**
  * Zod schema for SignInForm.
@@ -8,7 +8,7 @@
 
 import { object, string } from "zod";
 
-export const signInSchema = object({
+export const SignInSchema = object({
   email: string({ required_error: "Email is required" })
     .min(1, "Email is required")
     .email("Invalid email address"),
@@ -16,4 +16,4 @@ export const signInSchema = object({
     .min(1, "Password is required"),
 });
 
-export type signInSchemaType = typeof signInSchema._type;
+export type SignInSchemaType = typeof SignInSchema._type;

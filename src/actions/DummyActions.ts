@@ -1,6 +1,6 @@
 "use server";
 
-// @/actions/dummyActions.ts
+// @/actions/DummyActions.ts
 
 /**
  * Dummy server action to verify testability.

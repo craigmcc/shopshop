@@ -17,10 +17,10 @@ import { toast } from "react-toastify";
 
 // Internal Modules ----------------------------------------------------------
 
-import { doSignInAction } from "@/actions/authActions";
+import { doSignInAction } from "@/actions/AuthActions";
 import { InputField } from "@/components/daisyui/InputField";
 import { logger } from "@/lib/ClientLogger"
-import { signInSchema, type signInSchemaType } from "@/zod-schemas/signInSchema";
+import { SignInSchema, type SignInSchemaType } from "@/zod-schemas/SignInSchema";
 
 // Public Objects ------------------------------------------------------------
 
@@ -28,19 +28,19 @@ export function SignInForm() {
 
   const router = useRouter();
 
-  const defaultValues: signInSchemaType = {
+  const defaultValues: SignInSchemaType = {
     email: "",
     password: "",
   }
   const methods = useForm({
     defaultValues,
     mode: "onBlur",
-    resolver: zodResolver(signInSchema),
+    resolver: zodResolver(SignInSchema),
   });
   const formState = methods.formState;
   const errors = formState.errors;
 
-  async function submitForm(formData: signInSchemaType) {
+  async function submitForm(formData: SignInSchemaType) {
     logger.info({
       context: "SignInForm.submitForm",
       formData: {

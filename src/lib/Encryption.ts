@@ -1,4 +1,4 @@
-// @/lib/encryption.ts
+// @/lib/Encryption.ts
 
 /**
  * General utilities for encrypting and verifying passwords

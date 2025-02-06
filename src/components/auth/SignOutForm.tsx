@@ -15,7 +15,7 @@ import { toast } from "react-toastify";
 
 // Internal Modules ----------------------------------------------------------
 
-import { doSignOutAction } from "@/actions/authActions";
+import { doSignOutAction } from "@/actions/AuthActions";
 import { logger } from "@/lib/ClientLogger";
 
 // Public Objects ------------------------------------------------------------

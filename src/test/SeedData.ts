@@ -12,7 +12,7 @@ import { List, Profile } from "@prisma/client";
 
 // Internal Modules ----------------------------------------------------------
 
-import { hashPassword } from "@/lib/encryption";
+import { hashPassword } from "@/lib/Encryption";
 
 // Public Objects ------------------------------------------------------------
 
