@@ -6,7 +6,11 @@
  * @packageDocumentation
  */
 
+// External Modules ----------------------------------------------------------
+
 import { object, string } from "zod";
+
+// Public Objects ------------------------------------------------------------
 
 export const SignUpSchema = object({
   confirmPassword: string({ required_error: "Confirm Password is required" })

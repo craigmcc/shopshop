@@ -35,6 +35,46 @@ export class ForeignKeyConstraintViolation extends DatabaseError {
 }
 
 /**
+ * Error describing the user not being authorized to perform this action.
+ */
+export class NotAuthorizedViolation extends DatabaseError {
+  constructor(message?: string) {
+    super(message ? message : "The user is not authorized to perform this action");
+    this.name = "NotAuthorizedViolation";
+  }
+}
+
+/**
+ * Error describing the user not being signed in.
+ */
+export class NotAuthenticatedViolation extends DatabaseError {
+  constructor(message?: string) {
+    super(message ? message : "The user is not signed in");
+    this.name = "NotAuthenticatedViolation";
+  }
+}
+
+/**
+ * Errror describing a record not found.
+ */
+export class NotFoundViolation extends DatabaseError {
+  constructor(message: string) {
+    super(message);
+    this.name = "NotFoundViolation";
+  }
+}
+
+/**
+ * Errror describing data that does not pass validation.
+ */
+export class NotValidViolation extends DatabaseError {
+  constructor(message: string) {
+    super(message);
+    this.name = "NotValidViolation";
+  }
+}
+
+/**
  * Error describing a null constraint violation.
  * For Prisma this will be code P2011.
  */

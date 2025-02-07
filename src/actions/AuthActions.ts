@@ -21,7 +21,7 @@ import { UniqueConstraintViolation, ValidationViolation } from "@/errors/Databas
 import { db } from "@/lib/db";
 import { hashPassword } from "@/lib/Encryption";
 import { logger } from "@/lib/ServerLogger";
-import { type SignInSchemaType } from "@/zod-schemas/SignInSchema";
+import{ type SignInSchemaType } from "@/zod-schemas/SignInSchema";
 import { SignUpSchema, type SignUpSchemaType } from "@/zod-schemas/SignUpSchema";
 
 // Public Objects ------------------------------------------------------------

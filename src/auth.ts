@@ -17,7 +17,7 @@ import NextAuth, { AuthError } from "next-auth";
 import { db } from "@/lib/db";
 import { verifyPassword } from "@/lib/Encryption";
 import { logger } from "@/lib/ServerLogger";
-import { SignInSchemaType } from "@/zod-schemas/signInSchema";
+import { SignInSchemaType } from "@/zod-schemas/SignInSchema";
 
 // Public Objects ------------------------------------------------------------
 
