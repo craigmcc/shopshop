@@ -116,7 +116,7 @@ export async function removeList(listId: IdSchemaType): Promise<List> {
   try {
     IdSchema.parse(listId);
   } catch (error) {
-    throw new ValidationError(error as ZodError);
+    throw new ValidationError(error as ZodError, "Specified ID fails validation");
   }
 
   // Remove the List
@@ -166,6 +166,11 @@ export async function updateList(listId: IdSchemaType, data: ListSchemaType): Pr
   }
 
   // Check data validity
+  try {
+    IdSchema.parse(listId);
+  } catch (error) {
+    throw new ValidationError(error as ZodError, "Specified ID fails validation");
+  }
   try {
     ListSchema.parse(data);
   } catch (error) {
