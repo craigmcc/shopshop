@@ -53,7 +53,7 @@ export async function createList(data: ListSchemaType): Promise<List> {
   try {
     ListSchema.parse(data);
   } catch (error) {
-    throw new ValidationError(error as ZodError);
+    throw new ValidationError(error as ZodError, "Request data does not pass validation");
   }
 
   // Create and return the new List
@@ -109,7 +109,7 @@ export async function removeList(listId: IdSchemaType): Promise<List> {
     }
   });
   if (!member || member.role !== MemberRole.ADMIN ) {
-    throw new NotAuthorizedError();
+    throw new NotAuthorizedError("You are not an ADMIN for this List");
   }
 
   // Check data validity
@@ -162,7 +162,7 @@ export async function updateList(listId: IdSchemaType, data: ListSchemaType): Pr
     }
   });
   if (!member || member.role !== MemberRole.ADMIN ) {
-    throw new NotAuthorizedError();
+    throw new NotAuthorizedError("You are not an ADMIN for this List");
   }
 
   // Check data validity

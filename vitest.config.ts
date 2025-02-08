@@ -10,5 +10,10 @@ export default defineConfig({
     sequence: {
       hooks: "list",
     },
+    server: {
+      deps: {
+        inline: ["next"], // Avoid spurious vitest failures due to next-auth
+      },
+    },
   },
 });
