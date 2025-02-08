@@ -11,16 +11,17 @@
 // External Modules ----------------------------------------------------------
 
 import { List, MemberRole } from "@prisma/client";
+import { ZodError } from "zod";
 
 // Internal Modules ----------------------------------------------------------
 
-import {
-  NotAuthenticatedViolation,
-  NotAuthorizedViolation,
-  NotFoundViolation,
-  NotValidViolation,
-} from "@/errors/DatabaseErrors";
 import { db } from "@/lib/db";
+import {
+  NotAuthenticatedError,
+  NotAuthorizedError,
+  NotFoundError,
+  ValidationError,
+} from "@/lib/ErrorHelpers";
 import { findProfile } from "@/lib/ProfileHelpers";
 import { logger } from "@/lib/ServerLogger";
 import {
@@ -35,13 +36,18 @@ import {
 /**
  * Handle request to create a List.  The currently signed in Profile will be
  * added as an ADMIN member of the new List.
+ *
+ * @param data                          Parameters for creating a List
+ *
+ * @throws NotAuthenticatedError        If the Profile is not signed in
+ * @throws ValidationError              If a schema validation error occurs
  */
 export async function createList(data: ListSchemaType): Promise<List> {
 
   // Check authentication
   const profile = await findProfile();
   if (!profile) {
-    throw new NotAuthenticatedViolation();
+    throw new NotAuthenticatedError();
   }
 
   // Check authorization
@@ -50,9 +56,8 @@ export async function createList(data: ListSchemaType): Promise<List> {
   // Check data validity
   try {
     ListSchema.parse(data);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
-    throw new NotValidViolation("Request data does not pass validation");
+    throw new ValidationError(error as ZodError);
   }
 
   // Create and return the new List
@@ -86,14 +91,17 @@ export async function createList(data: ListSchemaType): Promise<List> {
  *
  * @param data                          Parameters for removing a List
  *
- * @throws
+ * @throws NotAuthenticatedError      If the Profile is not signed in
+ * @throws NotAuthorizedError         If the Profile is not an ADMIN member of the List
+ * @throws ValidationError            If a schema validation error occurs
+ *
  */
 export async function removeList(data: RemoveListSchemaType): Promise<List> {
 
   // Check authentication
   const profile = await findProfile();
   if (!profile) {
-    throw new NotAuthenticatedViolation();
+    throw new NotAuthenticatedError();
   }
 
   // Check authorization
@@ -104,15 +112,14 @@ export async function removeList(data: RemoveListSchemaType): Promise<List> {
     }
   });
   if (!member || member.role !== MemberRole.ADMIN ) {
-    throw new NotAuthorizedViolation();
+    throw new NotAuthorizedError();
   }
 
   // Check data validity
   try {
     RemoveListSchema.parse(data);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
-    throw new NotValidViolation("Request data does not pass validation");
+    throw new ValidationError(error as ZodError);
   }
 
   // Remove the List
@@ -121,25 +128,31 @@ export async function removeList(data: RemoveListSchemaType): Promise<List> {
     where: { id: data.id },
   });
   if (!list) {
-    throw new NotFoundViolation("That List does not exist");
+    throw new NotFoundError("That List does not exist");
   }
   logger.info({
     context: "ListActions.removeList",
     list: list,
-    user: profile.email,
+    user: profile!.email,
   });
   return list;
 }
 
 /**
  * Handle request to update a List.
+ *
+ * @param data                          Parameters for updating a List
+ *
+ * @throws NotAuthenticatedError        If the Profile is not signed in
+ * @throws NotAuthorizedError           If the Profile is not an ADMIN member of the List
+ * @throws ValidationError              If a schema validation error occurs
  */
 export async function updateList(listId: string, data: ListSchemaType): Promise<List> {
 
   // Check authentication
   const profile = await findProfile();
   if (!profile) {
-    throw new NotAuthenticatedViolation();
+    throw new NotAuthenticatedError();
   }
 
   // Check authorization
@@ -150,15 +163,14 @@ export async function updateList(listId: string, data: ListSchemaType): Promise<
     }
   });
   if (!member || member.role !== MemberRole.ADMIN ) {
-    throw new NotAuthorizedViolation();
+    throw new NotAuthorizedError();
   }
 
   // Check data validity
   try {
     ListSchema.parse(data);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
-    throw new NotValidViolation("Request data does not pass validation");
+    throw new ValidationError(error as ZodError, "Request data does not pass validation");
   }
 
   // Update and return the specified List

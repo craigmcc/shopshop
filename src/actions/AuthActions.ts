@@ -17,7 +17,7 @@ import { ZodError } from "zod";
 // Internal Modules ----------------------------------------------------------
 
 import { signIn, signOut } from "@/auth";
-import { UniqueConstraintViolation, ValidationViolation } from "@/errors/DatabaseErrors";
+import { UniqueConstraintError, ValidationError } from "@/lib/ErrorHelpers";
 import { db } from "@/lib/db";
 import { hashPassword } from "@/lib/Encryption";
 import { logger } from "@/lib/ServerLogger";
@@ -81,7 +81,7 @@ export async function doSignOutAction() {
  * @returns                             The new Profile on success
  *
  * @throws UniqueConstraintError        If the email address is already in use
- * @throws ValidationViolation          If the data is invalid per the schema
+ * @throws ValidationError          If the data is invalid per the schema
  */
 export async function doSignUpAction(formData: SignUpSchemaType): Promise<Profile> {
 
@@ -99,9 +99,9 @@ export async function doSignUpAction(formData: SignUpSchemaType): Promise<Profil
     SignUpSchema.parse(formData);
   } catch (error) {
     if (error instanceof ZodError) {
-      throw new ValidationViolation(error);
+      throw new ValidationError(error);
     } else {
-
+      throw error;
     }
   }
 
@@ -119,7 +119,7 @@ export async function doSignUpAction(formData: SignUpSchemaType): Promise<Profil
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       switch (error.code) {
         case "P2002":
-          throw new UniqueConstraintViolation(`Email '${formData.email}' is already in use`);
+          throw new UniqueConstraintError(`Email '${formData.email}' is already in use`);
         default:
           throw error;
       }
