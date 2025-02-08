@@ -13,16 +13,9 @@ import { object, string } from "zod";
 // Public Objects ------------------------------------------------------------
 
 export const ListSchema = object({
-  // id: string().uuid("Invalid object ID").optional(),
   imageUrl: string().url("Invalid image URL").optional(),
   name: string({ required_error: "Name is required" })
     .min(1, "Name is required"),
 });
 
 export type ListSchemaType = typeof ListSchema._type;
-
-export const RemoveListSchema = object({
-  id: string().uuid("Invalid object ID"),
-});
-
-export type RemoveListSchemaType = typeof RemoveListSchema._type;

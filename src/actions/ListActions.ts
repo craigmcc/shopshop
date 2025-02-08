@@ -24,12 +24,8 @@ import {
 } from "@/lib/ErrorHelpers";
 import { findProfile } from "@/lib/ProfileHelpers";
 import { logger } from "@/lib/ServerLogger";
-import {
-  ListSchema,
-  type ListSchemaType,
-  RemoveListSchema,
-  RemoveListSchemaType,
-} from "@/zod-schemas/ListSchema";
+import { IdSchema, type IdSchemaType } from "@/zod-schemas/IdSchema";
+import { ListSchema, type ListSchemaType } from "@/zod-schemas/ListSchema";
 
 // Public Objects ------------------------------------------------------------
 
@@ -89,14 +85,15 @@ export async function createList(data: ListSchemaType): Promise<List> {
 /**
  * Handle request to remove a List.
  *
- * @param data                          Parameters for removing a List
+ * @param listId                      ID of the List to be removed
  *
  * @throws NotAuthenticatedError      If the Profile is not signed in
  * @throws NotAuthorizedError         If the Profile is not an ADMIN member of the List
+ * @throws NotFoundError              If the List does not exist
  * @throws ValidationError            If a schema validation error occurs
  *
  */
-export async function removeList(data: RemoveListSchemaType): Promise<List> {
+export async function removeList(listId: IdSchemaType): Promise<List> {
 
   // Check authentication
   const profile = await findProfile();
@@ -107,7 +104,7 @@ export async function removeList(data: RemoveListSchemaType): Promise<List> {
   // Check authorization
   const member = await db.member.findFirst({
     where: {
-      listId: data.id,
+      listId,
       profileId: profile.id,
     }
   });
@@ -117,7 +114,7 @@ export async function removeList(data: RemoveListSchemaType): Promise<List> {
 
   // Check data validity
   try {
-    RemoveListSchema.parse(data);
+    IdSchema.parse(listId);
   } catch (error) {
     throw new ValidationError(error as ZodError);
   }
@@ -125,7 +122,7 @@ export async function removeList(data: RemoveListSchemaType): Promise<List> {
   // Remove the List
   // TODO - will this delete all the related Categories and Items and Members?
   const list = await db.list.delete({
-    where: { id: data.id },
+    where: { id: listId },
   });
   if (!list) {
     throw new NotFoundError("That List does not exist");
@@ -141,13 +138,15 @@ export async function removeList(data: RemoveListSchemaType): Promise<List> {
 /**
  * Handle request to update a List.
  *
+ * @param listId                        ID of the List to be updated
  * @param data                          Parameters for updating a List
  *
  * @throws NotAuthenticatedError        If the Profile is not signed in
  * @throws NotAuthorizedError           If the Profile is not an ADMIN member of the List
+ * @throws NotFoundError                If the List does not exist
  * @throws ValidationError              If a schema validation error occurs
  */
-export async function updateList(listId: string, data: ListSchemaType): Promise<List> {
+export async function updateList(listId: IdSchemaType, data: ListSchemaType): Promise<List> {
 
   // Check authentication
   const profile = await findProfile();
