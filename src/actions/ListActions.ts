@@ -22,6 +22,7 @@ import {
   NotFoundError,
   ValidationError,
 } from "@/lib/ErrorHelpers";
+import { populateList } from "@/lib/ListHelpers";
 import { findProfile } from "@/lib/ProfileHelpers";
 import { logger } from "@/lib/ServerLogger";
 import { IdSchema, type IdSchemaType } from "@/zod-schemas/IdSchema";
@@ -72,7 +73,8 @@ export async function createList(data: ListSchemaType): Promise<List> {
       members: true,
     }
   });
-  // TODO - seed the related Category and Item models
+  // Also populate the initial Categories and Items for this List
+  await populateList(list.id, true, true);
   logger.info({
     context: "ListActions.createList",
     list,

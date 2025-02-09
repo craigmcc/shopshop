@@ -14,6 +14,7 @@ import { /*Category, Item,*/ List, Member, MemberRole, Profile } from "@prisma/c
 
 import * as SeedData from "@/test/SeedData";
 import { db } from "@/lib/db";
+import { populateList } from "@/lib/ListHelpers";
 
 // Public Objects ------------------------------------------------------------
 
@@ -65,13 +66,17 @@ export abstract class BaseUtils {
     const lists: List[] = [];
     if (options.withLists) {
       for (const list of SeedData.LISTS) {
-        lists.push(await db.list.create({
+        const created: List = await db.list.create({
           data: {
             name: list.name!,
           }
-        }));
+        });
+        lists.push(created);
+        // Also create the related Categories and Items, if requested
+        if (options.withCategories || options.withItems) {
+          await populateList(created.id, options.withCategories!, options.withItems!);
+        }
       }
-      // TODO - Seed with initial Categories and Items for each List if requested
     }
 
     // Load Members if requested
