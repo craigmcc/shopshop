@@ -36,6 +36,8 @@ import { ListSchema, type ListSchemaType } from "@/zod-schemas/ListSchema";
  *
  * @param data                          Parameters for creating a List
  *
+ * @returns                             Newly created List
+ *
  * @throws NotAuthenticatedError        If the Profile is not signed in
  * @throws ValidationError              If a schema validation error occurs
  */
@@ -121,8 +123,7 @@ export async function removeList(listId: IdSchemaType): Promise<List> {
     throw new ValidationError(error as ZodError, "Specified ID fails validation");
   }
 
-  // Remove the List
-  // TODO - will this delete all the related Categories and Items and Members?
+  // Remove and return the List
   const list = await db.list.delete({
     where: { id: listId },
   });
@@ -179,9 +180,12 @@ export async function updateList(listId: IdSchemaType, data: ListSchemaType): Pr
     throw new ValidationError(error as ZodError, "Request data does not pass validation");
   }
 
-  // Update and return the specified List
+  // Update and return the List
   const list = await db.list.update({
-    data: data,
+    data: {
+      ...data,
+      id: listId, // No cheating allowed
+    },
     where: {
       id: listId,
     }
