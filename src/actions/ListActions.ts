@@ -26,7 +26,12 @@ import { populateList } from "@/lib/ListHelpers";
 import { findProfile } from "@/lib/ProfileHelpers";
 import { logger } from "@/lib/ServerLogger";
 import { IdSchema, type IdSchemaType } from "@/zod-schemas/IdSchema";
-import { ListSchema, type ListSchemaType } from "@/zod-schemas/ListSchema";
+import {
+  ListSchema,
+  type ListSchemaType,
+  ListSchemaUpdate,
+  type ListSchemaUpdateType,
+} from "@/zod-schemas/ListSchema";
 
 // Public Objects ------------------------------------------------------------
 
@@ -148,7 +153,7 @@ export async function removeList(listId: IdSchemaType): Promise<List> {
  * @throws NotFoundError                If the List does not exist
  * @throws ValidationError              If a schema validation error occurs
  */
-export async function updateList(listId: IdSchemaType, data: ListSchemaType): Promise<List> {
+export async function updateList(listId: IdSchemaType, data: ListSchemaUpdateType): Promise<List> {
 
   // Check authentication
   const profile = await findProfile();
@@ -174,7 +179,7 @@ export async function updateList(listId: IdSchemaType, data: ListSchemaType): Pr
     throw new ValidationError(error as ZodError, "Specified ID fails validation");
   }
   try {
-    ListSchema.parse(data);
+    ListSchemaUpdate.parse(data);
   } catch (error) {
     throw new ValidationError(error as ZodError, "Request data does not pass validation");
   }

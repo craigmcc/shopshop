@@ -16,7 +16,10 @@ import { createList, removeList, updateList } from "@/actions/ListActions";
 import { setTestProfile } from "@/lib/ProfileHelpers";
 import { ActionUtils } from "@/test/ActionUtils";
 import { LISTS, PROFILES } from "@/test/SeedData";
-import { type ListSchemaType } from "@/zod-schemas/ListSchema";
+import {
+  type ListSchemaType,
+  type ListSchemaUpdateType,
+} from "@/zod-schemas/ListSchema";
 
 const UTILS = new ActionUtils();
 
@@ -221,13 +224,30 @@ describe("ListActions", () => {
 
     });
 
-    it("should pass on an existing List", async () => {
+    it("should pass on empty update", async () => {
 
       // Pick a Profile that is an ADMIN Member of this List
       const profile = await UTILS.lookupProfile(PROFILES[0].email!);
       setTestProfile(profile);
       const list = await UTILS.lookupList(LISTS[0].name!);
-      const update: ListSchemaType = {
+      const update: ListSchemaUpdateType = {};
+
+      try {
+        const updated = await updateList(list.id, update);
+        expect(updated.name).toBe(list.name);
+      } catch (error) {
+        should().fail(`Should not have thrown '${error}'`);
+      }
+
+    });
+
+    it("should pass on valid data", async () => {
+
+      // Pick a Profile that is an ADMIN Member of this List
+      const profile = await UTILS.lookupProfile(PROFILES[0].email!);
+      setTestProfile(profile);
+      const list = await UTILS.lookupList(LISTS[0].name!);
+      const update: ListSchemaUpdateType = {
         name: "Updated List",
       }
 

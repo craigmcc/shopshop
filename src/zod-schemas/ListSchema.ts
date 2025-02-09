@@ -19,3 +19,7 @@ export const ListSchema = object({
 });
 
 export type ListSchemaType = typeof ListSchema._type;
+
+export const ListSchemaUpdate = ListSchema.partial();
+
+export type ListSchemaUpdateType = typeof ListSchemaUpdate._type;
