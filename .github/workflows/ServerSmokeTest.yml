@@ -44,6 +44,6 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
       - run: npm ci
-      - run: npm run build
       - run: npm run dbpush
+      - run: npm run build
       - run: npm test -- --ci --passWithNoTests --reporters=default --reporters=github-actions-formatter
