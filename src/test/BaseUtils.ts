@@ -8,7 +8,7 @@
 
 // External Modules ----------------------------------------------------------
 
-import { /*Category, Item,*/ List, Member, MemberRole, Profile } from "@prisma/client";
+import { Category, Item, List, Member, MemberRole, Profile } from "@prisma/client";
 
 // Internal Modules ----------------------------------------------------------
 
@@ -64,6 +64,8 @@ export abstract class BaseUtils {
 
     // Load Lists if requested
     const lists: List[] = [];
+    let categories: Category[] = [];
+    let items: Item[] = [];
     if (options.withLists) {
       for (const list of SeedData.LISTS) {
         const created: List = await db.list.create({
@@ -74,7 +76,7 @@ export abstract class BaseUtils {
         lists.push(created);
         // Also create the related Categories and Items, if requested
         if (options.withCategories || options.withItems) {
-          await populateList(created.id, options.withCategories!, options.withItems!);
+          ({ categories, items } = await populateList(created.id, options.withCategories!, options.withItems!));
         }
       }
     }
@@ -139,7 +141,7 @@ export abstract class BaseUtils {
 
     }
 
-    return { profiles, lists, members }; // TODO - categories and items?
+    return { categories, items, lists, members, profiles };
 
   }
 

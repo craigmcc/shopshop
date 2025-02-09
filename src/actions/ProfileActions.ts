@@ -79,6 +79,8 @@ export async function createProfile(data: ProfileSchemaType): Promise<Profile> {
  *
  * @param profileId                     ID of the Profile to be removed
  *
+ * @returns                             Removed Profile
+ *
  * @throws NotFoundError                If no Profile can be found with the given
  * @throws ValidationError              If a schema validation error occurs
  */

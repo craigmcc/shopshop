@@ -95,6 +95,8 @@ export async function createList(data: ListSchemaType): Promise<List> {
  *
  * @param listId                      ID of the List to be removed
  *
+ * @returns                           Removed List
+ *
  * @throws NotAuthenticatedError      If the Profile is not signed in
  * @throws NotAuthorizedError         If the Profile is not an ADMIN member of the List
  * @throws NotFoundError              If the List does not exist
@@ -148,6 +150,8 @@ export async function removeList(listId: IdSchemaType): Promise<List> {
  * @param listId                        ID of the List to be updated
  * @param data                          Parameters for updating a List
  *
+ * @returns                             Updated List
+ *
  * @throws NotAuthenticatedError        If the Profile is not signed in
  * @throws NotAuthorizedError           If the Profile is not an ADMIN member of the List
  * @throws NotFoundError                If the List does not exist
@@ -185,7 +189,7 @@ export async function updateList(listId: IdSchemaType, data: ListSchemaUpdateTyp
   }
 
   // Update and return the List
-  const list = await db.list.update({
+  const updated = await db.list.update({
     data: {
       ...data,
       id: listId, // No cheating allowed
@@ -196,9 +200,9 @@ export async function updateList(listId: IdSchemaType, data: ListSchemaUpdateTyp
   });
   logger.info({
     context: "ListActions.updateList",
-    list: list,
+    list: updated,
     user: profile.email,
   });
-  return list;
+  return updated;
 
 }

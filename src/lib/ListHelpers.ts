@@ -10,7 +10,7 @@
 
 // External Modules ----------------------------------------------------------
 
-import { Category } from "@prisma/client";
+import { Category, Item } from "@prisma/client";
 
 // Internal Modules ----------------------------------------------------------
 
@@ -27,10 +27,12 @@ import { type ItemSchemaType } from "@/zod-schemas/ItemSchema";
  * @param listId                        ID of the List to be populated
  * @param withCategories                Should we include Categories?
  * @param withItems                     Should we include Items?  (implies withCategories)
+ *
+ * @returns                             Newly created Categories and Items
  */
-export async function populateList(listId: string, withCategories: boolean, withItems: boolean): Promise<void> {
+export async function populateList(listId: string, withCategories: boolean, withItems: boolean) {
 
-  // Create each defined Category, keeping them around for access to IDs
+  // Create each defined Category
   const categories: Category[] = [];
   if (withCategories || withItems) {
     for (const element of InitialListData) {
@@ -43,6 +45,7 @@ export async function populateList(listId: string, withCategories: boolean, with
   }
 
   // For each created category, create the relevant Items
+  const items: Item[] = [];
   if (withItems) {
     for (let i = 0; i < InitialListData.length; i++) {
       const element = InitialListData[i];
@@ -55,10 +58,12 @@ export async function populateList(listId: string, withCategories: boolean, with
             name: element[j],
             selected: false,
           }
-          await db.item.create({ data: item });
+          items.push(await db.item.create({ data: item }));
         }
       }
     }
   }
+
+  return { categories, items };
 
 }
