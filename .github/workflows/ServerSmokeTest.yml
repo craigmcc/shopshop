@@ -46,4 +46,4 @@ jobs:
       - run: npm ci
       - run: npm run dbpush
       - run: npm run build
-      - run: npm test -- --ci --passWithNoTests --reporters=default --reporters=github-actions-formatter
+      - run: npm run test:ci
