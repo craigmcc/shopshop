@@ -1,0 +1,60 @@
+name: Server Smoke Test
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+    ServerSmokeTest:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+        matrix:
+            node-version: [22.x]
+
+    services:
+      postgres:
+        image: postgres:16.3
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+          POSTGRES_PORT: 5432
+        ports:
+          - 5432:5432
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+       AUTH_SECRET: m2PT1GvL6x3qVSlspkZeOdqUwV5TfzesM4m/C/9dzHk=
+       DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres
+
+    steps:
+
+        - name: Checkout
+            uses: actions/checkout@v4
+
+        - name: Use Node.js ${{ matrix.node-version }}
+            uses: actions/setup-node@v4
+            with:
+                node-version: ${{ matrix.node-version }}
+                cache: 'npm'
+
+        - name: Install dependencies
+            run: npm ci
+
+        - name: Build
+            run: npm run build
+
+        - name: Push database schema
+            run: npm run dbpush
+
+        - name: Run tests
+            run: npm test -- --ci --passWithNoTests --reporters=default --reporters=github-actions-formatter
