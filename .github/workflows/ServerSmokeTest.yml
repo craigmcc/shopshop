@@ -9,41 +9,41 @@ on:
 jobs:
   ServerSmokeTest:
 
-  runs-on: ubuntu-latest
+    runs-on: ubuntu-latest
 
-  strategy:
-    matrix:
-      node-version: [22.x]
+    strategy:
+      matrix:
+        node-version: [22.x]
 
-  services:
-    postgres:
-      image: postgres:16.3
-      env:
-        POSTGRES_USER: postgres
-        POSTGRES_PASSWORD: postgres
-        POSTGRES_DB: postgres
-        POSTGRES_PORT: 5432
-      ports:
-        - 5432:5432
-      # Set health checks to wait until postgres has started
-      options: >-
-        --health-cmd pg_isready
-        --health-interval 10s
-        --health-timeout 5s
-        --health-retries 5
+    services:
+      postgres:
+        image: postgres:16.3
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+          POSTGRES_PORT: 5432
+        ports:
+          - 5432:5432
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
-  env:
-    AUTH_SECRET: m2PT1GvL6x3qVSlspkZeOdqUwV5TfzesM4m/C/9dzHk=
-    DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres
+    env:
+      AUTH_SECRET: m2PT1GvL6x3qVSlspkZeOdqUwV5TfzesM4m/C/9dzHk=
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres
 
-  steps:
-    - uses: actions/checkout@v4
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - run: npm ci
-    - run: npm run build
-    - run: npm run dbpush
-    - run: npm test -- --ci --passWithNoTests --reporters=default --reporters=github-actions-formatter
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run build
+      - run: npm run dbpush
+      - run: npm test -- --ci --passWithNoTests --reporters=default --reporters=github-actions-formatter
