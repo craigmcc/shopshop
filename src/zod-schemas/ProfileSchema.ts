@@ -23,3 +23,7 @@ export const ProfileSchema = object({
 });
 
 export type ProfileSchemaType = typeof ProfileSchema._type;
+
+export const ProfileSchemaUpdate = ProfileSchema.partial();
+
+export type ProfileSchemaUpdateType = typeof ProfileSchemaUpdate._type;

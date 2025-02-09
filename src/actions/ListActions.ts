@@ -60,12 +60,11 @@ export async function createList(data: ListSchemaType): Promise<List> {
   }
 
   // Create and return the new List
-  const list = await db.list.create({
+  const created = await db.list.create({
     data: {
       ...data,
       members: {
         create: {
-          // TODO - is listId needed here?
           profileId: profile.id,
           role: MemberRole.ADMIN,
         }
@@ -76,13 +75,13 @@ export async function createList(data: ListSchemaType): Promise<List> {
     }
   });
   // Also populate the initial Categories and Items for this List
-  await populateList(list.id, true, true);
+  await populateList(created.id, true, true);
   logger.info({
     context: "ListActions.createList",
-    list,
+    list: created,
     user: profile.email,
   });
-  return list;
+  return created;
 
 }
 

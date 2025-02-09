@@ -25,7 +25,12 @@ import {
 import { findProfile } from "@/lib/ProfileHelpers";
 import { logger } from "@/lib/ServerLogger";
 import { IdSchema, type IdSchemaType } from "@/zod-schemas/IdSchema";
-import { ProfileSchema, type ProfileSchemaType } from "@/zod-schemas/ProfileSchema";
+import {
+  ProfileSchema,
+  type ProfileSchemaType,
+  ProfileSchemaUpdate,
+  ProfileSchemaUpdateType,
+} from "@/zod-schemas/ProfileSchema";
 
 // Public Objects ------------------------------------------------------------
 
@@ -54,15 +59,18 @@ export async function createProfile(data: ProfileSchemaType): Promise<Profile> {
   }
 
   // Create and return the new Profile
-  const profile = await db.profile.create({
+  const created = await db.profile.create({
     data,
   });
   logger.info({
     context: "ProfileActions.createProfile",
     message: "Profile created",
-    profile,
+    profile: {
+      ...created,
+      password: "*REDACTED*",
+    },
   });
-  return profile;
+  return created;
 
 }
 
@@ -77,10 +85,15 @@ export async function createProfile(data: ProfileSchemaType): Promise<Profile> {
 export async function removeProfile(profileId: IdSchemaType): Promise<Profile> {
 
   // Check authentication
-  // HMMM - should this really be exposed?
+  const profile = await findProfile();
+  if (!profile) {
+    throw new NotAuthenticatedError();
+  }
 
   // Check authorization
-  // HMMM - should this really be exposed?
+  if (profile.id !== profileId) {
+    throw new NotAuthorizedError("You can only remove your own Profile");
+  }
 
   // Check data validity
   try {
@@ -90,22 +103,22 @@ export async function removeProfile(profileId: IdSchemaType): Promise<Profile> {
   }
 
   // Remove and return the Profile
-  const profile = await db.profile.delete({
+  const removed = await db.profile.delete({
     where: {
       id: profileId,
     }
   });
-  if (!profile) {
+  if (!removed) {
     throw new NotFoundError("That Profile does not exist");
   }
   logger.info({
     context: "ProfileActions.removeProfile",
     profile: {
-      ...profile,
+      ...removed,
       password: "*REDACTED*",
     }
   });
-  return profile;
+  return removed;
 
 }
 
@@ -122,7 +135,7 @@ export async function removeProfile(profileId: IdSchemaType): Promise<Profile> {
  * @throws NotFoundError                If no Profile can be found with the given
  * @throws ValidationError              If a schema validation error occurs
  */
-export async function updateProfile(profileId: IdSchemaType, data: ProfileSchemaType): Promise<Profile> {
+export async function updateProfile(profileId: IdSchemaType, data: ProfileSchemaUpdateType): Promise<Profile> {
 
   // Check authentication
   const profile = await findProfile();
@@ -142,13 +155,13 @@ export async function updateProfile(profileId: IdSchemaType, data: ProfileSchema
     throw new ValidationError(error as ZodError, "Specified ID fails validation");
   }
   try {
-    ProfileSchema.parse(data);
+    ProfileSchemaUpdate.parse(data);
   } catch (error) {
     throw new ValidationError(error as ZodError, "Request data does not pass validation");
   }
 
   // Update and return the Profile
-  const updatedProfile = await db.profile.update({
+  const updated = await db.profile.update({
     data: {
       ...data,
       id: profileId, // No cheating allowed
@@ -160,10 +173,10 @@ export async function updateProfile(profileId: IdSchemaType, data: ProfileSchema
   logger.info({
     context: "ProfileActions.updateProfile",
     profile: {
-      ...updatedProfile,
+      ...updated,
       password: "*REDACTED*",
     }
   });
-  return updatedProfile;
+  return updated;
 
 }

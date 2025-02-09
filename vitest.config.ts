@@ -6,6 +6,7 @@ export default defineConfig({
   plugins: [ react(), tsconfigPaths() ],
   test: {
     environment: 'jsdom',
+    fileParallelism: false, // Avoid clashes with multiple tests and the database
     globals: true,
     sequence: {
       hooks: "list",
