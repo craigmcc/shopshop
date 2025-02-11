@@ -8,12 +8,13 @@
 
 // External Modules ----------------------------------------------------------
 
-import {Category, List} from "@prisma/client";
+import {Category, List, MemberRole } from "@prisma/client";
 import { should } from "vitest";
 
 // Internal Modules ----------------------------------------------------------
 
 import {createCategory, removeCategory/*, updateCategory*/} from "@/actions/CategoryActions";
+import { db } from "@/lib/db";
 import { setTestProfile } from "@/lib/ProfileHelpers";
 import { ActionUtils } from "@/test/ActionUtils";
 import { PROFILES } from "@/test/SeedData";
@@ -139,15 +140,34 @@ describe("CategoryActions", () => {
 
     });
 
-    // TODO - fails on authorization when it shouldn't
-    it.skip("should pass on existing Category", async () => {
+    it("should pass on existing Category", async () => {
 
-      const profile = await UTILS.lookupProfile(PROFILES[0].email!);
+      // Identify a Category in a List where this Profile is an ADMIN
+      const profile = await db.profile.findFirst({
+        include: {
+          members: {
+            include: {
+              list: {
+                include: {
+                  categories: true,
+                },
+              }
+            },
+            where: {
+              role: MemberRole.ADMIN,
+            },
+          },
+        },
+        where: {
+          email: PROFILES[0].email,
+        }
+      });
       setTestProfile(profile);
-      const removed = await removeCategory(categories[0].id);
+      const category =  profile!.members[0].list.categories[0];
 
+      const removed = await removeCategory(category!.id);
       should().exist(removed.id);
-      expect(removed.name).toBe(categories[0].name);
+      expect(removed.name).toBe(category!.name);
 
     });
 

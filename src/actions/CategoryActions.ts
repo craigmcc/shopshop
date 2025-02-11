@@ -117,12 +117,6 @@ export async function removeCategory(id: IdSchemaType): Promise<Category> {
       profileId: profile.id,
     }
   });
-  logger.info({
-    context: "CategoryActions.removeCategory.midpoint",
-    listId: category.listId,
-    profileId: profile.id,
-    member,
-  });
   if (!member || member.role !== MemberRole.ADMIN) {
     throw new NotAuthorizedError();
   }
