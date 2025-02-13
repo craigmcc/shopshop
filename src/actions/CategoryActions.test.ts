@@ -8,19 +8,19 @@
 
 // External Modules ----------------------------------------------------------
 
-import {Category, List, MemberRole } from "@prisma/client";
+import {Category, List, MemberRole, Profile } from "@prisma/client";
 import { should } from "vitest";
 
 // Internal Modules ----------------------------------------------------------
 
-import {createCategory, removeCategory/*, updateCategory*/} from "@/actions/CategoryActions";
+import {createCategory, removeCategory, updateCategory } from "@/actions/CategoryActions";
 import { db } from "@/lib/db";
 import { setTestProfile } from "@/lib/ProfileHelpers";
 import { ActionUtils } from "@/test/ActionUtils";
 import { PROFILES } from "@/test/SeedData";
 import {
   type CategorySchemaType,
-//  type CategorySchemaUpdateType,
+  type CategorySchemaUpdateType,
 } from "@/zod-schemas/CategorySchema";
 
 const UTILS = new ActionUtils();
@@ -131,9 +131,10 @@ describe("CategoryActions", () => {
 
       const profile = await UTILS.lookupProfile(PROFILES[2].email!);
       setTestProfile(profile);
+      const category = await lookupCategory(profile, MemberRole.ADMIN);
 
       try {
-        await removeCategory(categories[0].id);
+        await removeCategory(category.id);
       } catch (error) {
         expect((error as Error).message).toBe("This Profile is not authorized to perform this action");
       }
@@ -142,28 +143,9 @@ describe("CategoryActions", () => {
 
     it("should pass on existing Category", async () => {
 
-      // Identify a Category in a List where this Profile is an ADMIN
-      const profile = await db.profile.findFirst({
-        include: {
-          members: {
-            include: {
-              list: {
-                include: {
-                  categories: true,
-                },
-              }
-            },
-            where: {
-              role: MemberRole.ADMIN,
-            },
-          },
-        },
-        where: {
-          email: PROFILES[0].email,
-        }
-      });
+      const profile = await UTILS.lookupProfile(PROFILES[0].email!);
       setTestProfile(profile);
-      const category =  profile!.members[0].list.categories[0];
+      const category = await lookupCategory(profile, MemberRole.ADMIN);
 
       const removed = await removeCategory(category!.id);
       should().exist(removed.id);
@@ -173,6 +155,71 @@ describe("CategoryActions", () => {
 
   });
 
+  describe("updateCategory", () => {
 
+    it("should fail on not authenticated", async () => {
+
+      setTestProfile(null);
+
+      try {
+        await updateCategory(categories[0].id, { name: "New Name" });
+      } catch (error) {
+        expect((error as Error).message).toBe("This Profile is not signed in");
+      }
+
+    });
+
+    it("should fail on not authorized", async () => {
+
+      const profile = await UTILS.lookupProfile(PROFILES[2].email!);
+      setTestProfile(profile);
+      const category = await lookupCategory(profile, MemberRole.GUEST);
+
+      try {
+        await updateCategory(category.id, { name: "New Name" });
+      } catch (error) {
+        expect((error as Error).message).toBe("This Profile is not authorized to perform this action");
+      }
+
+    });
+
+    it("should pass on existing Category", async () => {
+
+      const profile = await UTILS.lookupProfile(PROFILES[0].email!);
+      setTestProfile(profile);
+      const category = await lookupCategory(profile, MemberRole.ADMIN);
+
+      const data: CategorySchemaUpdateType = { name: "New Name" };
+      const updated = await updateCategory(category!.id, data);
+      expect(updated.name).toBe(data.name);
+
+    });
+
+  });
 
 });
+
+// Private Objects -----------------------------------------------------------
+
+/**
+ * Look up and return a Category for which the specified Profile is a
+ * Member with the specified MemberRole.
+ */
+async function lookupCategory(profile: Profile, role: MemberRole): Promise<Category> {
+
+  const member = await db.member.findFirst({
+    include: {
+      list: {
+        include: {
+          categories: true,
+        },
+      },
+    },
+    where: {
+      profileId: profile.id,
+      role: role,
+    },
+  });
+  return member!.list.categories[0];
+
+}

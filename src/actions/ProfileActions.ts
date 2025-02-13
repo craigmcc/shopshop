@@ -62,7 +62,7 @@ export async function createProfile(data: ProfileSchemaType): Promise<Profile> {
   const created = await db.profile.create({
     data,
   });
-  logger.info({
+  logger.trace({
     context: "ProfileActions.createProfile",
     message: "Profile created",
     profile: {
@@ -113,7 +113,7 @@ export async function removeProfile(profileId: IdSchemaType): Promise<Profile> {
   if (!removed) {
     throw new NotFoundError("That Profile does not exist");
   }
-  logger.info({
+  logger.trace({
     context: "ProfileActions.removeProfile",
     profile: {
       ...removed,
@@ -172,7 +172,7 @@ export async function updateProfile(profileId: IdSchemaType, data: ProfileSchema
       id: profileId
     },
   });
-  logger.info({
+  logger.trace({
     context: "ProfileActions.updateProfile",
     profile: {
       ...updated,

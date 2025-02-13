@@ -81,7 +81,7 @@ export async function createList(data: ListSchemaType): Promise<List> {
   });
   // Also populate the initial Categories and Items for this List
   await populateList(created.id, true, true);
-  logger.info({
+  logger.trace({
     context: "ListActions.createList",
     list: created,
     user: profile.email,
@@ -136,7 +136,7 @@ export async function removeList(listId: IdSchemaType): Promise<List> {
   if (!list) {
     throw new NotFoundError("That List does not exist");
   }
-  logger.info({
+  logger.trace({
     context: "ListActions.removeList",
     list: list,
     user: profile!.email,
@@ -198,7 +198,7 @@ export async function updateList(listId: IdSchemaType, data: ListSchemaUpdateTyp
       id: listId,
     }
   });
-  logger.info({
+  logger.trace({
     context: "ListActions.updateList",
     list: updated,
     user: profile.email,

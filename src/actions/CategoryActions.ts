@@ -195,7 +195,7 @@ export async function updateCategory(categoryId: IdSchemaType, data: CategorySch
       id: categoryId,
     },
   });
-  logger.info({
+  logger.trace({
     context: "CategoryActions.updateCategory",
     updated,
     user: profile.email,
