@@ -65,6 +65,7 @@ describe("SignInForm", () => {
     // Submit the form
     act(() => submitButton.click());
 //    submitButton.click();
+    expect(submitButton).toBeDefined();
     screen.debug();
 
     // Check for errors
