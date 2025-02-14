@@ -99,7 +99,7 @@ export async function removeCategory(id: IdSchemaType): Promise<Category> {
   // Check authentication
   const profile = await findProfile();
   if (!profile) {
-    throw new NotAuthenticatedError();
+    throw new NotAuthenticatedError("This Profile is not signed in");
   }
 
   // Check authorization and Category existence
@@ -141,7 +141,7 @@ export async function removeCategory(id: IdSchemaType): Promise<Category> {
 /**
  * Handle request to update a Category.
  *
- * @param categoryId                            ID of the Category to update
+ * @param categoryId                    ID of the Category to update
  * @param data                          Parameters for updating a Category
  *
  * @returns                             Updated Category
