@@ -57,6 +57,22 @@ describe("ProfileActions", () => {
 
     });
 
+    it("should fail on duplicate email", async () => {
+
+      const profile: ProfileSchemaType = {
+        email: PROFILES[0].email!,
+        name: "Test User",
+        password: hashPassword("password"),
+      }
+
+      try {
+        await createProfile(profile);
+      } catch (error) {
+        expect((error as Error).message).toBe("That email address is already in use");
+      }
+
+    });
+
     it("should pass on valid data", async () => {
 
       const profile: ProfileSchemaType = {
@@ -148,6 +164,23 @@ describe("ProfileActions", () => {
 
     });
 
+    it("should fail on duplicate email", async () => {
+
+      const profile = await UTILS.lookupProfile(PROFILES[0].email!);
+      setTestProfile(profile);
+      const update: ProfileSchemaUpdateType = {
+        email: PROFILES[1].email!,
+        name: profile.name,
+      }
+
+      try {
+        await updateProfile(profile.id, update);
+      } catch (error) {
+        expect((error as Error).message).toBe("That email address is already in use");
+      }
+
+    });
+
     it("should pass on empty update", async () => {
 
       const profile = await UTILS.lookupProfile(PROFILES[2].email!);
@@ -155,6 +188,30 @@ describe("ProfileActions", () => {
 
       try {
         const updated = await updateProfile(profile.id, {});
+        expect(updated.id).toBe(profile.id);
+        expect(updated.email).toBe(profile.email);
+        expect(updated.name).toBe(profile.name);
+        expect(updated.password).toBe(profile.password);
+      } catch (error) {
+        should().fail(`Should not have thrown '${error}'`);
+      }
+
+    });
+
+    it("should pass on full update", async () => {
+
+      const profile = await UTILS.lookupProfile(PROFILES[0].email!);
+      setTestProfile(profile);
+      const update: ProfileSchemaUpdateType = {
+        email: profile.email,
+        imageUrl: profile.imageUrl? profile.imageUrl : undefined,
+        name: profile.name,
+        password: profile.password,
+        scope: profile.scope? profile.scope : undefined,
+      }
+
+      try {
+        const updated = await updateProfile(profile.id, update);
         expect(updated.id).toBe(profile.id);
         expect(updated.email).toBe(profile.email);
         expect(updated.name).toBe(profile.name);

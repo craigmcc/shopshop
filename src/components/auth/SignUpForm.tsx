@@ -19,8 +19,9 @@ import { toast } from "react-toastify";
 
 // Internal Modules ----------------------------------------------------------
 
-import { doSignUpAction } from "@/actions/AuthActions";
+import { createProfile } from "@/actions/ProfileActions";
 import { InputField } from "@/components/daisyui/InputField";
+import { ServerResponse} from "@/components/shared/ServerResponse";
 import { logger } from "@/lib/ClientLogger";
 import {SignUpSchema, SignUpSchemaType} from "@/zod-schemas/SignUpSchema";
 
@@ -30,6 +31,7 @@ export function SignUpForm() {
 
   const router = useRouter();
   const [isSaving, setisSaving] = useState<boolean>(false);
+  const [result, setResult] = useState<string | Error | null>(null);
 
   const defaultValues: SignUpSchemaType = {
     confirmPassword: "",
@@ -44,14 +46,10 @@ export function SignUpForm() {
   });
   const formState = methods.formState;
   const errors = formState.errors;
-  logger.info({
-    context: "SignUpForm.errors",
-    errors
-  });
 
   async function submitForm(formData: SignUpSchemaType) {
 
-    logger.info({
+    logger.trace({
       context: "SignUpForm.submitForm",
       formData: {
         ...formData,
@@ -63,9 +61,10 @@ export function SignUpForm() {
     try {
 
       setisSaving(true);
-      const profile = await doSignUpAction(formData);
+//      const profile = await doSignUpAction(formData);
+      const profile = await createProfile(formData);
       setisSaving(false);
-      logger.info({
+      logger.trace({
         context: "SignUpForm.submitForm.success",
         profile: {
           email: profile.email,
@@ -78,12 +77,12 @@ export function SignUpForm() {
     } catch (error) {
 
       setisSaving(false);
-      logger.info({
+      logger.trace({
         context: "SignUpForm.submitForm.error",
         error: error,
       });
       const message = error instanceof Error ? error.message : `${error}`;
-      toast.error(message);
+      setResult(error instanceof Error ? error : message);
 
     }
 
@@ -93,6 +92,7 @@ export function SignUpForm() {
     <div className="card bg-base-100 shadow-xl">
       <div className="card-body">
         <h2 className="card-title justify-center">Sign Up for ShopShop</h2>
+        {result && <ServerResponse result={result} />}
         <FormProvider {...methods}>
           <form className="flex flex-row gap-2" onSubmit={methods.handleSubmit(submitForm)}>
             <div className="flex flex-col w-full gap-2">

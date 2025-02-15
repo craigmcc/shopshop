@@ -20,6 +20,7 @@ import {
   NotAuthenticatedError,
   NotAuthorizedError,
   NotFoundError,
+  UniqueConstraintError,
   ValidationError,
 } from "@/lib/ErrorHelpers";
 import { findProfile } from "@/lib/ProfileHelpers";
@@ -56,6 +57,16 @@ export async function createProfile(data: ProfileSchemaType): Promise<Profile> {
     ProfileSchema.parse(data);
   } catch (error) {
     throw new ValidationError(error as ZodError, "Request data does not pass validation");
+  }
+
+  // Check for uniqueness constraint violation
+  const existing = await db.profile.findUnique({
+    where: {
+      email: data.email,
+    },
+  });
+  if (existing) {
+    throw new UniqueConstraintError("That email address is already in use");
   }
 
   // Create and return the new Profile
@@ -160,6 +171,21 @@ export async function updateProfile(profileId: IdSchemaType, data: ProfileSchema
     ProfileSchemaUpdate.parse(data);
   } catch (error) {
     throw new ValidationError(error as ZodError, "Request data does not pass validation");
+  }
+
+  // Check for uniqueness constraint violation if email is specified
+  if (data.email) {
+    const existing = await db.profile.findUnique({
+      where: {
+        email: data.email,
+        NOT: {
+          id: profileId,
+        },
+      },
+    });
+    if (existing) {
+      throw new UniqueConstraintError("That email address is already in use");
+    }
   }
 
   // Update and return the Profile
