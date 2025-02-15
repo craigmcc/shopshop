@@ -26,6 +26,8 @@ export const ItemSchema = object({
 
 export type ItemSchemaType = typeof ItemSchema._type;
 
-export const ItemSchemaUpdate = ItemSchema.partial();
+export const ItemSchemaUpdate = ItemSchema
+  .partial()
+  .omit({ categoryId: true, listId: true });
 
 export type ItemSchemaUpdateType = typeof ItemSchemaUpdate._type;

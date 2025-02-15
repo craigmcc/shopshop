@@ -104,10 +104,14 @@ describe("CategoryActions", () => {
         listId: lists[0].id,
         name: "New Category",
       }
-      const created = await createCategory(category);
 
-      should().exist(created.id);
-      expect(created.name).toBe(category.name);
+      try {
+        const created = await createCategory(category);
+        should().exist(created.id);
+        expect(created.name).toBe(category.name);
+      } catch (error) {
+        should().fail(`Should not have thrown '${error}'`);
+      }
 
     });
 
@@ -179,6 +183,21 @@ describe("CategoryActions", () => {
         await updateCategory(category.id, { name: "New Name" });
       } catch (error) {
         expect((error as Error).message).toBe("This Profile is not authorized to perform this action");
+      }
+
+    });
+
+    it("should fail on invalid data", async () => {
+
+      const profile = await UTILS.lookupProfile(PROFILES[0].email!);
+      setTestProfile(profile);
+      const category = await lookupCategory(profile, MemberRole.ADMIN);
+      const data:CategorySchemaUpdateType = { name: "" };
+
+      try {
+        await updateCategory(category.id, data);
+      } catch (error) {
+        expect((error as Error).message).toBe("Request data does not pass validation");
       }
 
     });
