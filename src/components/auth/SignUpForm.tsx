@@ -21,9 +21,9 @@ import { toast } from "react-toastify";
 
 import { createProfile } from "@/actions/ProfileActions";
 import { InputField } from "@/components/daisyui/InputField";
-import { ServerResponse} from "@/components/shared/ServerResponse";
+import { ServerResponse } from "@/components/shared/ServerResponse";
 import { logger } from "@/lib/ClientLogger";
-import {SignUpSchema, SignUpSchemaType} from "@/zod-schemas/SignUpSchema";
+import {SignUpSchema, type SignUpSchemaType} from "@/zod-schemas/SignUpSchema";
 
 // Public Objects ------------------------------------------------------------
 
@@ -71,6 +71,7 @@ export function SignUpForm() {
           name: profile.name,
         }
       });
+      setResult(null);
       toast.success(`Profile for '${profile.name}' was successfully created`);
       router.push("/");
 
@@ -94,7 +95,11 @@ export function SignUpForm() {
         <h2 className="card-title justify-center">Sign Up for ShopShop</h2>
         {result && <ServerResponse result={result} />}
         <FormProvider {...methods}>
-          <form className="flex flex-row gap-2" onSubmit={methods.handleSubmit(submitForm)}>
+          <form
+            className="flex flex-row gap-2"
+            name="SignUpForm"
+            onSubmit={methods.handleSubmit(submitForm)}
+          >
             <div className="flex flex-col w-full gap-2">
               <InputField
                 autoFocus
