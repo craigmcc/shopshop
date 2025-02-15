@@ -113,8 +113,8 @@ describe("SignInForm", () => {
     await user.type(passwordField, "badpassword");
     await user.click(submitButton);
 
-    // TODO - SignInForm just puts up a toast
-//    screen.debug();
+    // Check for server side validation errors
+    expect(screen.getByText("Invalid email or password, please try again."));
 
   });
 

@@ -93,14 +93,26 @@ export class UniqueConstraintError extends ErrorHelper {
  */
 export class ValidationError extends ErrorHelper {
 
-  fieldErrors = {};
-  formErrors = {};
+  _fieldErrors :  {
+    [p: string]: string[] | undefined;
+    [p: number]: string[] | undefined;
+    [p: symbol]: string[] | undefined
+  } = {};
+  _formErrors: string[] = [];
 
   constructor(error: ZodError, message?: string) {
     super(message ? message : error.message);
     const flattened = error.flatten();
-    this.fieldErrors = flattened.fieldErrors || {};
-    this.formErrors = flattened.formErrors || {};
+    this._fieldErrors = flattened.fieldErrors || {};
+    this._formErrors = flattened.formErrors || {};
+  }
+
+  get fieldErrors(): typeof this._fieldErrors {
+    return this._fieldErrors;
+  }
+
+  get formErrors(): string[] {
+    return this._formErrors;
   }
 
 }
