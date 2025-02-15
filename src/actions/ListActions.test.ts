@@ -81,7 +81,8 @@ describe("ListActions", () => {
       }
 
       try {
-        await createList(list);
+        const created = await createList(list);
+        expect(created.name).toBe(list.name);
       } catch (error) {
         should().fail(`Should not have thrown '${error}'`);
       }
