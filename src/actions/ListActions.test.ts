@@ -65,7 +65,7 @@ describe("ListActions", () => {
       }
 
       try {
-        const created = await createList(list);
+        await createList(list);
       } catch (error) {
         expect((error as Error).message).toBe("This Profile is not signed in");
       }
