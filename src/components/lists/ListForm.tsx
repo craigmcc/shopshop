@@ -38,7 +38,7 @@ type Props = {
   profile: Profile,                     // Signed in Profile
 }
 
-export default function ListForm({ list, profile }: Props ) {
+export function ListForm({ list, profile }: Props ) {
 
   const isCreating = !list;
   const router = useRouter();
@@ -74,6 +74,12 @@ export default function ListForm({ list, profile }: Props ) {
 
     try {
 
+      logger.info({
+        context: "ListForm.submitForm",
+        formData,
+        isCreating,
+      });
+
       setIsSaving(true);
       if (isCreating) {
         await createList(formData);
@@ -82,7 +88,7 @@ export default function ListForm({ list, profile }: Props ) {
       }
       setIsSaving(false);
       setResult(null);
-      toast.success(`List ${formData.name} was successfully ${isCreating ? "created" : "updated"}`);
+      toast.success(`List "${formData.name}" was successfully ${isCreating ? "created" : "updated"}`);
       router.push("/lists");
 
     } catch (error) {
@@ -98,20 +104,20 @@ export default function ListForm({ list, profile }: Props ) {
   }
 
   return (
-    <div className={"card bg-base-100 shadow-xl"}>
+    <div className={"card bg-base-300 shadow-xl"}>
       <div className="card-body">
         <h2 className="card-title justify-center">{ isCreating ? "Create List" : "Update List" }</h2>
         {result && <ServerResponse result={result} />}
         <FormProvider {...methods}>
           <form
-            className="flex flex-row gap-2"
+            className="flex flex-col gap-2"
             name="ListForm"
             onSubmit={methods.handleSubmit(submitForm)}
           >
-            <div className="flex w-full gap-2">
+            <div className="flex flex-col w-full gap-2">
               <InputField
                 autoFocus={true}
-                label="Name"
+                label="List Name"
                 name="name"
                 placeholder="List Name"
                 type="text"

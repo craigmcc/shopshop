@@ -23,7 +23,7 @@ import { createProfile } from "@/actions/ProfileActions";
 import { InputField } from "@/components/daisyui/InputField";
 import { ServerResponse } from "@/components/shared/ServerResponse";
 import { logger } from "@/lib/ClientLogger";
-import {SignUpSchema, type SignUpSchemaType} from "@/zod-schemas/SignUpSchema";
+import { SignUpSchema, type SignUpSchemaType } from "@/zod-schemas/SignUpSchema";
 
 // Public Objects ------------------------------------------------------------
 

@@ -16,7 +16,7 @@ import { redirect } from "next/navigation";
 
 // Internal Modules ----------------------------------------------------------
 
-//import { ListSidebarTable } from "@/components/lists/ListSidebarTable";
+import { ListSidebarTable } from "@/components/lists/ListSidebarTable";
 import { db } from "@/lib/db";
 import { findProfile } from "@/lib/ProfileHelpers";
 import { logger } from "@/lib/ServerLogger";
@@ -30,7 +30,7 @@ export async function ListsSidebar() {
   if (!profile) {
     redirect("/auth/signIn");
   }
-  logger.info({
+  logger.trace({
     context: "ListsSidebar.findProfile",
     profile: {
       ...profile,
@@ -38,7 +38,7 @@ export async function ListsSidebar() {
     },
   });
 
-  // Select Lists this Profile is a Member of
+  // Select and sort Lists this Profile is a Member of
   const members = await db.member.findMany({
     include: {
       list: true,
@@ -46,6 +46,10 @@ export async function ListsSidebar() {
     where: {
       profileId: profile.id,
     }
+  });
+  logger.trace({
+    context: "ListsSidebar.findMembers",
+    members,
   });
   const lists: List[] = [];
   for (const member of members) {
@@ -55,27 +59,19 @@ export async function ListsSidebar() {
 
   return (
     <>
-      <div className="flex flex-col h-[calc(100vh-80px)]">
-      <div className="flex items-centered justify-between w-full">
-        <div>Shopping Lists</div>
-        <div>
+      <div className="flex flex-col h-[calc(100vh-80px)] bg-base-100">
+      <div className="flex items-centered justify-between w-full p-2">
+        <div className="font-semibold pl-2">Shopping Lists</div>
+        <div className="pr-1">
           <Link href="/lists/new/settings">
             <SquarePlus/>
           </Link>
         </div>
       </div>
-      <ul>
-        {lists.map((list) => (
-          <li key={list.id}>{list.name}</li>
-        ))}
-      </ul>
-      <div>ListsSidebar End</div>
-{/*
       <ListSidebarTable
         lists={lists}
-        profile={profile}
+        members={members}
       />
-*/}
       </div>
     </>
   )
