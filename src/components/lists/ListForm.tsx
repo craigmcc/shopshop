@@ -60,6 +60,7 @@ export function ListForm({ list, profile }: Props ) {
   const methods = useForm<ListCreateSchemaType | ListUpdateSchemaType>({
     defaultValues: isCreating ? defaultValuesCreate : defaultValuesUpdate,
     mode: "onBlur",
+    // @ts-expect-error Type weirdness on resolver property
     resolver: isCreating ? zodResolver(ListCreateSchema) : zodResolver(ListUpdateSchema),
   });
   const formState = methods.formState;
