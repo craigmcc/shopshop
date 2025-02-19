@@ -16,8 +16,8 @@ import { Category, Item } from "@prisma/client";
 
 import { db } from "@/lib/db";
 import { InitialListData } from "@/lib/InitialListData";
-import { type CategoryCreateSchemaType } from "@/zod-schemas/CategoryCreateSchema";
-import { type ItemCreateSchemaType } from "@/zod-schemas/ItemCreateSchema";
+import { type CategoryCreateSchemaType } from "@/zod-schemas/CategorySchema";
+import { type ItemCreateSchemaType } from "@/zod-schemas/ItemSchema";
 
 // Public Objects ------------------------------------------------------------
 

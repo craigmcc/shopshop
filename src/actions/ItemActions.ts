@@ -30,7 +30,7 @@ import {
   type ItemCreateSchemaType,
   ItemUpdateSchema,
   type ItemUpdateSchemaType,
-} from "@/zod-schemas/ItemCreateSchema";
+} from "@/zod-schemas/ItemSchema";
 
 // Public Objects ------------------------------------------------------------
 
