@@ -18,8 +18,8 @@ import { setTestProfile } from "@/lib/ProfileHelpers";
 import { ActionUtils } from "@/test/ActionUtils";
 import { PROFILES } from "@/test/SeedData";
 import {
-  type ProfileSchemaType,
-  type ProfileSchemaUpdateType
+  type ProfileCreateSchemaType,
+  type ProfileUpdateSchemaType
 } from "@/zod-schemas/ProfileSchema";
 
 const UTILS = new ActionUtils();
@@ -43,7 +43,7 @@ describe("ProfileActions", () => {
 
     it("should fail on invalid data", async () => {
 
-      const profile: ProfileSchemaType = {
+      const profile: ProfileCreateSchemaType = {
         email: "invalid",
         name: "",
         password: "",
@@ -59,7 +59,7 @@ describe("ProfileActions", () => {
 
     it("should fail on duplicate email", async () => {
 
-      const profile: ProfileSchemaType = {
+      const profile: ProfileCreateSchemaType = {
         email: PROFILES[0].email!,
         name: "Test User",
         password: hashPassword("password"),
@@ -75,7 +75,7 @@ describe("ProfileActions", () => {
 
     it("should pass on valid data", async () => {
 
-      const profile: ProfileSchemaType = {
+      const profile: ProfileCreateSchemaType = {
         email: "test@example.com",
         name: "Test User",
         password: hashPassword("password"),
@@ -168,7 +168,7 @@ describe("ProfileActions", () => {
 
       const profile = await UTILS.lookupProfile(PROFILES[0].email!);
       setTestProfile(profile);
-      const update: ProfileSchemaUpdateType = {
+      const update: ProfileUpdateSchemaType = {
         email: PROFILES[1].email!,
         name: profile.name,
       }
@@ -202,7 +202,7 @@ describe("ProfileActions", () => {
 
       const profile = await UTILS.lookupProfile(PROFILES[0].email!);
       setTestProfile(profile);
-      const update: ProfileSchemaUpdateType = {
+      const update: ProfileUpdateSchemaType = {
         email: profile.email,
         imageUrl: profile.imageUrl? profile.imageUrl : undefined,
         name: profile.name,
@@ -226,7 +226,7 @@ describe("ProfileActions", () => {
 
       const profile = await UTILS.lookupProfile(PROFILES[0].email!);
       setTestProfile(profile);
-      const update: ProfileSchemaUpdateType = {
+      const update: ProfileUpdateSchemaType = {
         name: profile.name + " Updated",
       }
 

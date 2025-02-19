@@ -27,10 +27,10 @@ import { findProfile } from "@/lib/ProfileHelpers";
 import { logger } from "@/lib/ServerLogger";
 import { IdSchema, type IdSchemaType } from "@/zod-schemas/IdSchema";
 import {
-  ListSchema,
-  type ListSchemaType,
-  ListSchemaUpdate,
-  type ListSchemaUpdateType,
+  ListCreateSchema,
+  type ListCreateSchemaType,
+  ListUpdateSchema,
+  type ListUpdateSchemaType,
 } from "@/zod-schemas/ListSchema";
 
 // Public Objects ------------------------------------------------------------
@@ -46,7 +46,7 @@ import {
  * @throws NotAuthenticatedError        If the Profile is not signed in
  * @throws ValidationError              If a schema validation error occurs
  */
-export async function createList(data: ListSchemaType): Promise<List> {
+export async function createList(data: ListCreateSchemaType): Promise<List> {
 
   // Check authentication
   const profile = await findProfile();
@@ -59,7 +59,7 @@ export async function createList(data: ListSchemaType): Promise<List> {
 
   // Check data validity
   try {
-    ListSchema.parse(data);
+    ListCreateSchema.parse(data);
   } catch (error) {
     throw new ValidationError(error as ZodError, "Request data does not pass validation");
   }
@@ -157,7 +157,7 @@ export async function removeList(listId: IdSchemaType): Promise<List> {
  * @throws NotFoundError                If the List does not exist
  * @throws ValidationError              If a schema validation error occurs
  */
-export async function updateList(listId: IdSchemaType, data: ListSchemaUpdateType): Promise<List> {
+export async function updateList(listId: IdSchemaType, data: ListUpdateSchemaType): Promise<List> {
 
   // Check authentication
   const profile = await findProfile();
@@ -183,7 +183,7 @@ export async function updateList(listId: IdSchemaType, data: ListSchemaUpdateTyp
     throw new ValidationError(error as ZodError, "Specified ID fails validation");
   }
   try {
-    ListSchemaUpdate.parse(data);
+    ListUpdateSchema.parse(data);
   } catch (error) {
     throw new ValidationError(error as ZodError, "Request data does not pass validation");
   }

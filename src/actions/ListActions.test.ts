@@ -17,8 +17,8 @@ import { setTestProfile } from "@/lib/ProfileHelpers";
 import { ActionUtils } from "@/test/ActionUtils";
 import { LISTS, PROFILES } from "@/test/SeedData";
 import {
-  type ListSchemaType,
-  type ListSchemaUpdateType,
+  type ListCreateSchemaType,
+  type ListUpdateSchemaType,
 } from "@/zod-schemas/ListSchema";
 
 const UTILS = new ActionUtils();
@@ -45,7 +45,7 @@ describe("ListActions", () => {
 
       const profile = await UTILS.lookupProfile(PROFILES[1].email!);
       setTestProfile(profile);
-      const list: ListSchemaType = {
+      const list: ListCreateSchemaType = {
         name: "",
       }
 
@@ -60,7 +60,7 @@ describe("ListActions", () => {
     it("should fail on not authenticated", async () => {
 
       setTestProfile(null);
-      const list: ListSchemaType = {
+      const list: ListCreateSchemaType = {
         name: "New List",
       }
 
@@ -76,7 +76,7 @@ describe("ListActions", () => {
 
       const profile = await UTILS.lookupProfile(PROFILES[1].email!);
       setTestProfile(profile);
-      const list: ListSchemaType = {
+      const list: ListCreateSchemaType = {
         name: "New List",
       }
 
@@ -162,7 +162,7 @@ describe("ListActions", () => {
       const profile = await UTILS.lookupProfile(PROFILES[0].email!);
       setTestProfile(profile);
       const list = await UTILS.lookupList(LISTS[0].name!);
-      const update: ListSchemaType = {
+      const update: ListUpdateSchemaType = {
         name: "",
       }
 
@@ -180,7 +180,7 @@ describe("ListActions", () => {
       const profile = await UTILS.lookupProfile(PROFILES[0].email!);
       setTestProfile(profile);
       const list = await UTILS.lookupList(LISTS[1].name!);
-      const update: ListSchemaType = {
+      const update: ListUpdateSchemaType = {
         name: "Updated List",
       }
 
@@ -198,7 +198,7 @@ describe("ListActions", () => {
       const profile = await UTILS.lookupProfile(PROFILES[0].email!);
       setTestProfile(profile);
       const list = await UTILS.lookupList(LISTS[2].name!);
-      const update: ListSchemaType = {
+      const update: ListUpdateSchemaType = {
         name: "Updated List",
       }
 
@@ -214,7 +214,7 @@ describe("ListActions", () => {
 
       setTestProfile(null);
       const list = await UTILS.lookupList(LISTS[0].name!);
-      const update: ListSchemaType = {
+      const update: ListUpdateSchemaType = {
         name: "Updated List",
       }
 
@@ -232,7 +232,7 @@ describe("ListActions", () => {
       const profile = await UTILS.lookupProfile(PROFILES[0].email!);
       setTestProfile(profile);
       const list = await UTILS.lookupList(LISTS[0].name!);
-      const update: ListSchemaUpdateType = {};
+      const update: ListUpdateSchemaType = {};
 
       try {
         const updated = await updateList(list.id, update);
@@ -249,7 +249,7 @@ describe("ListActions", () => {
       const profile = await UTILS.lookupProfile(PROFILES[0].email!);
       setTestProfile(profile);
       const list = await UTILS.lookupList(LISTS[0].name!);
-      const update: ListSchemaUpdateType = {
+      const update: ListUpdateSchemaType = {
         name: "Updated List",
       }
 

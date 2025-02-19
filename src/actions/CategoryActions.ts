@@ -26,11 +26,11 @@ import { findProfile } from "@/lib/ProfileHelpers";
 import { logger } from "@/lib/ServerLogger";
 import { IdSchema, type IdSchemaType } from "@/zod-schemas/IdSchema";
 import {
-  CategorySchema,
-  type CategorySchemaType,
-  CategorySchemaUpdate,
-  type CategorySchemaUpdateType,
-} from "@/zod-schemas/CategorySchema";
+  CategoryCreateSchema,
+  type CategoryCreateSchemaType,
+  CategoryUpdateSchema,
+  type CategoryUpdateSchemaType,
+} from "@/zod-schemas/CategoryCreateSchema";
 
 // Public Objects ------------------------------------------------------------
 
@@ -45,7 +45,7 @@ import {
  * @throws NotAuthorizedError           If the Profile is not a member of the owning List
  * @throws ValidationError              If a schema validation error occurs
  */
-export async function createCategory(data: CategorySchemaType): Promise<Category> {
+export async function createCategory(data: CategoryCreateSchemaType): Promise<Category> {
 
   // Check authentication
   const profile = await findProfile();
@@ -70,7 +70,7 @@ export async function createCategory(data: CategorySchemaType): Promise<Category
 
   // Check data validity
   try {
-    data = CategorySchema.parse(data);
+    data = CategoryCreateSchema.parse(data);
   } catch (error) {
     throw new ValidationError(error as ZodError, "Request data does not pass validation");
   }
@@ -151,7 +151,7 @@ export async function removeCategory(id: IdSchemaType): Promise<Category> {
  * @throws NotFoundError                If the Category does not exist
  * @throws ValidationError              If a schema validation error occurs
  */
-export async function updateCategory(categoryId: IdSchemaType, data: CategorySchemaUpdateType): Promise<Category> {
+export async function updateCategory(categoryId: IdSchemaType, data: CategoryUpdateSchemaType): Promise<Category> {
 
   // Check authentication
   const profile = await findProfile();
@@ -180,7 +180,7 @@ export async function updateCategory(categoryId: IdSchemaType, data: CategorySch
 
   // Check data validity
   try {
-    data = CategorySchemaUpdate.parse(data);
+    data = CategoryUpdateSchema.parse(data);
   } catch (error) {
     throw new ValidationError(error as ZodError, "Request data does not pass validation");
   }

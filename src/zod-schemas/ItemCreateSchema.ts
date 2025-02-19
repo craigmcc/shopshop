@@ -1,7 +1,7 @@
 // @/zod-schemas/ItemSchema.ts
 
 /**
- * Zod schema for Item models.
+ * Zod schemas for Item models.
  *
  * @packageDocumentation
  */
@@ -14,7 +14,7 @@ import { boolean, object, string } from "zod";
 
 // Public Objects ------------------------------------------------------------
 
-export const ItemSchema = object({
+export const ItemCreateSchema = object({
   categoryId: string().uuid(),
   checked: boolean().optional(),
   listId: string().uuid(),
@@ -24,10 +24,10 @@ export const ItemSchema = object({
   selected: boolean().optional(),
 });
 
-export type ItemSchemaType = typeof ItemSchema._type;
+export type ItemCreateSchemaType = typeof ItemCreateSchema._type;
 
-export const ItemSchemaUpdate = ItemSchema
+export const ItemUpdateSchema = ItemCreateSchema
   .partial()
   .omit({ categoryId: true, listId: true });
 
-export type ItemSchemaUpdateType = typeof ItemSchemaUpdate._type;
+export type ItemUpdateSchemaType = typeof ItemUpdateSchema._type;

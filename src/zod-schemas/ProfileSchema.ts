@@ -1,7 +1,7 @@
 // @/zod-schemas/ProfileSchema.ts
 
 /**
- * Zod schema for Profile models.
+ * Zod schemas for Profile models.
  *
  * @packageDocumentation
  */
@@ -12,7 +12,7 @@ import { object, string } from "zod";
 
 // Public Objects ------------------------------------------------------------
 
-export const ProfileSchema = object({
+export const ProfileCreateSchema = object({
   email: string().email("Invalid email address"),
   imageUrl: string().url("Invalid image URL").optional(),
   name: string({ required_error: "Name is required" })
@@ -22,8 +22,8 @@ export const ProfileSchema = object({
   scope: string().optional(), // TODO - get rid of this
 });
 
-export type ProfileSchemaType = typeof ProfileSchema._type;
+export type ProfileCreateSchemaType = typeof ProfileCreateSchema._type;
 
-export const ProfileSchemaUpdate = ProfileSchema.partial();
+export const ProfileUpdateSchema = ProfileCreateSchema.partial();
 
-export type ProfileSchemaUpdateType = typeof ProfileSchemaUpdate._type;
+export type ProfileUpdateSchemaType = typeof ProfileUpdateSchema._type;

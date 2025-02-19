@@ -16,8 +16,8 @@ import { Category, Item } from "@prisma/client";
 
 import { db } from "@/lib/db";
 import { InitialListData } from "@/lib/InitialListData";
-import { type CategorySchemaType } from "@/zod-schemas/CategorySchema";
-import { type ItemSchemaType } from "@/zod-schemas/ItemSchema";
+import { type CategoryCreateSchemaType } from "@/zod-schemas/CategoryCreateSchema";
+import { type ItemCreateSchemaType } from "@/zod-schemas/ItemCreateSchema";
 
 // Public Objects ------------------------------------------------------------
 
@@ -36,7 +36,7 @@ export async function populateList(listId: string, withCategories: boolean, with
   const categories: Category[] = [];
   if (withCategories || withItems) {
     for (const element of InitialListData) {
-      const category: CategorySchemaType = {
+      const category: CategoryCreateSchemaType = {
         listId: listId,
         name: element[0],
       }
@@ -51,7 +51,7 @@ export async function populateList(listId: string, withCategories: boolean, with
       const element = InitialListData[i];
       if (element.length > 1) {
         for (let j = 1; j < element.length; j++) {
-          const item: ItemSchemaType = {
+          const item: ItemCreateSchemaType = {
             categoryId: categories[i].id,
             checked: false,
             listId: listId,

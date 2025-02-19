@@ -1,7 +1,7 @@
 // @/zod-schemas/CategorySchema.ts
 
 /**
- * Zod schema for Category models.
+ * Zod schemas for Category models.
  *
  * @packageDocumentation
  */
@@ -14,16 +14,16 @@ import { object, string } from "zod";
 
 // Public Objects ------------------------------------------------------------
 
-export const CategorySchema = object({
+export const CategoryCreateSchema = object({
   listId: string().uuid(),
   name: string({ required_error: "Name is required" })
     .min(1, "Name is required"),
 });
 
-export type CategorySchemaType = typeof CategorySchema._type;
+export type CategoryCreateSchemaType = typeof CategoryCreateSchema._type;
 
-export const CategorySchemaUpdate = CategorySchema
+export const CategoryUpdateSchema = CategoryCreateSchema
   .partial()
   .omit({ listId: true });
 
-export type CategorySchemaUpdateType = typeof CategorySchemaUpdate._type;
+export type CategoryUpdateSchemaType = typeof CategoryUpdateSchema._type;

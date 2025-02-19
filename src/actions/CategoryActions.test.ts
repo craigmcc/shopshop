@@ -19,9 +19,9 @@ import { setTestProfile } from "@/lib/ProfileHelpers";
 import { ActionUtils } from "@/test/ActionUtils";
 import { PROFILES } from "@/test/SeedData";
 import {
-  type CategorySchemaType,
-  type CategorySchemaUpdateType,
-} from "@/zod-schemas/CategorySchema";
+  type CategoryCreateSchemaType,
+  type CategoryUpdateSchemaType,
+} from "@/zod-schemas/CategoryCreateSchema";
 
 const UTILS = new ActionUtils();
 let categories: Category[]= [];
@@ -50,7 +50,7 @@ describe("CategoryActions", () => {
 
       const profile = await UTILS.lookupProfile(PROFILES[0].email!);
       setTestProfile(profile);
-      const category: CategorySchemaType = {
+      const category: CategoryCreateSchemaType = {
         listId: lists[0].id,
         name: "",
       }
@@ -66,7 +66,7 @@ describe("CategoryActions", () => {
     it("should fail on not authenticated", async () => {
 
       setTestProfile(null);
-      const category: CategorySchemaType = {
+      const category: CategoryCreateSchemaType = {
         listId: lists[0].id,
         name: "New Category",
       }
@@ -83,7 +83,7 @@ describe("CategoryActions", () => {
 
       const profile = await UTILS.lookupProfile(PROFILES[2].email!);
       setTestProfile(profile);
-      const category: CategorySchemaType = {
+      const category: CategoryCreateSchemaType = {
         listId: lists[0].id,
         name: "New Category",
       }
@@ -100,7 +100,7 @@ describe("CategoryActions", () => {
 
       const profile = await UTILS.lookupProfile(PROFILES[0].email!);
       setTestProfile(profile);
-      const category: CategorySchemaType = {
+      const category: CategoryCreateSchemaType = {
         listId: lists[0].id,
         name: "New Category",
       }
@@ -192,7 +192,7 @@ describe("CategoryActions", () => {
       const profile = await UTILS.lookupProfile(PROFILES[0].email!);
       setTestProfile(profile);
       const category = await lookupCategory(profile, MemberRole.ADMIN);
-      const data:CategorySchemaUpdateType = { name: "" };
+      const data:CategoryUpdateSchemaType = { name: "" };
 
       try {
         await updateCategory(category.id, data);
@@ -208,7 +208,7 @@ describe("CategoryActions", () => {
       setTestProfile(profile);
       const category = await lookupCategory(profile, MemberRole.ADMIN);
 
-      const data: CategorySchemaUpdateType = { name: "New Name" };
+      const data: CategoryUpdateSchemaType = { name: "New Name" };
       const updated = await updateCategory(category!.id, data);
       expect(updated.name).toBe(data.name);
 

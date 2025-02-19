@@ -27,10 +27,10 @@ import { findProfile } from "@/lib/ProfileHelpers";
 import { logger } from "@/lib/ServerLogger";
 import { IdSchema, type IdSchemaType } from "@/zod-schemas/IdSchema";
 import {
-  ProfileSchema,
-  type ProfileSchemaType,
-  ProfileSchemaUpdate,
-  ProfileSchemaUpdateType,
+  ProfileCreateSchema,
+  type ProfileCreateSchemaType,
+  ProfileUpdateSchema,
+  ProfileUpdateSchemaType,
 } from "@/zod-schemas/ProfileSchema";
 
 // Public Objects ------------------------------------------------------------
@@ -44,7 +44,7 @@ import {
  *
  * @throws ValidationError              If a schema validation error occurs
  */
-export async function createProfile(data: ProfileSchemaType): Promise<Profile> {
+export async function createProfile(data: ProfileCreateSchemaType): Promise<Profile> {
 
   // Check authentication
   // Not needed - signing up is open to all
@@ -54,7 +54,7 @@ export async function createProfile(data: ProfileSchemaType): Promise<Profile> {
 
   // Check data validity
   try {
-    ProfileSchema.parse(data);
+    ProfileCreateSchema.parse(data);
   } catch (error) {
     throw new ValidationError(error as ZodError, "Request data does not pass validation");
   }
@@ -148,7 +148,7 @@ export async function removeProfile(profileId: IdSchemaType): Promise<Profile> {
  * @throws NotFoundError                If no Profile can be found with the given
  * @throws ValidationError              If a schema validation error occurs
  */
-export async function updateProfile(profileId: IdSchemaType, data: ProfileSchemaUpdateType): Promise<Profile> {
+export async function updateProfile(profileId: IdSchemaType, data: ProfileUpdateSchemaType): Promise<Profile> {
 
   // Check authentication
   const profile = await findProfile();
@@ -168,7 +168,7 @@ export async function updateProfile(profileId: IdSchemaType, data: ProfileSchema
     throw new ValidationError(error as ZodError, "Specified ID fails validation");
   }
   try {
-    ProfileSchemaUpdate.parse(data);
+    ProfileUpdateSchema.parse(data);
   } catch (error) {
     throw new ValidationError(error as ZodError, "Request data does not pass validation");
   }

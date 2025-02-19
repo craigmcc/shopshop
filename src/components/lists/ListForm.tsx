@@ -25,10 +25,10 @@ import { InputField } from "@/components/daisyui/InputField";
 import { ServerResponse } from "@/components/shared/ServerResponse";
 import { logger } from "@/lib/ClientLogger";
 import {
-  ListSchema,
-  type ListSchemaType,
-  ListSchemaUpdate,
-  type ListSchemaUpdateType
+  ListCreateSchema,
+  type ListCreateSchemaType,
+  ListUpdateSchema,
+  type ListUpdateSchemaType
 } from "@/zod-schemas/ListSchema";
 
 // Public Objects ------------------------------------------------------------
@@ -45,10 +45,10 @@ export function ListForm({ list, profile }: Props ) {
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [result, setResult] = useState<string | Error | null>(null);
 
-  const defaultValuesCreate: ListSchemaType = {
+  const defaultValuesCreate: ListCreateSchemaType = {
     name: "",
   }
-  const defaultValuesUpdate: ListSchemaUpdateType = {
+  const defaultValuesUpdate: ListUpdateSchemaType = {
     name: list?.name ?? "",
   }
   logger.info({
@@ -57,15 +57,15 @@ export function ListForm({ list, profile }: Props ) {
     profile,
     defaultValues: isCreating ? defaultValuesCreate : defaultValuesUpdate,
   });
-  const methods = useForm<ListSchemaType | ListSchemaUpdateType>({
+  const methods = useForm<ListCreateSchemaType | ListUpdateSchemaType>({
     defaultValues: isCreating ? defaultValuesCreate : defaultValuesUpdate,
     mode: "onBlur",
-    resolver: isCreating ? zodResolver(ListSchema) : zodResolver(ListSchemaUpdate),
+    resolver: isCreating ? zodResolver(ListCreateSchema) : zodResolver(ListUpdateSchema),
   });
   const formState = methods.formState;
   const errors = formState.errors;
 
-  async function submitForm(formData: ListSchemaType | ListSchemaUpdateType) {
+  async function submitForm(formData: ListCreateSchemaType | ListUpdateSchemaType) {
 
     logger.info({
       context: "ListForm.submitForm",
@@ -82,9 +82,9 @@ export function ListForm({ list, profile }: Props ) {
 
       setIsSaving(true);
       if (isCreating) {
-        await createList(formData as ListSchemaType);
+        await createList(formData as ListCreateSchemaType);
       } else {
-        await updateList(list.id, formData as ListSchemaUpdateType);
+        await updateList(list.id, formData as ListUpdateSchemaType);
       }
       setIsSaving(false);
       setResult(null);

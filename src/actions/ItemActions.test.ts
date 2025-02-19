@@ -19,9 +19,9 @@ import { setTestProfile } from "@/lib/ProfileHelpers";
 import { ActionUtils } from "@/test/ActionUtils";
 import { PROFILES } from "@/test/SeedData";
 import {
-  type ItemSchemaType,
-  type ItemSchemaUpdateType,
-} from "@/zod-schemas/ItemSchema";
+  type ItemCreateSchemaType,
+  type ItemUpdateSchemaType,
+} from "@/zod-schemas/ItemCreateSchema";
 
 const UTILS = new ActionUtils();
 let categories: Category[]= [];
@@ -66,7 +66,7 @@ describe("ItemActions", () => {
         },
       });
 
-      const item: ItemSchemaType = {
+      const item: ItemCreateSchemaType = {
         categoryId: members[0].list.categories[0].id,
         listId: members[0].listId,
         name: "",
@@ -82,7 +82,7 @@ describe("ItemActions", () => {
     it("should fail on not authenticated", async () => {
 
       setTestProfile(null);
-      const item: ItemSchemaType = {
+      const item: ItemCreateSchemaType = {
         categoryId: categories[0].id,
         listId: lists[0].id,
         name: "New Item",
@@ -100,7 +100,7 @@ describe("ItemActions", () => {
 
       const profile = await UTILS.lookupProfile(PROFILES[2].email!);
       setTestProfile(profile);
-      const item: ItemSchemaType = {
+      const item: ItemCreateSchemaType = {
         categoryId: categories[0].id,
         listId: lists[0].id,
         name: "New Item",
@@ -132,7 +132,7 @@ describe("ItemActions", () => {
         },
       });
 
-      const item: ItemSchemaType = {
+      const item: ItemCreateSchemaType = {
         categoryId: members[0].list.categories[0].id,
         listId: members[0].listId,
         name: "New Item",
@@ -208,7 +208,7 @@ describe("ItemActions", () => {
       setTestProfile(profile);
       const item = await lookupItem(profile, MemberRole.GUEST);
 
-      const data: ItemSchemaUpdateType = {
+      const data: ItemUpdateSchemaType = {
         name: "New Name",
       };
       const updated = await updateItem(item.id, data);

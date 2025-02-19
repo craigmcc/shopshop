@@ -1,7 +1,7 @@
 // @/zod-schemas/ListSchema.ts
 
 /**
- * Zod schema for List models.
+ * Zod schemas for List models.
  *
  * @packageDocumentation
  */
@@ -12,14 +12,14 @@ import { object, string } from "zod";
 
 // Public Objects ------------------------------------------------------------
 
-export const ListSchema = object({
+export const ListCreateSchema = object({
   imageUrl: string().url("Invalid image URL").optional(),
   name: string({ required_error: "Name is required" })
     .min(1, "Name is required"),
 });
 
-export type ListSchemaType = typeof ListSchema._type;
+export type ListCreateSchemaType = typeof ListCreateSchema._type;
 
-export const ListSchemaUpdate = ListSchema.partial();
+export const ListUpdateSchema = ListCreateSchema.partial();
 
-export type ListSchemaUpdateType = typeof ListSchemaUpdate._type;
+export type ListUpdateSchemaType = typeof ListUpdateSchema._type;

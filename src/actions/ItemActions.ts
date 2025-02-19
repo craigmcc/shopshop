@@ -26,11 +26,11 @@ import { findProfile } from "@/lib/ProfileHelpers";
 import { logger } from "@/lib/ServerLogger";
 import { IdSchema, type IdSchemaType } from "@/zod-schemas/IdSchema";
 import {
-  ItemSchema,
-  type ItemSchemaType,
-  ItemSchemaUpdate,
-  type ItemSchemaUpdateType,
-} from "@/zod-schemas/ItemSchema";
+  ItemCreateSchema,
+  type ItemCreateSchemaType,
+  ItemUpdateSchema,
+  type ItemUpdateSchemaType,
+} from "@/zod-schemas/ItemCreateSchema";
 
 // Public Objects ------------------------------------------------------------
 
@@ -45,7 +45,7 @@ import {
  * @throws NotAuthorizedError           If the Profile is not a member of the owning List
  * @throws ValidationError              If a schema validation error occurs
  */
-export async function createItem(data: ItemSchemaType): Promise<Item> {
+export async function createItem(data: ItemCreateSchemaType): Promise<Item> {
 
   // Check authentication
   const profile = await findProfile();
@@ -75,7 +75,7 @@ export async function createItem(data: ItemSchemaType): Promise<Item> {
 
   // Validate input data
   try {
-    const parsedData = ItemSchema.parse(data);
+    const parsedData = ItemCreateSchema.parse(data);
     logger.trace({
       context: "ItemActions.createItem.ItemSchema.parse",
       parsedData,
@@ -165,7 +165,7 @@ export async function removeItem(id: IdSchemaType): Promise<Item> {
  * @throws NotFoundError                If the Item does not exist
  * @throws ValidationError              If a schema validation error occurs
  */
-export async function updateItem(itemId: IdSchemaType, data: ItemSchemaUpdateType): Promise<Item> {
+export async function updateItem(itemId: IdSchemaType, data: ItemUpdateSchemaType): Promise<Item> {
 
   // Check authentication
   const profile = await findProfile();
@@ -194,7 +194,7 @@ export async function updateItem(itemId: IdSchemaType, data: ItemSchemaUpdateTyp
 
   // Validate input data
   try {
-    const parsedData = ItemSchemaUpdate.parse(data);
+    const parsedData = ItemUpdateSchema.parse(data);
     logger.trace({
       context: "ItemActions.updateItem.ItemSchemaUpdate.parse",
       parsedData,
