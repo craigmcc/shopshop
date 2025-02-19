@@ -57,7 +57,7 @@ export function ListForm({ list, profile }: Props ) {
     profile,
     defaultValues: isCreating ? defaultValuesCreate : defaultValuesUpdate,
   });
-  const methods = useForm<ListSchemaType>({
+  const methods = useForm<ListSchemaType | ListSchemaUpdateType>({
     defaultValues: isCreating ? defaultValuesCreate : defaultValuesUpdate,
     mode: "onBlur",
     resolver: isCreating ? zodResolver(ListSchema) : zodResolver(ListSchemaUpdate),
@@ -65,7 +65,7 @@ export function ListForm({ list, profile }: Props ) {
   const formState = methods.formState;
   const errors = formState.errors;
 
-  async function submitForm(formData: ListSchemaType) {
+  async function submitForm(formData: ListSchemaType | ListSchemaUpdateType) {
 
     logger.info({
       context: "ListForm.submitForm",
@@ -82,7 +82,7 @@ export function ListForm({ list, profile }: Props ) {
 
       setIsSaving(true);
       if (isCreating) {
-        await createList(formData);
+        await createList(formData as ListSchemaType);
       } else {
         await updateList(list.id, formData as ListSchemaUpdateType);
       }
