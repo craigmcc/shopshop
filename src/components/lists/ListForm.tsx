@@ -34,8 +34,10 @@ import {
 // Public Objects ------------------------------------------------------------
 
 type Props = {
-  list: List | undefined,               // For update only
-  profile: Profile,                     // Signed in Profile
+  // List to be updated (for update only)
+  list: List | undefined,
+  // Signed in Profile
+  profile: Profile,
 }
 
 export function ListForm({ list, profile }: Props ) {
@@ -68,11 +70,6 @@ export function ListForm({ list, profile }: Props ) {
 
   async function submitForm(formData: ListCreateSchemaType | ListUpdateSchemaType) {
 
-    logger.info({
-      context: "ListForm.submitForm",
-      formData
-    });
-
     try {
 
       logger.info({
@@ -89,15 +86,16 @@ export function ListForm({ list, profile }: Props ) {
       }
       setIsSaving(false);
       setResult(null);
-      toast.success(`List "${formData.name}" was successfully ${isCreating ? "created" : "updated"}`);
+      toast.success(`List '${formData.name}' was successfully ${isCreating ? "created" : "updated"}`);
       router.push("/lists");
 
     } catch (error) {
 
       setIsSaving(false);
       logger.info({
+        context: "ListForm.submitForm.error",
         message: "Error creating or updating List",
-        error
+        error,
       });
       setResult(error instanceof Error ? error : `${error}`);
 
@@ -105,7 +103,7 @@ export function ListForm({ list, profile }: Props ) {
   }
 
   return (
-    <div className={"card bg-base-300 shadow-xl"}>
+    <div className="card bg-base-300 shadow-xl">
       <div className="card-body">
         <h2 className="card-title justify-center">{ isCreating ? "Create List" : "Update List" }</h2>
         {result && <ServerResponse result={result} />}

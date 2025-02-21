@@ -22,6 +22,7 @@ import { findProfile } from "@/lib/ProfileHelpers";
 
 type Props = {
   params: Promise<{
+    // List ID to be edited, or "new" for a new List
     listId: string,
   }>
 }
