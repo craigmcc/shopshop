@@ -24,7 +24,7 @@ export default async function ListsLayout(props: Props) {
       <div className="h-full w-60 border-r-2 border-gray-500">
         <ListsSidebar />
       </div>
-      <main className="flex h-full w-full items-center justify-center p-4">
+      <main className="flex h-[calc(100vh-80px)] w-full items-center justify-center p-4">
         {props.children}
       </main>
     </div>
