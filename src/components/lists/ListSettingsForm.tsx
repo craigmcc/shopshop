@@ -11,7 +11,7 @@
 // External Modules ----------------------------------------------------------
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { List, Profile } from "@prisma/client";
+import { List } from "@prisma/client";
 import { LoaderCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -34,13 +34,11 @@ import {
 // Public Objects ------------------------------------------------------------
 
 type Props = {
-  // List to be updated (for update only)
+  // List to be updated (or undefined for create)
   list: List | undefined,
-  // Signed in Profile
-  profile: Profile,
 }
 
-export function ListForm({ list, profile }: Props ) {
+export function ListSettingsForm({ list }: Props ) {
 
   const isCreating = !list;
   const router = useRouter();
@@ -54,9 +52,8 @@ export function ListForm({ list, profile }: Props ) {
     name: list?.name ?? "",
   }
   logger.info({
-    context: "ListForm",
+    context: "ListSettingsForm",
     list,
-    profile,
     defaultValues: isCreating ? defaultValuesCreate : defaultValuesUpdate,
   });
   const methods = useForm<ListCreateSchemaType | ListUpdateSchemaType>({
@@ -73,7 +70,7 @@ export function ListForm({ list, profile }: Props ) {
     try {
 
       logger.info({
-        context: "ListForm.submitForm",
+        context: "ListSettingsForm.submitForm",
         formData,
         isCreating,
       });
@@ -93,7 +90,7 @@ export function ListForm({ list, profile }: Props ) {
 
       setIsSaving(false);
       logger.info({
-        context: "ListForm.submitForm.error",
+        context: "ListSettingsForm.submitForm.error",
         message: "Error creating or updating List",
         error,
       });

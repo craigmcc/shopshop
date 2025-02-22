@@ -25,13 +25,11 @@ import { logger } from "@/lib/ClientLogger";
 // Public Objects ------------------------------------------------------------
 
 type Props = {
-  // List to be removed (if valid), else null
-  list: List | null,
-  // Error message if validation failed, else null
-  message: string | null,
+  // List to be removed
+  list: List,
 }
 
-export function ListRemoveForm({ list, message }: Props) {
+export function ListRemoveForm({ list }: Props) {
 
   const router = useRouter();
   const [isRemoving, setIsRemoving] = useState<boolean>(false);
@@ -44,18 +42,12 @@ export function ListRemoveForm({ list, message }: Props) {
       logger.info({
         context: "ListRemoveForm.performRemove",
         list,
-        message,
       });
 
-      if (message) {
-        setResult(message);
-        return;
-      }
-
       setIsRemoving(true);
-      await removeList(list!.id);
+      await removeList(list.id);
       setIsRemoving(false);
-      toast.success(`List '${list!.name}' was successfully removed`);
+      toast.success(`List '${list.name}' was successfully removed`);
       router.push("/lists");
 
     } catch (error) {

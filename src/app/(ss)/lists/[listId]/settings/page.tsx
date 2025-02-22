@@ -8,12 +8,13 @@
 
  // External Modules ---------------------------------------------------------
 
-import { List } from "@prisma/client";
+import { List, MemberRole } from "@prisma/client";
 import { redirect } from "next/navigation";
 
 // Internal Modules ----------------------------------------------------------
 
-import { ListForm } from "@/components/lists/ListForm";
+import { ListSettingsForm } from "@/components/lists/ListSettingsForm";
+import { ServerResponse } from "@/components/shared/ServerResponse";
 import { db } from "@/lib/db";
 import { findProfile } from "@/lib/ProfileHelpers";
 //import { logger } from "@/lib/ServerLogger";
@@ -32,7 +33,7 @@ export default async function ListSettingsPage(props: Props) {
   const params = await props.params;
   const listId = params.listId;
 
-  // Check sign in status
+  // Check authentication
   const profile = await findProfile();
   if (!profile) {
     redirect("/auth/signIn");
@@ -41,17 +42,30 @@ export default async function ListSettingsPage(props: Props) {
   // Look up an existing List (if requested)
   let list: List | undefined = undefined;
   if (listId !== "new") {
-    // @ts-expect-error Leave list undefined if listId is "new"
-    list = await db.list.findUnique({
+    // Check authorization (and List existence)
+    const member = await db.member.findFirst({
+      include: {
+        list: true,
+      },
       where: {
-        id: listId,
+        listId: listId,
+        profileId: profile.id,
       }
     });
+    if (!member || (member.role !== MemberRole.ADMIN)) {
+      return (
+        <ServerResponse
+          result="You are not an admin of this List, so you cannot update it"
+        />
+      );
+    } else {
+      list = member.list;
+    }
   }
 
   return (
     <div>
-      <ListForm list={list} profile={profile} />
+      <ListSettingsForm list={list}/>
     </div>
   );
 
