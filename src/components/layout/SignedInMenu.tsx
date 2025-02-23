@@ -20,6 +20,7 @@ export const SignedInMenu = () => {
 
   const CHOICES = [
     { title: "Edit Profile", href: "/profile" },
+    { title: "Edit Lists", href: "/lists" },
     { title: "Sign Out", href: "/auth/signOut" },
   ];
 

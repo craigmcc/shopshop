@@ -1,6 +1,4 @@
-//"use client"; // Only for when using toast()
-
-// @/app/(auth)/lists/page.tsx
+// @/app/(ss)/lists/page.tsx
 
 /**
  * Enumerate the actions that can be taken to manage shopping lists.
@@ -10,8 +8,6 @@
  */
 
 // External Modules ----------------------------------------------------------
-
-//import { toast } from "react-toastify";
 
 // Internal Modules ----------------------------------------------------------
 
