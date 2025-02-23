@@ -19,7 +19,6 @@ export const ProfileCreateSchema = object({
     .min(1, "Name is required"),
   password: string({ required_error: "Password is required" })
     .min(1, "Password is required"),
-  scope: string().optional(), // TODO - get rid of this
 });
 
 export type ProfileCreateSchemaType = typeof ProfileCreateSchema._type;

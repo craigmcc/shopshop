@@ -29,12 +29,15 @@ export const LIST_NAME_THIRD = "Third List";
 export const LISTS: Partial<List>[] = [
     {
         name: LIST_NAME_FIRST,
+        private: false,
     },
     {
         name: LIST_NAME_SECOND,
+        private: false,
     },
     {
         name: LIST_NAME_THIRD,
+        private: false,
     },
 ];
 

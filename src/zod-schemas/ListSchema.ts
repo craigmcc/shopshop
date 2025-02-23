@@ -8,7 +8,7 @@
 
 // External Modules ----------------------------------------------------------
 
-import { object, string } from "zod";
+import { boolean, object, string } from "zod";
 
 // Public Objects ------------------------------------------------------------
 
@@ -16,6 +16,7 @@ export const ListCreateSchema = object({
   imageUrl: string().url("Invalid image URL").optional(),
   name: string({ required_error: "Name is required" })
     .min(1, "Name is required"),
+  private: boolean().default(false).optional(),
 });
 
 export type ListCreateSchemaType = typeof ListCreateSchema._type;

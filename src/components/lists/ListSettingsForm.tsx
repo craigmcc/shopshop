@@ -47,6 +47,7 @@ export function ListSettingsForm({ list }: Props ) {
 
   const defaultValuesCreate: ListCreateSchemaType = {
     name: "",
+    private: false,
   }
   const defaultValuesUpdate: ListUpdateSchemaType = {
     name: list?.name ?? "",

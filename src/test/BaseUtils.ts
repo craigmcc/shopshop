@@ -56,7 +56,6 @@ export abstract class BaseUtils {
             email: profile.email!,
             name: profile.name!,
             password: profile.password!,
-            scope: null, // TODO - eliminate
           }
         }));
       }
