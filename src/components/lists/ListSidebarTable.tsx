@@ -13,7 +13,7 @@
 import { List, Member, MemberRole } from "@prisma/client";
 import { MoreHorizontal } from "lucide-react";
 import Link from "next/link";
-//import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 // Internal Modules ----------------------------------------------------------
 
@@ -27,6 +27,24 @@ type Props = {
 }
 
 export function ListSidebarTable({ lists, members }: Props) {
+
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const dropdownRefs = useRef<(HTMLDetailsElement | null)[]>([]);
+
+  useEffect(() => {
+
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRefs.current.every(ref => ref && !ref.contains(event.target as Node))) {
+        setOpenDropdown(null);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+
+  }, []);
 
 
   return (
@@ -44,8 +62,16 @@ export function ListSidebarTable({ lists, members }: Props) {
                 <td>{list.name}</td>
               )}
               <td>
-                <details className="dropdown dropdown-center">
-                  <summary className="btn btn-square btn-ghost">
+                <details
+                  className="dropdown dropdown-center"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setOpenDropdown(openDropdown === list.id ? null : list.id);
+                  }}
+                  open={openDropdown === list.id}
+                  ref={el => { dropdownRefs.current[index] = el; }}
+                >
+                  <summary className="btn btn-square btn-ghost tabIndex={0}">
                     <MoreHorizontal className="h-4 w-4"/>
                   </summary>
                   <ul
