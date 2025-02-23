@@ -12,16 +12,16 @@ import Link from "next/link";
 
 // Internal Modules ----------------------------------------------------------
 
-import { auth } from "@/auth";
 import { AlignJustify } from "lucide-react";
 import { SignedInMenu } from "@/components/layout/SignedInMenu";
 import { ThemeSwitcher } from "@/components/layout/ThemeSwitcher";
+import { findProfile } from "@/lib/ProfileHelpers";
 
 // Public Objects ------------------------------------------------------------
 
 export async function Header() {
 
-  const session = await auth();
+  const profile = await findProfile();
 
   return (
     <div className="navbar justify-between items-center bg-base-200">
@@ -34,9 +34,7 @@ export async function Header() {
         </Link>
       </div>
       <div className="flex flex-row gap-2">
-        {session?.user?.email ? (
-          <SignedInMenu />
-        ) : null }
+        {profile && <SignedInMenu profile={profile}/>}
         <ThemeSwitcher />
       </div>
     </div>
