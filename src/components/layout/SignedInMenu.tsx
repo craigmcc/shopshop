@@ -28,14 +28,16 @@ export const SignedInMenu = () => {
     <div className="dropdown dropdown-end">
       <details>
         <summary>User Options</summary>
-        <ul tabIndex={0} className="menu dropdown-content z-1 mt-6 shadow-sm bg-base-300 rounded-box">
+        <ul className="menu dropdown-content z-1 mt-6 shadow-sm bg-base-300 rounded-box" tabIndex={0}>
           {CHOICES.map((CHOICE) => (
-            <Link
-              href={CHOICE.href}
-              key={CHOICE.title}
-            >
-              {CHOICE.title}
-            </Link>
+            <li key={CHOICE.title}>
+              <Link
+                href={CHOICE.href}
+                key={CHOICE.title}
+              >
+                {CHOICE.title}
+              </Link>
+            </li>
           ))}
         </ul>
       </details>
