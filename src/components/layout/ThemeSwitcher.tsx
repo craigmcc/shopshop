@@ -28,10 +28,9 @@ export const ThemeSwitcher = () => {
 
   return (
     <div className="dropdown dropdown-end">
-      {/*<div tabIndex={0} role="button" className="btn btn-ghost rounded-btn">Theme</div>*/}
       <details>
-        <summary>Theme</summary>
-        <ul tabIndex={0} className="menu dropdown-content z-1 mt-6 shadow-sm bg-base-300 rounded-box mt-2">
+        <summary className="btn btn-ghost">Theme</summary>
+        <ul tabIndex={0} className="menu dropdown-content z-1 mt-6 shadow-sm bg-base-300 rounded-box">
           {THEMES.map((THEME) => (
             <li
               className={THEME === theme ? "font-bold" : "font-normal"}

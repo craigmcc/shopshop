@@ -27,7 +27,7 @@ export const SignedInMenu = () => {
   return (
     <div className="dropdown dropdown-end">
       <details>
-        <summary>User Options</summary>
+        <summary className="btn btn-ghost">User Options</summary>
         <ul className="menu dropdown-content z-1 mt-6 shadow-sm bg-base-300 rounded-box" tabIndex={0}>
           {CHOICES.map((CHOICE) => (
             <li key={CHOICE.title}>
