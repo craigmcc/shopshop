@@ -20,27 +20,13 @@ type Props = {
 
 export default async function ListsLayout(props: Props) {
   return (
-    <div className="flex flex-row gap-2">
-      <div className="h-full w-60 border-r-2 border-gray-500">
+    <div className="flex flex-row h-[calc(100vh-80px)] gap-2">
+      <div className="w-60 border-r-2 border-gray-500">
         <ListsSidebar />
       </div>
-      <main className="flex h-[calc(100vh-80px)] w-full items-center justify-center p-4">
+      <main className="flex w-full items-center justify-center p-4">
         {props.children}
       </main>
     </div>
   );
 }
-/*
-export default async function ListsLayout(props: Props) {
-
-  return (
-    <div className="flex flex-row gap-2">
-      <div className="h-full w-60 border-r-4">
-        <ListsSidebar />
-      </div>
-      <main className="h-full">{props.children}</main>
-    </div>
-  )
-
-}
-*/

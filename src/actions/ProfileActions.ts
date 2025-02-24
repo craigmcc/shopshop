@@ -23,6 +23,7 @@ import {
   UniqueConstraintError,
   ValidationError,
 } from "@/lib/ErrorHelpers";
+import { hashPassword} from "@/lib/Encryption";
 import { findProfile } from "@/lib/ProfileHelpers";
 import { logger } from "@/lib/ServerLogger";
 import { IdSchema, type IdSchemaType } from "@/zod-schemas/IdSchema";
@@ -32,6 +33,10 @@ import {
   ProfileUpdateSchema,
   ProfileUpdateSchemaType,
 } from "@/zod-schemas/ProfileSchema";
+import {
+  SignUpSchema,
+  type SignUpSchemaType,
+} from "@/zod-schemas/SignUpSchema";
 
 // Public Objects ------------------------------------------------------------
 
@@ -132,6 +137,61 @@ export async function removeProfile(profileId: IdSchemaType): Promise<Profile> {
     }
   });
   return removed;
+
+}
+
+/**
+ * Handle request to create a Profile from SignUpForm.
+ *
+ * @param data                          Parameters for creating a Profile
+ *
+ * @returns                             Newly created Profile
+ *
+ * @throws ValidationError              If a schema validation error occurs
+ */
+export async function signUpProfile(data: SignUpSchemaType): Promise<Profile> {
+
+  // Check authentication
+  // Not needed - signing up is open to all
+
+  // Check authorization
+  // Not needed - signing up is open to all
+
+  // Check data validity
+  try {
+    SignUpSchema.parse(data);
+  } catch (error) {
+    throw new ValidationError(error as ZodError, "Request data does not pass validation");
+  }
+
+  // Check for uniqueness constraint violation
+  const existing = await db.profile.findUnique({
+    where: {
+      email: data.email,
+    },
+  });
+  if (existing) {
+    throw new UniqueConstraintError("That email address is already in use");
+  }
+
+  // Create and return the new Profile
+  const created = await db.profile.create({
+    data: {
+      email: data.email,
+      // TODO - imageUrl when supported
+      name: data.name,
+      password: hashPassword(data.password),
+    }
+  });
+  logger.trace({
+    context: "ProfileActions.signUpProfile",
+    message: "Profile created",
+    profile: {
+      ...created,
+      password: "*REDACTED*",
+    },
+  });
+  return created;
 
 }
 

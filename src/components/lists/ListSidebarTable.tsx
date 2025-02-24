@@ -57,9 +57,13 @@ export function ListSidebarTable({ lists, members }: Props) {
           {lists.map((list, index) => (
             <tr key={index}>
               {isAdmin(list.id, members) ? (
-                <td className="font-bold">{list.name}</td>
+                <td className="font-bold">
+                  <Link href={`/lists/{list.id}/entries`}>{list.name}</Link>
+                </td>
               ) : (
-                <td>{list.name}</td>
+                <td>
+                  <Link href={`/lists/{list.id}/entries`}>{list.name}</Link>
+                </td>
               )}
               <td>
                 <details

@@ -59,7 +59,7 @@ export async function ListsSidebar() {
 
   return (
     <>
-      <div className="flex flex-col h-[calc(100vh-80px)] bg-base-100">
+      <div className="flex flex-col bg-base-100">
       <div className="flex items-centered justify-between w-full p-2">
         <div className="font-semibold pl-2">Shopping Lists</div>
         <div className="pr-1">

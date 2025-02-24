@@ -19,7 +19,7 @@ import { toast } from "react-toastify";
 
 // Internal Modules ----------------------------------------------------------
 
-import { createProfile } from "@/actions/ProfileActions";
+import { signUpProfile } from "@/actions/ProfileActions";
 import { InputField } from "@/components/daisyui/InputField";
 import { ServerResponse } from "@/components/shared/ServerResponse";
 import { logger } from "@/lib/ClientLogger";
@@ -30,7 +30,7 @@ import { SignUpSchema, type SignUpSchemaType } from "@/zod-schemas/SignUpSchema"
 export function SignUpForm() {
 
   const router = useRouter();
-  const [isSaving, setisSaving] = useState<boolean>(false);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
   const [result, setResult] = useState<string | Error | null>(null);
 
   const defaultValues: SignUpSchemaType = {
@@ -60,10 +60,10 @@ export function SignUpForm() {
 
     try {
 
-      setisSaving(true);
+      setIsSaving(true);
 //      const profile = await doSignUpAction(formData);
-      const profile = await createProfile(formData);
-      setisSaving(false);
+      const profile = await signUpProfile(formData);
+      setIsSaving(false);
       logger.trace({
         context: "SignUpForm.submitForm.success",
         profile: {
@@ -77,7 +77,7 @@ export function SignUpForm() {
 
     } catch (error) {
 
-      setisSaving(false);
+      setIsSaving(false);
       logger.trace({
         context: "SignUpForm.submitForm.error",
         error: error,
