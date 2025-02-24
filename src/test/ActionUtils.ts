@@ -38,7 +38,7 @@ export class ActionUtils extends BaseUtils {
       },
     });
     if (!list) {
-      throw new NotFoundError(`No LIst found for name ${name}`);
+      throw new NotFoundError(`No List found for name '${name}'`);
     }
     return list;
   }

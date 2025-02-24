@@ -51,6 +51,7 @@ export function ListSettingsForm({ list }: Props ) {
   }
   const defaultValuesUpdate: ListUpdateSchemaType = {
     name: list?.name ?? "",
+    private: list?.private ?? false,
   }
   logger.info({
     context: "ListSettingsForm",
