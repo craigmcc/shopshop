@@ -21,7 +21,7 @@ import { PROFILES } from "@/test/SeedData";
 import {
   type ItemCreateSchemaType,
   type ItemUpdateSchemaType,
-} from "@/zod-schemas/ItemCreateSchema";
+} from "@/zod-schemas/ItemSchema";
 
 const UTILS = new ActionUtils();
 let categories: Category[]= [];

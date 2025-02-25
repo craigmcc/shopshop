@@ -207,7 +207,6 @@ describe("ProfileActions", () => {
         imageUrl: profile.imageUrl? profile.imageUrl : undefined,
         name: profile.name,
         password: profile.password,
-        scope: profile.scope? profile.scope : undefined,
       }
 
       try {
