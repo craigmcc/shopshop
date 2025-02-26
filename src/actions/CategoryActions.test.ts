@@ -9,7 +9,7 @@
 // External Modules ----------------------------------------------------------
 
 import {Category, List, MemberRole, Profile } from "@prisma/client";
-import { beforeEach, describe, expect, it, should } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 
 // Internal Modules ----------------------------------------------------------
 
@@ -55,11 +55,8 @@ describe("CategoryActions", () => {
         name: "",
       }
 
-      try {
-        await createCategory(category);
-      } catch (error) {
-        expect((error as Error).message).toBe("Request data does not pass validation");
-      }
+      const result = await createCategory(category);
+      expect(result.message).toBe("Request data does not pass validation");
 
     });
 
@@ -71,11 +68,8 @@ describe("CategoryActions", () => {
         name: "New Category",
       }
 
-      try {
-        await createCategory(category);
-      } catch (error) {
-        expect((error as Error).message).toBe("This Profile is not signed in");
-      }
+      const result = await createCategory(category);
+      expect(result.message).toBe("This Profile is not signed in");
 
     });
 
@@ -88,11 +82,8 @@ describe("CategoryActions", () => {
         name: "New Category",
       }
 
-      try {
-        await createCategory(category);
-      } catch (error) {
-        expect((error as Error).message).toBe("This Profile is not authorized to perform this action");
-      }
+      const result = await createCategory(category);
+      expect(result.message).toBe("This Profile is not a Member of the owning List");
 
     });
 
@@ -105,13 +96,10 @@ describe("CategoryActions", () => {
         name: "New Category",
       }
 
-      try {
-        const created = await createCategory(category);
-        should().exist(created.id);
-        expect(created.name).toBe(category.name);
-      } catch (error) {
-        should().fail(`Should not have thrown '${error}'`);
-      }
+      const result = await createCategory(category);
+      expect(result.model).toBeDefined();
+      expect(result.model!.id).toBeDefined();
+      expect(result.model!.name).toBe(category.name);
 
     });
 
@@ -123,11 +111,8 @@ describe("CategoryActions", () => {
 
       setTestProfile(null);
 
-      try {
-        await removeCategory(categories[0].id);
-      } catch (error) {
-        expect((error as Error).message).toBe("This Profile is not signed in");
-      }
+      const result = await removeCategory(categories[0].id);
+      expect(result.message).toBe("This Profile is not signed in");
 
     });
 
@@ -135,13 +120,10 @@ describe("CategoryActions", () => {
 
       const profile = await UTILS.lookupProfile(PROFILES[2].email!);
       setTestProfile(profile);
-      const category = await lookupCategory(profile, MemberRole.ADMIN);
+      const category = await lookupCategory(profile, MemberRole.GUEST);
 
-      try {
-        await removeCategory(category.id);
-      } catch (error) {
-        expect((error as Error).message).toBe("This Profile is not authorized to perform this action");
-      }
+      const result = await removeCategory(category!.id);
+      expect(result.message).toBe("This Profile is not an Admin of the owning List");
 
     });
 
@@ -151,9 +133,10 @@ describe("CategoryActions", () => {
       setTestProfile(profile);
       const category = await lookupCategory(profile, MemberRole.ADMIN);
 
-      const removed = await removeCategory(category!.id);
-      should().exist(removed.id);
-      expect(removed.name).toBe(category!.name);
+      const result = await removeCategory(category!.id);
+      expect(result.model).toBeDefined();
+      expect(result.model!.id).toBe(category!.id);
+      expect(result.model!.name).toBe(category!.name);
 
     });
 
@@ -165,25 +148,34 @@ describe("CategoryActions", () => {
 
       setTestProfile(null);
 
-      try {
-        await updateCategory(categories[0].id, { name: "New Name" });
-      } catch (error) {
-        expect((error as Error).message).toBe("This Profile is not signed in");
-      }
+      const result = await updateCategory(categories[0].id, { name: "New Name" });
+      expect(result.message).toBe("This Profile is not signed in");
 
     });
 
     it("should fail on not authorized", async () => {
 
-      const profile = await UTILS.lookupProfile(PROFILES[2].email!);
+      const profile = await UTILS.lookupProfile(PROFILES[0].email!);
       setTestProfile(profile);
-      const category = await lookupCategory(profile, MemberRole.GUEST);
+//      const category = await lookupCategory(profile, MemberRole.GUEST);
+      const members = await db.member.findMany({
+        where: {
+          profileId: profile.id,
+        }
+      });
+      await db.member.delete({
+        where: {
+          id: members[0].id,
+        }
+      });
+      const categories = await db.category.findMany({
+        where: {
+          listId: members[0].listId
+        }
+      });
 
-      try {
-        await updateCategory(category.id, { name: "New Name" });
-      } catch (error) {
-        expect((error as Error).message).toBe("This Profile is not authorized to perform this action");
-      }
+      const result = await updateCategory(categories[0].id, { name: "New Name" });
+      expect(result.message).toBe("This Profile is not a Member of the owning List");
 
     });
 
@@ -194,11 +186,8 @@ describe("CategoryActions", () => {
       const category = await lookupCategory(profile, MemberRole.ADMIN);
       const data:CategoryUpdateSchemaType = { name: "" };
 
-      try {
-        await updateCategory(category.id, data);
-      } catch (error) {
-        expect((error as Error).message).toBe("Request data does not pass validation");
-      }
+      const result = await updateCategory(category.id, data);
+      expect(result.message).toBe("Request data does not pass validation");
 
     });
 
@@ -209,8 +198,10 @@ describe("CategoryActions", () => {
       const category = await lookupCategory(profile, MemberRole.ADMIN);
 
       const data: CategoryUpdateSchemaType = { name: "New Name" };
-      const updated = await updateCategory(category!.id, data);
-      expect(updated.name).toBe(data.name);
+      const result = await updateCategory(category!.id, data);
+      expect(result.model).toBeDefined();
+      expect(result.model!.id).toBe(category!.id);
+      expect(result.model!.name).toBe(data.name);
 
     });
 

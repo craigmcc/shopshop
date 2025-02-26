@@ -15,13 +15,8 @@ import { ZodError } from "zod";
 
 // Internal Modules ----------------------------------------------------------
 
+import { ActionResult, ValidationActionResult } from "@/lib/ActionResult";
 import { db } from "@/lib/db";
-import {
-  NotAuthenticatedError,
-  NotAuthorizedError,
-  NotFoundError,
-  ValidationError,
-} from "@/lib/ErrorHelpers";
 import { findProfile } from "@/lib/ProfileHelpers";
 import { logger } from "@/lib/ServerLogger";
 import { IdSchema, type IdSchemaType } from "@/zod-schemas/IdSchema";
@@ -39,18 +34,14 @@ import {
  *
  * @param data                          Parameters for creating a Category
  *
- * @returns                             Newly created Category
- *
- * @throws NotAuthenticatedError        If the Profile is not signed in
- * @throws NotAuthorizedError           If the Profile is not a member of the owning List
- * @throws ValidationError              If a schema validation error occurs
+ * @returns                             Newly created Category or relevant errors
  */
-export async function createCategory(data: CategoryCreateSchemaType): Promise<Category> {
+export async function createCategory(data: CategoryCreateSchemaType): Promise<ActionResult<Category>> {
 
   // Check authentication
   const profile = await findProfile();
   if (!profile) {
-    throw new NotAuthenticatedError("This Profile is not signed in");
+    return ({ message: "This Profile is not signed in" });
   }
 
   // Check authorization
@@ -65,20 +56,24 @@ export async function createCategory(data: CategoryCreateSchemaType): Promise<Ca
     },
   });
   if (!list) {
-    throw new NotAuthorizedError();
+    return ({ message: "This Profile is not a Member of the owning List" });
   }
 
   // Check data validity
   try {
     data = CategoryCreateSchema.parse(data);
   } catch (error) {
-    throw new ValidationError(error as ZodError, "Request data does not pass validation");
+    return ValidationActionResult(error as ZodError);
   }
 
   // Create and return the new Category
-  return await db.category.create({
-    data,
-  });
+  try {
+    return ({ model: await db.category.create({
+      data,
+    }) });
+  } catch (error) {
+    return ({ message: (error as Error).message });
+  }
 
 }
 
@@ -87,19 +82,14 @@ export async function createCategory(data: CategoryCreateSchemaType): Promise<Ca
  *
  * @param id                            ID of the Category to delete
  *
- * @returns                             Removed Category
- *
- * @throws NotAuthenticatedError        If the Profile is not signed in
- * @throws NotAuthorizedError           If the Profile is not a member of the owning List
- * @throws NotFoundError                If the Category does not exist
- * @throws ValidationError              If a schema validation error occurs
+ * @returns                             Removed Category or relevant errors
  */
-export async function removeCategory(id: IdSchemaType): Promise<Category> {
+export async function removeCategory(id: IdSchemaType): Promise<ActionResult<Category>> {
 
   // Check authentication
   const profile = await findProfile();
   if (!profile) {
-    throw new NotAuthenticatedError("This Profile is not signed in");
+    return ({ message: "This Profile is not signed in" });
   }
 
   // Check authorization and Category existence
@@ -109,7 +99,7 @@ export async function removeCategory(id: IdSchemaType): Promise<Category> {
     },
   });
   if (!category) {
-    throw new NotFoundError("That Category does not exist");
+    return ({ message: "That Category does not exist" });
   }
   const member = await db.member.findFirst({
     where: {
@@ -118,23 +108,27 @@ export async function removeCategory(id: IdSchemaType): Promise<Category> {
     }
   });
   if (!member || member.role !== MemberRole.ADMIN) {
-    throw new NotAuthorizedError();
+    return ({ message: "This Profile is not an Admin of the owning List" });
   }
 
   // Check data validity
   try {
     IdSchema.parse(id);
   } catch (error) {
-    throw new ValidationError(error as ZodError, "Specified ID fails validation");
+    return ValidationActionResult(error as ZodError);
   }
 
   // Remove and return the Category
-  await db.category.delete({
-    where: {
-      id: id,
-    },
-  });
-  return category;
+  try {
+    await db.category.delete({
+      where: {
+        id: id,
+      },
+    });
+    return ({ model: category });
+  } catch (error) {
+    return ({ message: (error as Error).message });
+  }
 
 }
 
@@ -151,12 +145,12 @@ export async function removeCategory(id: IdSchemaType): Promise<Category> {
  * @throws NotFoundError                If the Category does not exist
  * @throws ValidationError              If a schema validation error occurs
  */
-export async function updateCategory(categoryId: IdSchemaType, data: CategoryUpdateSchemaType): Promise<Category> {
+export async function updateCategory(categoryId: IdSchemaType, data: CategoryUpdateSchemaType): Promise<ActionResult<Category>> {
 
   // Check authentication
   const profile = await findProfile();
   if (!profile) {
-    throw new NotAuthenticatedError();
+    return ({ message: "This Profile is not signed in" });
   }
 
   // Check authorization and Category existence
@@ -166,7 +160,7 @@ export async function updateCategory(categoryId: IdSchemaType, data: CategoryUpd
     },
   });
   if (!category) {
-    throw new NotFoundError("That Category does not exist");
+    return ({ message: "That Category does not exist" });
   }
   const member = await db.member.findFirst({
     where: {
@@ -175,31 +169,35 @@ export async function updateCategory(categoryId: IdSchemaType, data: CategoryUpd
     }
   });
   if (!member) {
-    throw new NotAuthorizedError();
+    return ({ message: "This Profile is not a Member of the owning List" });
   }
 
   // Check data validity
   try {
     data = CategoryUpdateSchema.parse(data);
   } catch (error) {
-    throw new ValidationError(error as ZodError, "Request data does not pass validation");
+    return ValidationActionResult(error as ZodError);
   }
 
   // Update and return the Category
-  const updated = await db.category.update({
-    data: {
-      ...data,
-      id: categoryId, // No cheating allowed
-    },
-    where: {
-      id: categoryId,
-    },
-  });
-  logger.trace({
-    context: "CategoryActions.updateCategory",
-    updated,
-    user: profile.email,
-  });
-  return updated;
+  try {
+    const updated = await db.category.update({
+      data: {
+        ...data,
+        id: categoryId, // No cheating allowed
+      },
+      where: {
+        id: categoryId,
+      },
+    });
+    logger.trace({
+      context: "CategoryActions.updateCategory",
+      updated,
+      user: profile.email,
+    });
+    return ({ model: updated });
+  } catch (error) {
+    return ({ message: (error as Error).message });
+  }
 
 }
