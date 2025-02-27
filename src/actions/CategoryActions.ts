@@ -15,7 +15,7 @@ import { ZodError } from "zod";
 
 // Internal Modules ----------------------------------------------------------
 
-import { ActionResult, ValidationActionResult } from "@/lib/ActionResult";
+import { ActionResult, ValidationActionResult, ERRORS } from "@/lib/ActionResult";
 import { db } from "@/lib/db";
 import { findProfile } from "@/lib/ProfileHelpers";
 import { logger } from "@/lib/ServerLogger";
@@ -41,7 +41,7 @@ export async function createCategory(data: CategoryCreateSchemaType): Promise<Ac
   // Check authentication
   const profile = await findProfile();
   if (!profile) {
-    return ({ message: "This Profile is not signed in" });
+    return ({ message: ERRORS.AUTHENTICATION });
   }
 
   // Check authorization
@@ -56,7 +56,7 @@ export async function createCategory(data: CategoryCreateSchemaType): Promise<Ac
     },
   });
   if (!list) {
-    return ({ message: "This Profile is not a Member of the owning List" });
+    return ({ message: ERRORS.NOT_MEMBER });
   }
 
   // Check data validity
@@ -80,22 +80,22 @@ export async function createCategory(data: CategoryCreateSchemaType): Promise<Ac
 /**
  * Handle request to remove a Category.
  *
- * @param id                            ID of the Category to delete
+ * @param categoryId                            ID of the Category to delete
  *
  * @returns                             Removed Category or relevant errors
  */
-export async function removeCategory(id: IdSchemaType): Promise<ActionResult<Category>> {
+export async function removeCategory(categoryId: IdSchemaType): Promise<ActionResult<Category>> {
 
   // Check authentication
   const profile = await findProfile();
   if (!profile) {
-    return ({ message: "This Profile is not signed in" });
+    return ({ message: ERRORS.AUTHENTICATION });
   }
 
   // Check authorization and Category existence
   const category = await db.category.findUnique({
     where: {
-      id: id,
+      id: categoryId,
     },
   });
   if (!category) {
@@ -108,12 +108,12 @@ export async function removeCategory(id: IdSchemaType): Promise<ActionResult<Cat
     }
   });
   if (!member || member.role !== MemberRole.ADMIN) {
-    return ({ message: "This Profile is not an Admin of the owning List" });
+    return ({ message: ERRORS.NOT_ADMIN });
   }
 
   // Check data validity
   try {
-    IdSchema.parse(id);
+    IdSchema.parse(categoryId);
   } catch (error) {
     return ValidationActionResult(error as ZodError);
   }
@@ -122,7 +122,7 @@ export async function removeCategory(id: IdSchemaType): Promise<ActionResult<Cat
   try {
     await db.category.delete({
       where: {
-        id: id,
+        id: categoryId,
       },
     });
     return ({ model: category });
@@ -150,7 +150,7 @@ export async function updateCategory(categoryId: IdSchemaType, data: CategoryUpd
   // Check authentication
   const profile = await findProfile();
   if (!profile) {
-    return ({ message: "This Profile is not signed in" });
+    return ({ message: ERRORS.AUTHENTICATION });
   }
 
   // Check authorization and Category existence
@@ -169,7 +169,7 @@ export async function updateCategory(categoryId: IdSchemaType, data: CategoryUpd
     }
   });
   if (!member) {
-    return ({ message: "This Profile is not a Member of the owning List" });
+    return ({ message: ERRORS.NOT_MEMBER });
   }
 
   // Check data validity

@@ -15,6 +15,17 @@ import { ZodError } from "zod";
 // Public Objects ------------------------------------------------------------
 
 /**
+ * Default error messages for common problems.
+ */
+export const ERRORS = {
+  AUTHENTICATION: "This Profile is not signed in",
+  DATA_VALIDATION: "Request data does not pass validation",
+  ID_VALIDATION: "Specified ID does not pass validation",
+  NOT_ADMIN: "This Profile is not an Admin of the owning List",
+  NOT_MEMBER: "This Profile is not a Member of the owning List",
+};
+
+/**
  * The result of an action that may return an error message or a model object
  * (or both).  For cases where the action failed because of schema validation
  * issues, a set of form errors (individual strings) global to the entire

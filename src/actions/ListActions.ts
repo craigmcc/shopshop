@@ -15,13 +15,8 @@ import { ZodError } from "zod";
 
 // Internal Modules ----------------------------------------------------------
 
+import { ActionResult, ValidationActionResult, ERRORS } from "@/lib/ActionResult";
 import { db } from "@/lib/db";
-import {
-  NotAuthenticatedError,
-  NotAuthorizedError,
-  NotFoundError,
-  ValidationError,
-} from "@/lib/ErrorHelpers";
 import { populateList } from "@/lib/ListHelpers";
 import { findProfile } from "@/lib/ProfileHelpers";
 import { logger } from "@/lib/ServerLogger";
@@ -46,12 +41,12 @@ import {
  * @throws NotAuthenticatedError        If the Profile is not signed in
  * @throws ValidationError              If a schema validation error occurs
  */
-export async function createList(data: ListCreateSchemaType): Promise<List> {
+export async function createList(data: ListCreateSchemaType): Promise<ActionResult<List>> {
 
   // Check authentication
   const profile = await findProfile();
   if (!profile) {
-    throw new NotAuthenticatedError();
+    return ({ message: ERRORS.AUTHENTICATION });
   }
 
   // Check authorization
@@ -59,34 +54,39 @@ export async function createList(data: ListCreateSchemaType): Promise<List> {
 
   // Check data validity
   try {
-    ListCreateSchema.parse(data);
+    data = ListCreateSchema.parse(data);
   } catch (error) {
-    throw new ValidationError(error as ZodError, "Request data does not pass validation");
+    return ValidationActionResult(error as ZodError);
   }
 
-  // Create and return the new List
-  const created = await db.list.create({
-    data: {
-      ...data,
-      members: {
-        create: {
-          profileId: profile.id,
-          role: MemberRole.ADMIN,
+  try {
+    // Create the new List
+    const created = await db.list.create({
+      data: {
+        ...data,
+        members: {
+          create: {
+            profileId: profile.id,
+            role: MemberRole.ADMIN,
+          }
         }
+      },
+      include: {
+        members: true,
       }
-    },
-    include: {
-      members: true,
-    }
-  });
-  // Also populate the initial Categories and Items for this List
-  await populateList(created.id, true, true);
-  logger.trace({
-    context: "ListActions.createList",
-    list: created,
-    user: profile.email,
-  });
-  return created;
+    });
+    logger.trace({
+      context: "ListActions.createList",
+      list: created,
+      user: profile.email,
+    });
+    // Also populate the initial Categories and Items for this List
+    await populateList(created.id, true, true);
+    // Return the new List
+    return ({ model: created });
+  } catch (error) {
+    return ({ message: (error as Error).message });
+  }
 
 }
 
@@ -97,18 +97,13 @@ export async function createList(data: ListCreateSchemaType): Promise<List> {
  *
  * @returns                           Removed List
  *
- * @throws NotAuthenticatedError      If the Profile is not signed in
- * @throws NotAuthorizedError         If the Profile is not an ADMIN member of the List
- * @throws NotFoundError              If the List does not exist
- * @throws ValidationError            If a schema validation error occurs
- *
  */
-export async function removeList(listId: IdSchemaType): Promise<List> {
+export async function removeList(listId: IdSchemaType): Promise<ActionResult<List>> {
 
   // Check authentication
   const profile = await findProfile();
   if (!profile) {
-    throw new NotAuthenticatedError();
+    return ({ message: ERRORS.AUTHENTICATION });
   }
 
   // Check authorization
@@ -119,29 +114,28 @@ export async function removeList(listId: IdSchemaType): Promise<List> {
     }
   });
   if (!member || member.role !== MemberRole.ADMIN ) {
-    throw new NotAuthorizedError("You are not an ADMIN for this List");
+    return ({ message: ERRORS.NOT_ADMIN });
   }
 
   // Check data validity
   try {
     IdSchema.parse(listId);
   } catch (error) {
-    throw new ValidationError(error as ZodError, "Specified ID fails validation");
+    return ValidationActionResult(error as ZodError);
   }
 
   // Remove and return the List
-  const list = await db.list.delete({
-    where: { id: listId },
-  });
-  if (!list) {
-    throw new NotFoundError("That List does not exist");
+  try {
+    const list = await db.list.delete({
+      where: {
+        id: listId,
+      },
+    });
+    return ({ model: list });
+  } catch (error) {
+    return ({ message: (error as Error).message });
   }
-  logger.trace({
-    context: "ListActions.removeList",
-    list: list,
-    user: profile!.email,
-  });
-  return list;
+
 }
 
 /**
@@ -157,12 +151,12 @@ export async function removeList(listId: IdSchemaType): Promise<List> {
  * @throws NotFoundError                If the List does not exist
  * @throws ValidationError              If a schema validation error occurs
  */
-export async function updateList(listId: IdSchemaType, data: ListUpdateSchemaType): Promise<List> {
+export async function updateList(listId: IdSchemaType, data: ListUpdateSchemaType): Promise<ActionResult<List>> {
 
   // Check authentication
   const profile = await findProfile();
   if (!profile) {
-    throw new NotAuthenticatedError();
+    return ({ message: ERRORS.AUTHENTICATION });
   }
 
   // Check authorization
@@ -173,36 +167,41 @@ export async function updateList(listId: IdSchemaType, data: ListUpdateSchemaTyp
     }
   });
   if (!member || member.role !== MemberRole.ADMIN ) {
-    throw new NotAuthorizedError("You are not an ADMIN for this List");
+    return ({ message: ERRORS.NOT_ADMIN });
   }
 
   // Check data validity
   try {
     IdSchema.parse(listId);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
-    throw new ValidationError(error as ZodError, "Specified ID fails validation");
+    return ({ message: ERRORS.ID_VALIDATION });
   }
   try {
     ListUpdateSchema.parse(data);
   } catch (error) {
-    throw new ValidationError(error as ZodError, "Request data does not pass validation");
+    return ValidationActionResult(error as ZodError);
   }
 
   // Update and return the List
-  const updated = await db.list.update({
-    data: {
-      ...data,
-      id: listId, // No cheating allowed
-    },
-    where: {
-      id: listId,
-    }
-  });
-  logger.trace({
-    context: "ListActions.updateList",
-    list: updated,
-    user: profile.email,
-  });
-  return updated;
+  try {
+    const updated = await db.list.update({
+      data: {
+        ...data,
+        id: listId, // No cheating allowed
+      },
+      where: {
+        id: listId,
+      }
+    });
+    logger.trace({
+      context: "ListActions.updateList",
+      list: updated,
+      user: profile.email,
+    });
+    return ({ model: updated });
+  } catch (error) {
+    return ({ message: (error as Error).message });
+  }
 
 }

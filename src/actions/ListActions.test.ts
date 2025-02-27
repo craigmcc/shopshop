@@ -12,6 +12,7 @@ import { beforeEach, describe, expect, it, should } from "vitest";
 
 // Internal Modules ----------------------------------------------------------
 
+import { ERRORS } from "@/lib/ActionResult";
 import { createList, removeList, updateList } from "@/actions/ListActions";
 import { setTestProfile } from "@/lib/ProfileHelpers";
 import { ActionUtils } from "@/test/ActionUtils";
@@ -49,11 +50,8 @@ describe("ListActions", () => {
         name: "",
       }
 
-      try {
-        await createList(list);
-      } catch (error) {
-        expect((error as Error).message).toBe("Request data does not pass validation");
-      }
+      const result = await createList(list);
+      expect(result.message).toBe(ERRORS.DATA_VALIDATION);
 
     });
 
@@ -64,11 +62,8 @@ describe("ListActions", () => {
         name: "New List",
       }
 
-      try {
-        await createList(list);
-      } catch (error) {
-        expect((error as Error).message).toBe("This Profile is not signed in");
-      }
+      const result = await createList(list);
+      expect(result.message).toBe(ERRORS.AUTHENTICATION);
 
     });
 
@@ -82,8 +77,8 @@ describe("ListActions", () => {
 
       try {
         const created = await createList(list);
-        should().exist(created.id);
-        expect(created.name).toBe(list.name);
+        should().exist(created.model!.id);
+        expect(created.model!.name).toBe(list.name);
       } catch (error) {
         should().fail(`Should not have thrown '${error}'`);
       }
@@ -101,11 +96,8 @@ describe("ListActions", () => {
       setTestProfile(profile);
       const list = await UTILS.lookupList(LISTS[1].name!);
 
-      try {
-        await removeList(list.id);
-      } catch (error) {
-        expect((error as Error).message).toBe("You are not an ADMIN for this List");
-      }
+      const result = await removeList(list.id);
+      expect(result.message).toBe(ERRORS.NOT_ADMIN);
 
     });
 
@@ -116,11 +108,8 @@ describe("ListActions", () => {
       setTestProfile(profile);
       const list = await UTILS.lookupList(LISTS[2].name!);
 
-      try {
-        await removeList(list.id);
-      } catch (error) {
-        expect((error as Error).message).toBe("You are not an ADMIN for this List");
-      }
+      const result = await removeList(list.id);
+      expect(result.message).toBe(ERRORS.NOT_ADMIN);
 
     });
 
@@ -129,11 +118,8 @@ describe("ListActions", () => {
       setTestProfile(null);
       const list = await UTILS.lookupList(LISTS[0].name!);
 
-      try {
-        await removeList(list.id);
-      } catch (error) {
-        expect((error as Error).message).toBe("This Profile is not signed in");
-      }
+      const result = await removeList(list.id);
+      expect(result.message).toBe(ERRORS.AUTHENTICATION);
 
     });
 
@@ -166,11 +152,8 @@ describe("ListActions", () => {
         name: "",
       }
 
-      try {
-        await updateList(list.id, update);
-      } catch (error) {
-        expect((error as Error).message).toBe("Request data does not pass validation");
-      }
+      const result = await updateList(list.id, update);
+      expect(result.message).toBe(ERRORS.DATA_VALIDATION);
 
     });
 
@@ -184,11 +167,8 @@ describe("ListActions", () => {
         name: "Updated List",
       }
 
-      try {
-        await updateList(list.id, update);
-      } catch (error) {
-        expect((error as Error).message).toBe("You are not an ADMIN for this List");
-      }
+      const result = await updateList(list.id, update);
+      expect(result.message).toBe(ERRORS.NOT_ADMIN);
 
     });
 
@@ -202,11 +182,8 @@ describe("ListActions", () => {
         name: "Updated List",
       }
 
-      try {
-        await updateList(list.id, update);
-      } catch (error) {
-        expect((error as Error).message).toBe("You are not an ADMIN for this List");
-      }
+      const result = await updateList(list.id, update);
+      expect(result.message).toBe(ERRORS.NOT_ADMIN);
 
     });
 
@@ -218,11 +195,8 @@ describe("ListActions", () => {
         name: "Updated List",
       }
 
-      try {
-        await updateList(list.id, update);
-      } catch (error) {
-        expect((error as Error).message).toBe("This Profile is not signed in");
-      }
+      const result = await updateList(list.id, update);
+      expect(result.message).toBe(ERRORS.AUTHENTICATION);
 
     });
 
@@ -235,8 +209,8 @@ describe("ListActions", () => {
       const update: ListUpdateSchemaType = {};
 
       try {
-        const updated = await updateList(list.id, update);
-        expect(updated.name).toBe(list.name);
+        const result = await updateList(list.id, update);
+        expect(result.model!.name).toBe(list.name);
       } catch (error) {
         should().fail(`Should not have thrown '${error}'`);
       }
@@ -254,8 +228,8 @@ describe("ListActions", () => {
       }
 
       try {
-        const updated = await updateList(list.id, update);
-        expect(updated.name).toBe(update.name);
+        const result = await updateList(list.id, update);
+        expect(result.model!.name).toBe(update.name);
       } catch (error) {
         should().fail(`Should not have thrown '${error}'`);
       }

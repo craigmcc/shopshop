@@ -13,6 +13,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 
 // Internal Modules ----------------------------------------------------------
 
+import { ERRORS } from "@/lib/ActionResult";
 import {createCategory, removeCategory, updateCategory } from "@/actions/CategoryActions";
 import { db } from "@/lib/db";
 import { setTestProfile } from "@/lib/ProfileHelpers";
@@ -56,7 +57,7 @@ describe("CategoryActions", () => {
       }
 
       const result = await createCategory(category);
-      expect(result.message).toBe("Request data does not pass validation");
+      expect(result.message).toBe(ERRORS.DATA_VALIDATION);
 
     });
 
@@ -69,7 +70,7 @@ describe("CategoryActions", () => {
       }
 
       const result = await createCategory(category);
-      expect(result.message).toBe("This Profile is not signed in");
+      expect(result.message).toBe(ERRORS.AUTHENTICATION);
 
     });
 
@@ -83,7 +84,7 @@ describe("CategoryActions", () => {
       }
 
       const result = await createCategory(category);
-      expect(result.message).toBe("This Profile is not a Member of the owning List");
+      expect(result.message).toBe(ERRORS.NOT_MEMBER);
 
     });
 
@@ -112,7 +113,7 @@ describe("CategoryActions", () => {
       setTestProfile(null);
 
       const result = await removeCategory(categories[0].id);
-      expect(result.message).toBe("This Profile is not signed in");
+      expect(result.message).toBe(ERRORS.AUTHENTICATION);
 
     });
 
@@ -123,7 +124,7 @@ describe("CategoryActions", () => {
       const category = await lookupCategory(profile, MemberRole.GUEST);
 
       const result = await removeCategory(category!.id);
-      expect(result.message).toBe("This Profile is not an Admin of the owning List");
+      expect(result.message).toBe(ERRORS.NOT_ADMIN);
 
     });
 
@@ -149,7 +150,7 @@ describe("CategoryActions", () => {
       setTestProfile(null);
 
       const result = await updateCategory(categories[0].id, { name: "New Name" });
-      expect(result.message).toBe("This Profile is not signed in");
+      expect(result.message).toBe(ERRORS.AUTHENTICATION);
 
     });
 
@@ -175,7 +176,7 @@ describe("CategoryActions", () => {
       });
 
       const result = await updateCategory(categories[0].id, { name: "New Name" });
-      expect(result.message).toBe("This Profile is not a Member of the owning List");
+      expect(result.message).toBe(ERRORS.NOT_MEMBER);
 
     });
 
@@ -187,7 +188,7 @@ describe("CategoryActions", () => {
       const data:CategoryUpdateSchemaType = { name: "" };
 
       const result = await updateCategory(category.id, data);
-      expect(result.message).toBe("Request data does not pass validation");
+      expect(result.message).toBe(ERRORS.DATA_VALIDATION);
 
     });
 

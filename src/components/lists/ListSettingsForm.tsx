@@ -23,6 +23,7 @@ import { toast } from "react-toastify";
 import { createList, updateList } from "@/actions/ListActions";
 import { InputField } from "@/components/daisyui/InputField";
 import { ServerResponse } from "@/components/shared/ServerResponse";
+import { ActionResult } from "@/lib/ActionResult";
 import { logger } from "@/lib/ClientLogger";
 import {
   ListCreateSchema,
@@ -69,36 +70,30 @@ export function ListSettingsForm({ list }: Props ) {
 
   async function submitForm(formData: ListCreateSchemaType | ListUpdateSchemaType) {
 
-    try {
+    logger.info({
+      context: "ListSettingsForm.submitForm",
+      formData,
+      isCreating,
+    });
 
+    setIsSaving(true);
+    const response: ActionResult<List> = isCreating
+      ? await createList(formData as ListCreateSchemaType)
+      : await updateList(list!.id, formData as ListUpdateSchemaType);
+    setIsSaving(false);
+
+    if (response.message) {
       logger.info({
-        context: "ListSettingsForm.submitForm",
-        formData,
-        isCreating,
+        context: "ListSettingsForm.submitForm.error",
+        message: response.message,
       });
-
-      setIsSaving(true);
-      if (isCreating) {
-        await createList(formData as ListCreateSchemaType);
-      } else {
-        await updateList(list.id, formData as ListUpdateSchemaType);
-      }
-      setIsSaving(false);
+      setResult(response.message);
+    } else {
       setResult(null);
       toast.success(`List '${formData.name}' was successfully ${isCreating ? "created" : "updated"}`);
       router.push("/lists");
-
-    } catch (error) {
-
-      setIsSaving(false);
-      logger.info({
-        context: "ListSettingsForm.submitForm.error",
-        message: "Error creating or updating List",
-        error,
-      });
-      setResult(error instanceof Error ? error : `${error}`);
-
     }
+
   }
 
   return (

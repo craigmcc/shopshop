@@ -37,29 +37,25 @@ export function ListRemoveForm({ list }: Props) {
 
   const performRemove = async () => {
 
-    try {
+    logger.info({
+      context: "ListRemoveForm.performRemove",
+      list,
+    });
 
-      logger.info({
-        context: "ListRemoveForm.performRemove",
-        list,
-      });
+    setIsRemoving(true);
+    const response = await removeList(list.id);
+    setIsRemoving(false);
 
-      setIsRemoving(true);
-      await removeList(list.id);
-      setIsRemoving(false);
-      toast.success(`List '${list.name}' was successfully removed`);
-      router.push("/lists");
-
-    } catch (error) {
-
-      setIsRemoving(false);
+    if (response.message) {
       logger.info({
         context: "ListRemoveForm.performRemove.error",
-        message: "Error removing List",
-        error,
+        message: response.message,
       });
-      setResult(error instanceof Error ? error : `${error}`);
-
+      setResult(response.message);
+    } else {
+      setResult(null);
+      toast.success(`List '${list.name}' was successfully removed`);
+      router.push("/lists");
     }
 
   }
