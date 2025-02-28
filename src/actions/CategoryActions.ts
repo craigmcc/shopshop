@@ -34,7 +34,7 @@ import {
  *
  * @param data                          Parameters for creating a Category
  *
- * @returns                             Newly created Category or relevant errors
+ * @returns                             Newly created Category or error message
  */
 export async function createCategory(data: CategoryCreateSchemaType): Promise<ActionResult<Category>> {
 
@@ -80,9 +80,9 @@ export async function createCategory(data: CategoryCreateSchemaType): Promise<Ac
 /**
  * Handle request to remove a Category.
  *
- * @param categoryId                            ID of the Category to delete
+ * @param categoryId                    ID of the Category to delete
  *
- * @returns                             Removed Category or relevant errors
+ * @returns                             Removed Category or error message
  */
 export async function removeCategory(categoryId: IdSchemaType): Promise<ActionResult<Category>> {
 
@@ -138,12 +138,7 @@ export async function removeCategory(categoryId: IdSchemaType): Promise<ActionRe
  * @param categoryId                    ID of the Category to update
  * @param data                          Parameters for updating a Category
  *
- * @returns                             Updated Category
- *
- * @throws NotAuthenticatedError        If the Profile is not signed in
- * @throws NotAuthorizedError           If the Profile is not a member of the owning List
- * @throws NotFoundError                If the Category does not exist
- * @throws ValidationError              If a schema validation error occurs
+ * @returns                             Updated Category or error message
  */
 export async function updateCategory(categoryId: IdSchemaType, data: CategoryUpdateSchemaType): Promise<ActionResult<Category>> {
 
@@ -192,7 +187,7 @@ export async function updateCategory(categoryId: IdSchemaType, data: CategoryUpd
     });
     logger.trace({
       context: "CategoryActions.updateCategory",
-      updated,
+      category: updated,
       user: profile.email,
     });
     return ({ model: updated });

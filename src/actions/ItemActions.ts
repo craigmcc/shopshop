@@ -15,13 +15,8 @@ import { ZodError } from "zod";
 
 // Internal Modules ----------------------------------------------------------
 
+import { ActionResult, ValidationActionResult, ERRORS } from "@/lib/ActionResult";
 import { db } from "@/lib/db";
-import {
-  NotAuthenticatedError,
-  NotAuthorizedError,
-  NotFoundError,
-  ValidationError,
-} from "@/lib/ErrorHelpers";
 import { findProfile } from "@/lib/ProfileHelpers";
 import { logger } from "@/lib/ServerLogger";
 import { IdSchema, type IdSchemaType } from "@/zod-schemas/IdSchema";
@@ -39,18 +34,14 @@ import {
  *
  * @param data                          Parameters for creating an Item
  *
- * @returns                             Newly created Item
- *
- * @throws NotAuthenticatedError        If the Profile is not signed in
- * @throws NotAuthorizedError           If the Profile is not a member of the owning List
- * @throws ValidationError              If a schema validation error occurs
+ * @returns                             Newly created Item or error message
  */
-export async function createItem(data: ItemCreateSchemaType): Promise<Item> {
+export async function createItem(data: ItemCreateSchemaType): Promise<ActionResult<Item>> {
 
   // Check authentication
   const profile = await findProfile();
   if (!profile) {
-    throw new NotAuthenticatedError("This Profile is not signed in");
+    return ({ message: ERRORS.AUTHENTICATION });
   }
 
   // Check authorization
@@ -61,7 +52,7 @@ export async function createItem(data: ItemCreateSchemaType): Promise<Item> {
     },
   });
   if (!member) {
-    throw new NotAuthorizedError("This Profile is not a member of this List");
+    return ({ message: ERRORS.NOT_MEMBER });
   }
   const category = await db.category.findFirst({
     where: {
@@ -70,7 +61,7 @@ export async function createItem(data: ItemCreateSchemaType): Promise<Item> {
     },
   });
   if (!category) {
-    throw new NotAuthorizedError("This Category does not exist on this List");
+    return ({ message: "This Category does not exist on this List" });
   }
 
   // Validate input data
@@ -81,50 +72,59 @@ export async function createItem(data: ItemCreateSchemaType): Promise<Item> {
       parsedData,
     });
   } catch (error) {
-      throw new ValidationError(error as ZodError, "Request data does not pass validation");
+    return ValidationActionResult(error as ZodError);
   }
 
-  // Create and return the new Item
-  return await db.item.create({
-    data,
-  });
+  try {
+    // Create the new Item
+    const created = await db.item.create({
+      data: {
+        ...data,
+      },
+    });
+    logger.trace({
+      context: "ItemActions.createItem",
+      item: created,
+      user: profile!.email,
+    });
+    // Return the new Item
+    return ({ model: created });
+  } catch (error) {
+    return ({ message: (error as Error).message });
+  }
 
 }
 
 /**
  * Handle request to remove an Item.
  *
- * @param id                            ID of the Item to delete
+ * @param itemId                        ID of the Item to delete
  *
- * @returns                             Removed Item
- *
- * @throws NotAuthenticatedError        If the Profile is not signed in
- * @throws NotAuthorizedError           If the Profile is not a member of the owning List
- * @throws NotFoundError                If the Item does not exist
+ * @returns                             Removed Item or error message
  */
-export async function removeItem(id: IdSchemaType): Promise<Item> {
+export async function removeItem(itemId: IdSchemaType): Promise<ActionResult<Item>> {
 
   // Check authentication
   const profile = await findProfile();
   if (!profile) {
-    throw new NotAuthenticatedError("This Profile is not signed in");
+    return ({ message: ERRORS.AUTHENTICATION });
   }
 
   // Check data validity
   try {
-    IdSchema.parse(id);
+    IdSchema.parse(itemId);
   } catch (error) {
-    throw new ValidationError(error as ZodError, "Specified ID fails validation");
+    return ValidationActionResult(error as ZodError);
   }
 
   // Check authorization
   const item = await db.item.findUnique({
     where: {
-      id: id,
+      id: itemId,
     },
   });
   if (!item) {
-    throw new NotFoundError("This Item does not exist");
+    return ({ message: "This Item does not exist" });
   }
   const category = await db.category.findFirst({
     where: {
@@ -133,7 +133,7 @@ export async function removeItem(id: IdSchemaType): Promise<Item> {
     },
   });
   if (!category) {
-    throw new NotAuthorizedError("This Category does not exist on this List");
+    return ({ message: "This Category does not exist on this List" });
   }
   const member = await db.member.findFirst({
     where: {
@@ -142,15 +142,20 @@ export async function removeItem(id: IdSchemaType): Promise<Item> {
     },
   });
   if (!member) {
-    throw new NotAuthorizedError("This Profile is not a Member of this List");
+    return ({ message: ERRORS.NOT_MEMBER });
   }
 
   // Remove and return the Item
-  return await db.item.delete({
-    where: {
-      id: id,
-    },
-  });
+  try {
+    await db.item.delete({
+      where: {
+        id: itemId,
+      },
+    });
+    return ({ model: item });
+  } catch (error) {
+    return ({ message: (error as Error).message });
+  }
 
 }
 
@@ -158,19 +163,16 @@ export async function removeItem(id: IdSchemaType): Promise<Item> {
  * Handle request to update an Item.
  *
  * @param itemId                        ID of the Item to update
- * @param data                          Parameters for updating the Item
+ * @param data                          Parameters for updating an Item
  *
- * @throws NotAuthenticatedError        If the Profile is not signed in
- * @throws NotAuthorizedError           If the Profile is not a member of the owning List
- * @throws NotFoundError                If the Item does not exist
- * @throws ValidationError              If a schema validation error occurs
+ * @returns                             Updated Item or error message
  */
-export async function updateItem(itemId: IdSchemaType, data: ItemUpdateSchemaType): Promise<Item> {
+export async function updateItem(itemId: IdSchemaType, data: ItemUpdateSchemaType): Promise<ActionResult<Item>> {
 
   // Check authentication
   const profile = await findProfile();
   if (!profile) {
-    throw new NotAuthenticatedError("This Profile is not signed in");
+    return ({ message: ERRORS.AUTHENTICATION });
   }
 
   // Check authorization and Item existence
@@ -180,7 +182,7 @@ export async function updateItem(itemId: IdSchemaType, data: ItemUpdateSchemaTyp
     },
   });
   if (!item) {
-    throw new NotFoundError("That Item does not exist");
+    return ({ message: "This Item does not exist" });
   }
   const member = await db.member.findFirst({
     where: {
@@ -189,30 +191,42 @@ export async function updateItem(itemId: IdSchemaType, data: ItemUpdateSchemaTyp
     },
   });
   if (!member) {
-    throw new NotAuthorizedError("This Profile is not a Member of this List");
+    return ({ message: ERRORS.NOT_MEMBER });
   }
 
-  // Validate input data
+  // Check data validity
   try {
-    const parsedData = ItemUpdateSchema.parse(data);
-    logger.trace({
-      context: "ItemActions.updateItem.ItemSchemaUpdate.parse",
-      parsedData,
-    });
+    IdSchema.parse(itemId);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
-      throw new ValidationError(error as ZodError, "Request data does not pass validation");
+    return ({ message: ERRORS.ID_VALIDATION });
+  }
+  try {
+    ItemUpdateSchema.parse(data);
+  } catch (error) {
+    return ValidationActionResult(error as ZodError);
   }
 
   // Update and return the Item
-  return await db.item.update({
-    data: {
-      ...data,
-      id: itemId,   // No cheating allowed
-    },
-    where: {
-      id: itemId,
-    },
-  });
+  try {
+    const updated = await db.item.update({
+      data: {
+        ...data,
+        id: itemId,   // No cheating allowed
+      },
+      where: {
+        id: itemId,
+      },
+    });
+    logger.trace({
+      context: "ItemActions.updateItem",
+      item: updated,
+      user: profile!.email,
+    });
+    return ({ model: updated });
+  } catch (error) {
+    return ({ message: (error as Error).message });
+  }
 
 }
 

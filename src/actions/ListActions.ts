@@ -36,10 +36,7 @@ import {
  *
  * @param data                          Parameters for creating a List
  *
- * @returns                             Newly created List
- *
- * @throws NotAuthenticatedError        If the Profile is not signed in
- * @throws ValidationError              If a schema validation error occurs
+ * @returns                             Newly created List or error message
  */
 export async function createList(data: ListCreateSchemaType): Promise<ActionResult<List>> {
 
@@ -95,8 +92,7 @@ export async function createList(data: ListCreateSchemaType): Promise<ActionResu
  *
  * @param listId                      ID of the List to be removed
  *
- * @returns                           Removed List
- *
+ * @returns                           Removed List or error message
  */
 export async function removeList(listId: IdSchemaType): Promise<ActionResult<List>> {
 
@@ -141,15 +137,10 @@ export async function removeList(listId: IdSchemaType): Promise<ActionResult<Lis
 /**
  * Handle request to update a List.
  *
- * @param listId                        ID of the List to be updated
+ * @param listId                        ID of the List to update
  * @param data                          Parameters for updating a List
  *
- * @returns                             Updated List
- *
- * @throws NotAuthenticatedError        If the Profile is not signed in
- * @throws NotAuthorizedError           If the Profile is not an ADMIN member of the List
- * @throws NotFoundError                If the List does not exist
- * @throws ValidationError              If a schema validation error occurs
+ * @returns                             Updated List or error message
  */
 export async function updateList(listId: IdSchemaType, data: ListUpdateSchemaType): Promise<ActionResult<List>> {
 
