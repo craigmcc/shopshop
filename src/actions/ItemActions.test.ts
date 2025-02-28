@@ -9,7 +9,7 @@
 // External Modules ----------------------------------------------------------
 
 import { Category, Item, List, MemberRole, Profile } from "@prisma/client";
-import { beforeEach, describe, expect, it, should } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 
 // Internal Modules ----------------------------------------------------------
 
