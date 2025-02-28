@@ -62,8 +62,7 @@ describe("ListRemoveForm", () => {
 
         });
 
-        // TODO - for some reason, router.push() fails in ListRemoveForm.performRemove()
-        it.skip("should remove the selected List", async () => {
+        it("should remove the selected List", async () => {
 
           const profile = await UTILS.lookupProfile(PROFILES[0].email!);
           setTestProfile(profile);

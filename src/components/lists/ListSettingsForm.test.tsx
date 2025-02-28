@@ -129,8 +129,7 @@ describe("ListSettingsForm", () => {
 
     });
 
-    // TODO - for some reason, router.push() fails in ListSettingsForm.submitForm()
-    it.skip("should pass submit with valid data", async () => {
+    it("should pass submit with valid data", async () => {
 
       const profile = await UTILS.lookupProfile(PROFILES[0].email!);
       setTestProfile(profile);
