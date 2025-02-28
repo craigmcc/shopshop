@@ -8,12 +8,12 @@
 
 // External Modules ----------------------------------------------------------
 
-import { beforeEach, describe, expect, it, should } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 
 // Internal Modules ----------------------------------------------------------
 
 import { createProfile, removeProfile, updateProfile } from "@/actions/ProfileActions";
-import {hashPassword} from "@/lib/Encryption";
+import { ERRORS } from "@/lib/ActionResult";
 import { setTestProfile } from "@/lib/ProfileHelpers";
 import { ActionUtils } from "@/test/ActionUtils";
 import { PROFILES } from "@/test/SeedData";
@@ -49,11 +49,8 @@ describe("ProfileActions", () => {
         password: "",
       }
 
-      try {
-        await createProfile(profile);
-      } catch (error) {
-        expect((error as Error).message).toBe("Request data does not pass validation");
-      }
+      const result = await createProfile(profile);
+      expect(result.message).toBe(ERRORS.DATA_VALIDATION);
 
     });
 
@@ -62,14 +59,11 @@ describe("ProfileActions", () => {
       const profile: ProfileCreateSchemaType = {
         email: PROFILES[0].email!,
         name: "Test User",
-        password: hashPassword("password"),
+        password: "password",
       }
 
-      try {
-        await createProfile(profile);
-      } catch (error) {
-        expect((error as Error).message).toBe("That email address is already in use");
-      }
+      const result = await createProfile(profile);
+      expect(result.message).toBe("That email address is already in use");
 
     });
 
@@ -78,14 +72,13 @@ describe("ProfileActions", () => {
       const profile: ProfileCreateSchemaType = {
         email: "test@example.com",
         name: "Test User",
-        password: hashPassword("password"),
+        password: "password",
       }
 
-      try {
-        await createProfile(profile);
-      } catch (error) {
-        should().fail(`Should not have thrown '${error}'`);
-      }
+      const result = await createProfile(profile);
+      expect(result.model).toBeDefined();
+      expect(result.model!.email).toBe(profile.email);
+      expect(result.model!.name).toBe(profile.name);
 
     });
 
@@ -98,11 +91,8 @@ describe("ProfileActions", () => {
       setTestProfile(null);
       const profile = await UTILS.lookupProfile(PROFILES[1].email!);
 
-      try {
-        await removeProfile(profile.id);
-      } catch (error) {
-        expect((error as Error).message).toBe("This Profile is not signed in");
-      }
+      const result = await removeProfile(profile.id);
+      expect(result.message).toBe(ERRORS.AUTHENTICATION);
 
     });
 
@@ -112,11 +102,8 @@ describe("ProfileActions", () => {
       setTestProfile(caller);
       const callee = await UTILS.lookupProfile(PROFILES[2].email!);
 
-      try {
-        await removeProfile(callee.id);
-      } catch (error) {
-        expect((error as Error).message).toBe("You can only remove your own Profile");
-      }
+      const result = await removeProfile(callee.id);
+      expect(result.message).toBe("You can only remove your own Profile");
 
     });
 
@@ -125,11 +112,9 @@ describe("ProfileActions", () => {
       const profile = await UTILS.lookupProfile(PROFILES[0].email!);
       setTestProfile(profile);
 
-      try {
-        await removeProfile(profile.id);
-      } catch (error) {
-        should().fail(`Should not have thrown '${error}'`);
-      }
+      const result = await removeProfile(profile.id);
+      expect(result.model).toBeDefined();
+      expect(result.model!.id).toBe(profile.id);
 
     });
 
@@ -142,11 +127,8 @@ describe("ProfileActions", () => {
       setTestProfile(null);
       const profile = await UTILS.lookupProfile(PROFILES[1].email!);
 
-      try {
-        await updateProfile(profile.id, {});
-      } catch (error) {
-        expect((error as Error).message).toBe("This Profile is not signed in");
-      }
+      const result = await updateProfile(profile.id, {});
+      expect(result.message).toBe(ERRORS.AUTHENTICATION);
 
     });
 
@@ -156,11 +138,8 @@ describe("ProfileActions", () => {
       setTestProfile(caller);
       const callee = await UTILS.lookupProfile(PROFILES[2].email!);
 
-      try {
-        await updateProfile(callee.id, {});
-      } catch (error) {
-        expect((error as Error).message).toBe("You can only update your own Profile");
-      }
+      const result = await updateProfile(callee.id, {});
+      expect(result.message).toBe("You can only update your own Profile");
 
     });
 
@@ -173,11 +152,8 @@ describe("ProfileActions", () => {
         name: profile.name,
       }
 
-      try {
-        await updateProfile(profile.id, update);
-      } catch (error) {
-        expect((error as Error).message).toBe("That email address is already in use");
-      }
+      const result = await updateProfile(profile.id, update);
+      expect(result.message).toBe("That email address is already in use");
 
     });
 
@@ -186,58 +162,31 @@ describe("ProfileActions", () => {
       const profile = await UTILS.lookupProfile(PROFILES[2].email!);
       setTestProfile(profile);
 
-      try {
-        const updated = await updateProfile(profile.id, {});
-        expect(updated.id).toBe(profile.id);
-        expect(updated.email).toBe(profile.email);
-        expect(updated.name).toBe(profile.name);
-        expect(updated.password).toBe(profile.password);
-      } catch (error) {
-        should().fail(`Should not have thrown '${error}'`);
-      }
+      const result = await updateProfile(profile.id, {});
+      expect(result.model).toBeDefined();
+      expect(result.model!.id).toBe(profile.id);
+      expect(result.model!.email).toBe(profile.email);
+      expect(result.model!.name).toBe(profile.name);
+      expect(result.model!.password).toBe(profile.password);
 
     });
 
     it("should pass on full update", async () => {
 
-      const profile = await UTILS.lookupProfile(PROFILES[0].email!);
+      const profile = await UTILS.lookupProfile(PROFILES[2].email!);
       setTestProfile(profile);
       const update: ProfileUpdateSchemaType = {
         email: profile.email,
         imageUrl: profile.imageUrl? profile.imageUrl : undefined,
         name: profile.name,
-        password: profile.password,
       }
 
-      try {
-        const updated = await updateProfile(profile.id, update);
-        expect(updated.id).toBe(profile.id);
-        expect(updated.email).toBe(profile.email);
-        expect(updated.name).toBe(profile.name);
-        expect(updated.password).toBe(profile.password);
-      } catch (error) {
-        should().fail(`Should not have thrown '${error}'`);
-      }
-
-    });
-
-    it("should pass on valid data", async () => {
-
-      const profile = await UTILS.lookupProfile(PROFILES[0].email!);
-      setTestProfile(profile);
-      const update: ProfileUpdateSchemaType = {
-        name: profile.name + " Updated",
-      }
-
-      try {
-        const updated = await updateProfile(profile.id, update);
-        expect(updated.id).toBe(profile.id);
-        expect(updated.email).toBe(profile.email);
-        expect(updated.name).toBe(update.name);
-        expect(updated.password).toBe(profile.password);
-      } catch (error) {
-        should().fail(`Should not have thrown '${error}'`);
-      }
+      const result = await updateProfile(profile.id, update);
+      expect(result.model).toBeDefined();
+      expect(result.model!.id).toBe(profile.id);
+      expect(result.model!.email).toBe(profile.email);
+      expect(result.model!.name).toBe(profile.name);
+      expect(result.model!.password).toBe(profile.password);
 
     });
 

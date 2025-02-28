@@ -1,9 +1,9 @@
 "use client";
 
-// @/components/lists/CategoryForm.tsx
+// @/components/lists/ItemSettingsForm.tsx
 
 /**
- * Form for creating and editing Categories.
+ * Form for creating and editing Items.
  *
  * @packageDocumentation
  */
@@ -11,7 +11,7 @@
 // External Modules ----------------------------------------------------------
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Category, List, Profile } from "@prisma/client";
+import { Category, Item, Profile } from "@prisma/client";
 import { LoaderCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -20,111 +20,110 @@ import { toast } from "react-toastify";
 
 // Internal Modules ----------------------------------------------------------
 
-import { createCategory, updateCategory } from "@/actions/CategoryActions";
+import { createItem, updateItem } from "@/actions/ItemActions";
 import { InputField } from "@/components/daisyui/InputField";
 import { ServerResponse } from "@/components/shared/ServerResponse";
 import { logger } from "@/lib/ClientLogger";
 import {
-  CategoryCreateSchema,
-  type CategoryCreateSchemaType,
-  CategoryUpdateSchema,
-  type CategoryUpdateSchemaType
-} from "@/zod-schemas/CategorySchema";
+  ItemCreateSchema,
+  type ItemCreateSchemaType,
+  ItemUpdateSchema,
+  type ItemUpdateSchemaType
+} from "@/zod-schemas/ItemSchema";
 
 // Public Objects ------------------------------------------------------------
 
 /* The properties for this component */
 type Props = {
-  /* The Category to be updated (for update only) */
+  /* The Category owning this Item (for create only) */
   category: Category | undefined,
-  /* The List owning this Category (for create only) */
-  list: List | undefined,
+  /* The Item to be updated (for update only) */
+  item: Item | undefined,
   /* The signed in Profile */
   profile: Profile,
 }
 
-export function CategoryForm({ category, list, profile }: Props ) {
+export function ItemSettingsForm({ category, item, profile }: Props ) {
 
-  const isCreating = !category;
+  const isCreating = !item;
   const router = useRouter();
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [result, setResult] = useState<string | Error | null>(null);
 
-  const defaultValuesCreate: CategoryCreateSchemaType = {
-    listId: list?.id ?? "",
+  const defaultValuesCreate: ItemCreateSchemaType = {
+    categoryId: category?.id ?? "",
+    checked: false,
+    listId: category?.listId ?? "",
     name: "",
+    notes: "",
+    selected: false,
   }
-  const defaultValuesUpdate: CategoryUpdateSchemaType = {
-    name: category?.name ?? "",
+  const defaultValuesUpdate: ItemUpdateSchemaType = {
+    checked: item?.checked ?? false,
+    name: item?.name ?? "",
+    selected: item?.selected ?? false,
   }
   logger.info({
-    context: "CategoryForm",
+    context: "ItemForm",
     category: category,
+    item: item,
     profile,
     defaultValues: isCreating ? defaultValuesCreate : defaultValuesUpdate,
   });
-  const methods = useForm<CategoryCreateSchemaType | CategoryUpdateSchemaType>({
+  const methods = useForm<ItemCreateSchemaType | ItemUpdateSchemaType>({
     defaultValues: isCreating ? defaultValuesCreate : defaultValuesUpdate,
     mode: "onBlur",
     // @ts-expect-error Type weirdness on resolver property
-    resolver: isCreating ? zodResolver(CategoryCreateSchema) : zodResolver(CategoryUpdateSchema),
+    resolver: isCreating ? zodResolver(ItemCreateSchema) : zodResolver(ItemUpdateSchema),
   });
   const formState = methods.formState;
   const errors = formState.errors;
 
-  async function submitForm(formData: CategoryCreateSchemaType | CategoryUpdateSchemaType) {
+  async function submitForm(formData: ItemCreateSchemaType | ItemUpdateSchemaType) {
 
-    try {
+    logger.trace({
+      context: "ItemSettingsForm.submitForm",
+      formData,
+      isCreating,
+    });
 
-      logger.info({
-        context: "CategoryForm.submitForm",
-        formData,
-        isCreating,
-      });
+    setIsSaving(true);
+    const response = isCreating
+      ? await createItem(formData as ItemCreateSchemaType)
+      : await updateItem(item.id, formData as ItemUpdateSchemaType);
+    setIsSaving(false);
 
-      setIsSaving(true);
-      if (isCreating) {
-        await createCategory(formData as CategoryCreateSchemaType);
-      } else {
-        await updateCategory(category.id, formData as CategoryUpdateSchemaType);
-      }
-      setIsSaving(false);
+    if (response.model) {
       setResult(null);
-      toast.success(`Category "${formData.name}" was successfully ${isCreating ? "created" : "updated"}`);
+      toast.success(`Item "${formData.name}" was successfully ${isCreating ? "created" : "updated"}`);
       router.push("/lists");
-
-    } catch (error) {
-
-      setIsSaving(false);
-      logger.info({
-        message: "Error creating or updating Category",
-        error
-      });
-      setResult(error instanceof Error ? error : `${error}`);
-
+    } else {
+      setResult(response.message!);
     }
+
   }
 
   return (
     <div className={"card bg-base-300 shadow-xl"}>
       <div className="card-body">
-        <h2 className="card-title justify-center">{ isCreating ? "Create Category" : "Update Category" }</h2>
+        <h2 className="card-title justify-center">{ isCreating ? "Create Item" : "Update Item" }</h2>
         {result && <ServerResponse result={result} />}
         <FormProvider {...methods}>
           <form
             className="flex flex-col gap-2"
-            name="CategoryForm"
+            name="ItemForm"
             onSubmit={methods.handleSubmit(submitForm)}
           >
             <div className="flex flex-col w-full gap-2">
               <InputField
                 autoFocus={true}
-                label="Category Name"
+                label="Item Name"
                 name="name"
-                placeholder="Category Name"
+                placeholder="Item Name"
                 type="text"
               />
-              {isCreating && <input type="hidden" name="listId" value={list?.id}/>}
+              {isCreating && <input type="hidden" name="categoryId" value={category?.id}/>}
+              {isCreating && <input type="hidden" name="listId" value={category?.listId}/>}
               <button
                 className="btn btn-primary"
                 disabled={Object.keys(errors).length > 0}

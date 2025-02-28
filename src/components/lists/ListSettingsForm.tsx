@@ -70,7 +70,7 @@ export function ListSettingsForm({ list }: Props ) {
 
   async function submitForm(formData: ListCreateSchemaType | ListUpdateSchemaType) {
 
-    logger.info({
+    logger.trace({
       context: "ListSettingsForm.submitForm",
       formData,
       isCreating,
@@ -82,16 +82,12 @@ export function ListSettingsForm({ list }: Props ) {
       : await updateList(list!.id, formData as ListUpdateSchemaType);
     setIsSaving(false);
 
-    if (response.message) {
-      logger.info({
-        context: "ListSettingsForm.submitForm.error",
-        message: response.message,
-      });
-      setResult(response.message);
-    } else {
+    if (response.model) {
       setResult(null);
       toast.success(`List '${formData.name}' was successfully ${isCreating ? "created" : "updated"}`);
       router.push("/lists");
+    } else {
+      setResult(response.message!);
     }
 
   }

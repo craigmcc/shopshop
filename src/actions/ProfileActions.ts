@@ -15,14 +15,8 @@ import { ZodError } from "zod";
 
 // Internal Modules ----------------------------------------------------------
 
+import { ActionResult, ValidationActionResult, ERRORS } from "@/lib/ActionResult";
 import { db } from "@/lib/db";
-import {
-  NotAuthenticatedError,
-  NotAuthorizedError,
-  NotFoundError,
-  UniqueConstraintError,
-  ValidationError,
-} from "@/lib/ErrorHelpers";
 import { hashPassword} from "@/lib/Encryption";
 import { findProfile } from "@/lib/ProfileHelpers";
 import { logger } from "@/lib/ServerLogger";
@@ -31,7 +25,7 @@ import {
   ProfileCreateSchema,
   type ProfileCreateSchemaType,
   ProfileUpdateSchema,
-  ProfileUpdateSchemaType,
+  type ProfileUpdateSchemaType,
 } from "@/zod-schemas/ProfileSchema";
 import {
   SignUpSchema,
@@ -45,11 +39,9 @@ import {
  *
  * @param data                          Parameters for creating a Profile
  *
- * @returns                             Newly created Profile
- *
- * @throws ValidationError              If a schema validation error occurs
+ * @returns                             Newly created Profile or error message
  */
-export async function createProfile(data: ProfileCreateSchemaType): Promise<Profile> {
+export async function createProfile(data: ProfileCreateSchemaType): Promise<ActionResult<Profile>> {
 
   // Check authentication
   // Not needed - signing up is open to all
@@ -61,7 +53,7 @@ export async function createProfile(data: ProfileCreateSchemaType): Promise<Prof
   try {
     ProfileCreateSchema.parse(data);
   } catch (error) {
-    throw new ValidationError(error as ZodError, "Request data does not pass validation");
+    return ValidationActionResult(error as ZodError);
   }
 
   // Check for uniqueness constraint violation
@@ -71,22 +63,31 @@ export async function createProfile(data: ProfileCreateSchemaType): Promise<Prof
     },
   });
   if (existing) {
-    throw new UniqueConstraintError("That email address is already in use");
+    return ({ message: "That email address is already in use" });
   }
 
-  // Create and return the new Profile
-  const created = await db.profile.create({
-    data,
-  });
-  logger.trace({
-    context: "ProfileActions.createProfile",
-    message: "Profile created",
-    profile: {
-      ...created,
-      password: "*REDACTED*",
-    },
-  });
-  return created;
+  try {
+    // Create and return the new Profile
+    const created = await db.profile.create({
+      data: {
+        email: data.email,
+        // TODO - imageUrl when supported
+        name: data.name,
+        password: hashPassword(data.password),
+      }
+    });
+    logger.trace({
+      context: "ProfileActions.createProfile",
+      message: "Profile created",
+      profile: {
+        ...created,
+        password: "*REDACTED*",
+      },
+    });
+    return ({ model: created });
+  } catch (error) {
+    return ({ message: (error as Error).message });
+  }
 
 }
 
@@ -95,48 +96,49 @@ export async function createProfile(data: ProfileCreateSchemaType): Promise<Prof
  *
  * @param profileId                     ID of the Profile to be removed
  *
- * @returns                             Removed Profile
- *
- * @throws NotFoundError                If no Profile can be found with the given
- * @throws ValidationError              If a schema validation error occurs
+ * @returns                             Removed Profile or error message
  */
-export async function removeProfile(profileId: IdSchemaType): Promise<Profile> {
+export async function removeProfile(profileId: IdSchemaType): Promise<ActionResult<Profile>> {
 
   // Check authentication
   const profile = await findProfile();
   if (!profile) {
-    throw new NotAuthenticatedError();
+    return ({ message: ERRORS.AUTHENTICATION });
   }
 
   // Check authorization
   if (profile.id !== profileId) {
-    throw new NotAuthorizedError("You can only remove your own Profile");
+    return ({ message: "You can only remove your own Profile" });
   }
 
   // Check data validity
   try {
     IdSchema.parse(profileId);
   } catch (error) {
-    throw new ValidationError(error as ZodError, "Specified ID fails validation");
+    return ValidationActionResult(error as ZodError);
   }
 
   // Remove and return the Profile
-  const removed = await db.profile.delete({
-    where: {
-      id: profileId,
+  try {
+    const removed = await db.profile.delete({
+      where: {
+        id: profileId,
+      }
+    });
+    if (!removed) {
+      return ({ message: "That Profile does not exist" });
     }
-  });
-  if (!removed) {
-    throw new NotFoundError("That Profile does not exist");
+    logger.trace({
+      context: "ProfileActions.removeProfile",
+      profile: {
+        ...removed,
+        password: "*REDACTED*",
+      }
+    });
+    return ({ model: removed });
+  } catch (error) {
+    return ({ message: (error as Error).message });
   }
-  logger.trace({
-    context: "ProfileActions.removeProfile",
-    profile: {
-      ...removed,
-      password: "*REDACTED*",
-    }
-  });
-  return removed;
 
 }
 
@@ -145,11 +147,9 @@ export async function removeProfile(profileId: IdSchemaType): Promise<Profile> {
  *
  * @param data                          Parameters for creating a Profile
  *
- * @returns                             Newly created Profile
- *
- * @throws ValidationError              If a schema validation error occurs
+ * @returns                             Newly created Profile or error message
  */
-export async function signUpProfile(data: SignUpSchemaType): Promise<Profile> {
+export async function signUpProfile(data: SignUpSchemaType): Promise<ActionResult<Profile>> {
 
   // Check authentication
   // Not needed - signing up is open to all
@@ -161,7 +161,7 @@ export async function signUpProfile(data: SignUpSchemaType): Promise<Profile> {
   try {
     SignUpSchema.parse(data);
   } catch (error) {
-    throw new ValidationError(error as ZodError, "Request data does not pass validation");
+    return ValidationActionResult(error as ZodError);
   }
 
   // Check for uniqueness constraint violation
@@ -171,27 +171,31 @@ export async function signUpProfile(data: SignUpSchemaType): Promise<Profile> {
     },
   });
   if (existing) {
-    throw new UniqueConstraintError("That email address is already in use");
+    return ({ message: "That email address is already in use" });
   }
 
   // Create and return the new Profile
-  const created = await db.profile.create({
-    data: {
-      email: data.email,
-      // TODO - imageUrl when supported
-      name: data.name,
-      password: hashPassword(data.password),
-    }
-  });
-  logger.trace({
-    context: "ProfileActions.signUpProfile",
-    message: "Profile created",
-    profile: {
-      ...created,
-      password: "*REDACTED*",
-    },
-  });
-  return created;
+  try {
+    const created = await db.profile.create({
+      data: {
+        email: data.email,
+        // TODO - imageUrl when supported
+        name: data.name,
+        password: hashPassword(data.password),
+      }
+    });
+    logger.trace({
+      context: "ProfileActions.signUpProfile",
+      message: "Profile created",
+      profile: {
+        ...created,
+        password: "*REDACTED*",
+      },
+    });
+    return ({model: created});
+  } catch (error) {
+    return ({ message: (error as Error).message });
+  }
 
 }
 
@@ -201,36 +205,32 @@ export async function signUpProfile(data: SignUpSchemaType): Promise<Profile> {
  * @param profileId                     ID of the Profile to be updated
  * @param data                          Parameters for updating a Profile
  *
- * @returns                             Updated Profile
- *
- * @throws NotAuthenticatedError        If the Profile is not signed in
- * @throws NotAuthorizedError           You can only update your own Profile
- * @throws NotFoundError                If no Profile can be found with the given
- * @throws ValidationError              If a schema validation error occurs
+ * @returns                             Updated Profile or error message
  */
-export async function updateProfile(profileId: IdSchemaType, data: ProfileUpdateSchemaType): Promise<Profile> {
+export async function updateProfile(profileId: IdSchemaType, data: ProfileUpdateSchemaType): Promise<ActionResult<Profile>> {
 
   // Check authentication
   const profile = await findProfile();
   if (!profile) {
-    throw new NotAuthenticatedError();
+    return ({ message: ERRORS.AUTHENTICATION });
   }
 
   // Check authorization
   if (profile.id !== profileId) {
-    throw new NotAuthorizedError("You can only update your own Profile");
+    return ({ message: "You can only update your own Profile" });
   }
 
   // Check data validity
   try {
     IdSchema.parse(profileId);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
-    throw new ValidationError(error as ZodError, "Specified ID fails validation");
+    return ({ message: ERRORS.ID_VALIDATION });
   }
   try {
     ProfileUpdateSchema.parse(data);
   } catch (error) {
-    throw new ValidationError(error as ZodError, "Request data does not pass validation");
+    return ValidationActionResult(error as ZodError);
   }
 
   // Check for uniqueness constraint violation if email is specified
@@ -244,27 +244,32 @@ export async function updateProfile(profileId: IdSchemaType, data: ProfileUpdate
       },
     });
     if (existing) {
-      throw new UniqueConstraintError("That email address is already in use");
+      return ({ message: "That email address is already in use" });
     }
   }
 
   // Update and return the Profile
-  const updated = await db.profile.update({
-    data: {
-      ...data,
-      id: profileId, // No cheating allowed
-    },
-    where: {
-      id: profileId
-    },
-  });
-  logger.trace({
-    context: "ProfileActions.updateProfile",
-    profile: {
-      ...updated,
-      password: "*REDACTED*",
-    }
-  });
-  return updated;
+  try {
+    const updated = await db.profile.update({
+      data: {
+        ...data,
+        password: data.password ? hashPassword(data.password) : undefined,
+        id: profileId, // No cheating allowed
+      },
+      where: {
+        id: profileId
+      },
+    });
+    logger.trace({
+      context: "ProfileActions.updateProfile",
+      profile: {
+        ...updated,
+        password: "*REDACTED*",
+      }
+    });
+    return ({ model: updated });
+  } catch (error) {
+    return ({ message: (error as Error).message });
+  }
 
 }

@@ -58,33 +58,16 @@ export function SignUpForm() {
       }
     });
 
-    try {
+    setIsSaving(true);
+    const response = await signUpProfile(formData);
+    setIsSaving(false);
 
-      setIsSaving(true);
-//      const profile = await doSignUpAction(formData);
-      const profile = await signUpProfile(formData);
-      setIsSaving(false);
-      logger.trace({
-        context: "SignUpForm.submitForm.success",
-        profile: {
-          email: profile.email,
-          name: profile.name,
-        }
-      });
+    if (response.model) {
       setResult(null);
-      toast.success(`Profile for '${profile.name}' was successfully created`);
+      toast.success(`Profile for '${formData.name}' was successfully created`);
       router.push("/");
-
-    } catch (error) {
-
-      setIsSaving(false);
-      logger.trace({
-        context: "SignUpForm.submitForm.error",
-        error: error,
-      });
-      const message = error instanceof Error ? error.message : `${error}`;
-      setResult(error instanceof Error ? error : message);
-
+    } else {
+      setResult(response.message!);
     }
 
   }

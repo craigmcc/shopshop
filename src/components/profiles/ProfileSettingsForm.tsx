@@ -3,7 +3,7 @@
 // @/components/profiles/ProfileSettingsForm.tsx
 
 /**
- * Form for creating and editing Profiles.
+ * Form for editing Profiles.
  *
  * @packageDocumentation
  */
@@ -61,30 +61,21 @@ export function ProfileSettingsForm({ profile }: Props) {
 
   async function submitForm(formData: ProfileUpdateSchemaType): Promise<void> {
 
-    try {
+    logger.info({
+      context: "ProfileSettingsForm.submitForm",
+      formData,
+    })
 
-      logger.info({
-        context: "ProfileSettingsForm.submitForm",
-        formData,
-      })
+    setIsSaving(true);
+    const response = await updateProfile(profile.id, formData);
+    setIsSaving(false);
 
-      setIsSaving(true);
-      await updateProfile(profile.id, formData);
-      setIsSaving(false);
+    if (response.model) {
       setResult(null);
       toast.success(`Profile '${formData.name}' was successfully updated`);
       router.push("/");
-
-    } catch (error) {
-
-      setIsSaving(false);
-      logger.info({
-        context: "ProfileSettingsForm.submitForm.error",
-        message: "Error updating Profile",
-        error,
-      });
-      setResult(error instanceof Error ? error : `${error}`);
-
+    } else {
+      setResult(response.message!);
     }
 
   }
