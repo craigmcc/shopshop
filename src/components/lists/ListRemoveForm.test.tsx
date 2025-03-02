@@ -56,7 +56,7 @@ describe("ListRemoveForm", () => {
 
           const profile = await UTILS.lookupProfile(PROFILES[0].email!);
           setTestProfile(profile);
-          const input = await UTILS.lookupList(LISTS[0].name!);
+          const input = await UTILS.lookupListByName(LISTS[0].name!);
 
           render(<ListRemoveForm list={input}/>);
 
@@ -66,7 +66,7 @@ describe("ListRemoveForm", () => {
 
           const profile = await UTILS.lookupProfile(PROFILES[0].email!);
           setTestProfile(profile);
-          const input = await UTILS.lookupList(LISTS[0].name!);
+          const input = await UTILS.lookupListByName(LISTS[0].name!);
           const user = userEvent.setup();
           render(<ListRemoveForm list={input}/>);
 

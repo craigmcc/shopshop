@@ -38,9 +38,9 @@ const isTesting = process.env.NODE_ENV === "test";
 /* The properties for this component */
 type Props = {
   /* The Category owning this Item (for create only) */
-  category: Category | undefined,
+  category?: Category,
   /* The Item to be updated (for update only) */
-  item: Item | undefined,
+  item?: Item,
   /* The signed in Profile */
   profile: Profile,
 }
@@ -66,10 +66,13 @@ export function ItemSettingsForm({ category, item, profile }: Props ) {
     selected: item?.selected ?? false,
   }
   logger.info({
-    context: "ItemForm",
+    context: "ItemSettingsForm",
     category: category,
     item: item,
-    profile,
+    profile: {
+      ...profile,
+      password: "*REDACTED*",
+    },
     defaultValues: isCreating ? defaultValuesCreate : defaultValuesUpdate,
   });
   const methods = useForm<ItemCreateSchemaType | ItemUpdateSchemaType>({

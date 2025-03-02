@@ -2,6 +2,7 @@
 
 // External Modules ----------------------------------------------------------
 
+import { MemberRole } from "@prisma/client";
 import { render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it } from "vitest";
 
@@ -59,7 +60,7 @@ describe("ListSettingsPage", () => {
 
             const profile = await UTILS.lookupProfile(PROFILES[1].email!);
             setTestProfile(profile);
-            const list = await UTILS.lookupList(LISTS[0].name!);
+            const list = await UTILS.lookupListByName(LISTS[0].name!);
             render(<ListSettingsPage params={Promise.resolve({listId: list.id})}/>);
 
             expect(screen.findByText("You are not an admin")).toBeDefined();
@@ -69,7 +70,7 @@ describe("ListSettingsPage", () => {
         it("Renders an update list page for ADMIN Member", async () => {
 
             const profile = await UTILS.lookupProfile(PROFILES[0].email!);
-            const list = await UTILS.lookupList(LISTS[0].name!);
+            const list = await UTILS.lookupList(LISTS[0].name!, profile, MemberRole.ADMIN);
             setTestProfile(profile);
             render(<ListSettingsPage params={Promise.resolve({listId: list.id})}/>);
 

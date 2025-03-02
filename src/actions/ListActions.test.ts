@@ -8,6 +8,7 @@
 
 // External Modules ----------------------------------------------------------
 
+import { MemberRole } from "@prisma/client";
 import { beforeEach, describe, expect, it, should } from "vitest";
 
 // Internal Modules ----------------------------------------------------------
@@ -94,7 +95,7 @@ describe("ListActions", () => {
       // Pick a Profile that is a GUEST Member of this List
       const profile = await UTILS.lookupProfile(PROFILES[0].email!);
       setTestProfile(profile);
-      const list = await UTILS.lookupList(LISTS[1].name!);
+      const list = await UTILS.lookupList(LISTS[1].name!, profile, MemberRole.GUEST);
 
       const result = await removeList(list.id);
       expect(result.message).toBe(ERRORS.NOT_ADMIN);
@@ -106,7 +107,7 @@ describe("ListActions", () => {
       // Pick a Profile that is not a Member
       const profile = await UTILS.lookupProfile(PROFILES[0].email!);
       setTestProfile(profile);
-      const list = await UTILS.lookupList(LISTS[2].name!);
+      const list = await UTILS.lookupListByName(LISTS[2].name!);
 
       const result = await removeList(list.id);
       expect(result.message).toBe(ERRORS.NOT_ADMIN);
@@ -116,7 +117,7 @@ describe("ListActions", () => {
     it("should fail on not authenticated", async () => {
 
       setTestProfile(null);
-      const list = await UTILS.lookupList(LISTS[0].name!);
+      const list = await UTILS.lookupListByName(LISTS[0].name!);
 
       const result = await removeList(list.id);
       expect(result.message).toBe(ERRORS.AUTHENTICATION);
@@ -128,7 +129,7 @@ describe("ListActions", () => {
       // Pick a Profile that is an ADMIN Member of this List
       const profile = await UTILS.lookupProfile(PROFILES[0].email!);
       setTestProfile(profile);
-      const list = await UTILS.lookupList(LISTS[0].name!);
+      const list = await UTILS.lookupList(LISTS[0].name!, profile, MemberRole.ADMIN);
 
       try {
         await removeList(list.id);
@@ -147,7 +148,7 @@ describe("ListActions", () => {
       // Pick a Profile that is an ADMIN Member of this List
       const profile = await UTILS.lookupProfile(PROFILES[0].email!);
       setTestProfile(profile);
-      const list = await UTILS.lookupList(LISTS[0].name!);
+      const list = await UTILS.lookupList(LISTS[0].name!, profile, MemberRole.ADMIN);
       const update: ListUpdateSchemaType = {
         name: "",
       }
@@ -162,7 +163,7 @@ describe("ListActions", () => {
       // Pick a Profile that is a GUEST Member of this List
       const profile = await UTILS.lookupProfile(PROFILES[0].email!);
       setTestProfile(profile);
-      const list = await UTILS.lookupList(LISTS[1].name!);
+      const list = await UTILS.lookupList(LISTS[1].name!, profile, MemberRole.GUEST);
       const update: ListUpdateSchemaType = {
         name: "Updated List",
       }
@@ -177,7 +178,7 @@ describe("ListActions", () => {
       // Pick a Profile that is not a Member
       const profile = await UTILS.lookupProfile(PROFILES[0].email!);
       setTestProfile(profile);
-      const list = await UTILS.lookupList(LISTS[2].name!);
+      const list = await UTILS.lookupListByName(LISTS[2].name!);
       const update: ListUpdateSchemaType = {
         name: "Updated List",
       }
@@ -190,7 +191,7 @@ describe("ListActions", () => {
     it("should fail on not authenticated", async () => {
 
       setTestProfile(null);
-      const list = await UTILS.lookupList(LISTS[0].name!);
+      const list = await UTILS.lookupListByName(LISTS[0].name!);
       const update: ListUpdateSchemaType = {
         name: "Updated List",
       }
@@ -205,7 +206,7 @@ describe("ListActions", () => {
       // Pick a Profile that is an ADMIN Member of this List
       const profile = await UTILS.lookupProfile(PROFILES[0].email!);
       setTestProfile(profile);
-      const list = await UTILS.lookupList(LISTS[0].name!);
+      const list = await UTILS.lookupList(LISTS[0].name!, profile, MemberRole.ADMIN);
       const update: ListUpdateSchemaType = {};
 
       try {
@@ -222,7 +223,7 @@ describe("ListActions", () => {
       // Pick a Profile that is an ADMIN Member of this List
       const profile = await UTILS.lookupProfile(PROFILES[0].email!);
       setTestProfile(profile);
-      const list = await UTILS.lookupList(LISTS[0].name!);
+      const list = await UTILS.lookupList(LISTS[0].name!, profile, MemberRole.ADMIN);
       const update: ListUpdateSchemaType = {
         name: "Updated List",
       }

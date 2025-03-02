@@ -2,6 +2,7 @@
 
 // External Modules ----------------------------------------------------------
 
+import { MemberRole } from "@prisma/client";
 import { render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it } from "vitest";
 
@@ -58,7 +59,7 @@ describe("ListRemovePage", () => {
         it("Renders a remove list page for ADMIN Member", async () => {
 
             const profile = await UTILS.lookupProfile(PROFILES[0].email!);
-            const list = await UTILS.lookupList(LISTS[0].name!);
+            const list = await UTILS.lookupList(LISTS[0].name!, profile, MemberRole.ADMIN );
             setTestProfile(profile);
             render(<ListRemovePage params={Promise.resolve({listId: list.id})}/>);
 

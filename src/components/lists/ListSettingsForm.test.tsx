@@ -91,7 +91,7 @@ describe("ListSettingsForm", () => {
       await user.type(nameField, NEW_NAME);
       await user.click(submitButton);
 
-      const list = await UTILS.lookupList(NEW_NAME);
+      const list = await UTILS.lookupListByName(NEW_NAME);
       expect(list.name).toBe(NEW_NAME);
 
     });
@@ -103,7 +103,7 @@ describe("ListSettingsForm", () => {
     it("should render the form as expected", async () => {
 
       const profile = await UTILS.lookupProfile(PROFILES[0].email!);
-      const list = await UTILS.lookupList(LISTS[0].name!);
+      const list = await UTILS.lookupListByName(LISTS[0].name!);
       setTestProfile(profile);
       render(<ListSettingsForm list={list}/>);
 
@@ -118,7 +118,7 @@ describe("ListSettingsForm", () => {
 
       const profile = await UTILS.lookupProfile(PROFILES[0].email!);
       setTestProfile(profile);
-      const input = await UTILS.lookupList(LISTS[0].name!);
+      const input = await UTILS.lookupListByName(LISTS[0].name!);
       const user = userEvent.setup();
       render(<ListSettingsForm list={input}/>);
 
@@ -133,7 +133,7 @@ describe("ListSettingsForm", () => {
 
       const profile = await UTILS.lookupProfile(PROFILES[0].email!);
       setTestProfile(profile);
-      const input = await UTILS.lookupList(LISTS[0].name!);
+      const input = await UTILS.lookupListByName(LISTS[0].name!);
       const user = userEvent.setup();
       render(<ListSettingsForm list={input}/>);
       const NEW_NAME = "The Updated List"
