@@ -5,7 +5,7 @@
 // External Modules ----------------------------------------------------------
 
 import { MemberRole } from "@prisma/client";
-import {render, screen } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -15,6 +15,7 @@ import { ListSettingsForm } from "@/components/lists/ListSettingsForm";
 import { ERRORS } from "@/lib/ActionResult";
 import { db } from "@/lib/db";
 import { setTestProfile } from "@/lib/ProfileHelpers";
+import { logger } from "@/lib/ClientLogger";
 import { ActionUtils } from "@/test/ActionUtils";
 import { LISTS, PROFILES } from "@/test/SeedData";
 
@@ -145,6 +146,7 @@ describe("ListSettingsForm", () => {
       await user.type(nameField, NEW_NAME);
       await user.click(submitButton);
 
+
       expect(screen.getByText(ERRORS.NOT_ADMIN));
 
     });
@@ -154,6 +156,11 @@ describe("ListSettingsForm", () => {
       const profile = await UTILS.lookupProfile(PROFILES[0].email!);
       setTestProfile(profile);
       const input = await UTILS.lookupListByRole(profile, MemberRole.ADMIN);
+      logger.info({
+        context: "ListSettingForm pass for ADMIN Member input",
+        input,
+      });
+
       const user = userEvent.setup();
       render(<ListSettingsForm list={input!}/>);
       const NEW_NAME = "The Updated List"
@@ -165,6 +172,10 @@ describe("ListSettingsForm", () => {
 
       const output = await db.list.findUnique({
         where: { id: input!.id },
+      });
+      logger.info({
+        context: "ListSettingForm pass for ADMIN Member output",
+        output,
       });
       expect(output!.name).toBe(NEW_NAME);
 
