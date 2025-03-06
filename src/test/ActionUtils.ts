@@ -114,25 +114,36 @@ export class ActionUtils extends BaseUtils {
 
   /**
    * Look up and return the first List for which the specified Profile is a Member
-   * with the specified Role.
+   * with the specified Role (or not a Member if role is null).
    *
    * @param profile                     Profile that must be an ADMIN Member of the List
-   * @param role                        Role that the Profile must have in the List
+   * @param role                        Role that the Profile must have in the List (or null)
    *
    * @returns                           The requested List (if any), or null
    */
-  public async lookupListByRole(profile: Profile, role: MemberRole): Promise<List | null> {
-    const list = await db.list.findFirst({
-      where: {
-        members: {
-          some: {
-            profileId: profile.id,
-            role,
+  public async lookupListByRole(profile: Profile, role: MemberRole | null): Promise<List | null> {
+    if (role) {
+      return await db.list.findFirst({
+        where: {
+          members: {
+            some: {
+              profileId: profile.id,
+              role,
+            },
           },
         },
-      },
-    });
-    return list;
+      });
+    } else {
+      return await db.list.findFirst({
+        where: {
+          members: {
+            none: {
+              profileId: profile.id,
+            },
+          },
+        },
+      });
+    }
   }
 
   /**

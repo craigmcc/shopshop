@@ -132,7 +132,7 @@ describe("ListSettingsForm", () => {
 
     });
 
-    it("should fail for non-ADMIN Member", async () => {
+    it("should fail for GUEST Member", async () => {
 
       const profile = await UTILS.lookupProfile(PROFILES[0].email!);
       setTestProfile(profile);
@@ -146,6 +146,23 @@ describe("ListSettingsForm", () => {
       await user.type(nameField, NEW_NAME);
       await user.click(submitButton);
 
+      expect(screen.getByText(ERRORS.NOT_ADMIN));
+
+    });
+
+    it("should fail for Non-Member", async () => {
+
+      const profile = await UTILS.lookupProfile(PROFILES[0].email!);
+      setTestProfile(profile);
+      const input = await UTILS.lookupListByRole(profile, null);
+      const user = userEvent.setup();
+      render(<ListSettingsForm list={input!}/>);
+      const NEW_NAME = "The Updated List"
+
+      const { nameField, submitButton } = elements();
+      await user.clear(nameField);
+      await user.type(nameField, NEW_NAME);
+      await user.click(submitButton);
 
       expect(screen.getByText(ERRORS.NOT_ADMIN));
 
@@ -156,7 +173,7 @@ describe("ListSettingsForm", () => {
       const profile = await UTILS.lookupProfile(PROFILES[0].email!);
       setTestProfile(profile);
       const input = await UTILS.lookupListByRole(profile, MemberRole.ADMIN);
-      logger.info({
+      logger.trace({
         context: "ListSettingForm pass for ADMIN Member input",
         input,
       });
@@ -173,7 +190,7 @@ describe("ListSettingsForm", () => {
       const output = await db.list.findUnique({
         where: { id: input!.id },
       });
-      logger.info({
+      logger.trace({
         context: "ListSettingForm pass for ADMIN Member output",
         output,
       });
