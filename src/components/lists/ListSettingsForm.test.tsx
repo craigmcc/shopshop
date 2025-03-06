@@ -82,7 +82,7 @@ describe("ListSettingsForm", () => {
 
     });
 
-    it("should pass submit with valid data", async () => {
+    it("should pass with valid data", async () => {
 
       const profile = await UTILS.lookupProfile(PROFILES[0].email!);
       setTestProfile(profile);
@@ -128,6 +128,7 @@ describe("ListSettingsForm", () => {
       const { nameField, submitButton } = elements();
       await user.clear(nameField);
       await user.click(submitButton);
+
       expect(screen.getByText("Name is required"));
 
     });
