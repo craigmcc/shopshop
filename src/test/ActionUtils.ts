@@ -63,7 +63,7 @@ export class ActionUtils extends BaseUtils {
   }
 
   /**
-   * Look up and return the List from the database constrained by membership.
+   * Look up and return a List from the database constrained by membership.
    *
    * @param name                        Name of the requested List
    * @param profile                     Profile that must be a Member of the List
@@ -109,6 +109,29 @@ export class ActionUtils extends BaseUtils {
     if (!list) {
       throw new NotFoundError(`No List found for name '${name}'`);
     }
+    return list;
+  }
+
+  /**
+   * Look up and return the first List for which the specified Profile is a Member
+   * with the specified Role.
+   *
+   * @param profile                     Profile that must be an ADMIN Member of the List
+   * @param role                        Role that the Profile must have in the List
+   *
+   * @returns                           The requested List (if any), or null
+   */
+  public async lookupListByRole(profile: Profile, role: MemberRole): Promise<List | null> {
+    const list = await db.list.findFirst({
+      where: {
+        members: {
+          some: {
+            profileId: profile.id,
+            role,
+          },
+        },
+      },
+    });
     return list;
   }
 

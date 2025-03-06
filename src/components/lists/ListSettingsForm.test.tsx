@@ -4,6 +4,7 @@
 
 // External Modules ----------------------------------------------------------
 
+import { MemberRole } from "@prisma/client";
 import {render, screen } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -11,6 +12,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 // Internal Modules ----------------------------------------------------------
 
 import { ListSettingsForm } from "@/components/lists/ListSettingsForm";
+import { ERRORS } from "@/lib/ActionResult";
 import { db } from "@/lib/db";
 import { setTestProfile } from "@/lib/ProfileHelpers";
 import { ActionUtils } from "@/test/ActionUtils";
@@ -129,13 +131,31 @@ describe("ListSettingsForm", () => {
 
     });
 
-    it("should pass submit with valid data", async () => {
+    it("should fail for non-ADMIN Member", async () => {
 
       const profile = await UTILS.lookupProfile(PROFILES[0].email!);
       setTestProfile(profile);
-      const input = await UTILS.lookupListByName(LISTS[0].name!);
+      const input = await UTILS.lookupListByRole(profile, MemberRole.GUEST);
       const user = userEvent.setup();
-      render(<ListSettingsForm list={input}/>);
+      render(<ListSettingsForm list={input!}/>);
+      const NEW_NAME = "The Updated List"
+
+      const { nameField, submitButton } = elements();
+      await user.clear(nameField);
+      await user.type(nameField, NEW_NAME);
+      await user.click(submitButton);
+
+      expect(screen.getByText(ERRORS.NOT_ADMIN));
+
+    });
+
+    it("should pass for ADMIN Member", async () => {
+
+      const profile = await UTILS.lookupProfile(PROFILES[0].email!);
+      setTestProfile(profile);
+      const input = await UTILS.lookupListByRole(profile, MemberRole.ADMIN);
+      const user = userEvent.setup();
+      render(<ListSettingsForm list={input!}/>);
       const NEW_NAME = "The Updated List"
 
       const { nameField, submitButton } = elements();
@@ -144,7 +164,7 @@ describe("ListSettingsForm", () => {
       await user.click(submitButton);
 
       const output = await db.list.findUnique({
-        where: { id: input.id },
+        where: { id: input!.id },
       });
       expect(output!.name).toBe(NEW_NAME);
 
