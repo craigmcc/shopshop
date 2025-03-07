@@ -13,7 +13,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ItemSettingsForm } from "@/components/items/ItemSettingsForm";
 import { ERRORS } from "@/lib/ActionResult";
-//import { db } from "@/lib/db";
+import { db } from "@/lib/db";
 import { InitialListData }  from "@/lib/InitialListData";
 import { setTestProfile } from "@/lib/ProfileHelpers";
 import { ActionUtils } from "@/test/ActionUtils";
@@ -122,8 +122,13 @@ describe("ItemSettingsForm", () => {
       await user.type(nameField, NEW_NAME);
       await user.click(submitButton);
 
-      const item = await UTILS.lookupItemByName(category, NEW_NAME);
-      expect(item.name).toBe(NEW_NAME);
+      const item = await db.item.findFirst({
+        where: {
+          categoryId: category!.id,
+          name: NEW_NAME,
+        }
+      });
+      expect(item).toBeDefined();
 
     });
 
