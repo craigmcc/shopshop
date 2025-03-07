@@ -70,8 +70,8 @@ describe("ListSettingsPage", () => {
         it("Renders an update list page for ADMIN Member", async () => {
 
             const profile = await UTILS.lookupProfile(PROFILES[0].email!);
-            const list = await UTILS.lookupList(LISTS[0].name!, profile, MemberRole.ADMIN);
             setTestProfile(profile);
+            const list = await UTILS.lookupListByRole(profile, MemberRole.ADMIN);
             render(<ListSettingsPage params={Promise.resolve({listId: list.id})}/>);
 
             expect(screen.findByText("Update List")).toBeDefined();

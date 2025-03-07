@@ -59,8 +59,8 @@ describe("ListRemovePage", () => {
         it("Renders a remove list page for ADMIN Member", async () => {
 
             const profile = await UTILS.lookupProfile(PROFILES[0].email!);
-            const list = await UTILS.lookupList(LISTS[0].name!, profile, MemberRole.ADMIN );
             setTestProfile(profile);
+            const list = await UTILS.lookupListByRole(profile, MemberRole.ADMIN );
             render(<ListRemovePage params={Promise.resolve({listId: list.id})}/>);
 
             expect(screen.findByText(`Are you sure you want to remove List "${list.name}"}`)).toBeDefined();

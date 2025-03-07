@@ -23,13 +23,31 @@ export class ActionUtils extends BaseUtils {
   // Public Members --------------------------------------------------------
 
   /**
+   * Look up and return the Categories for the specified List.
+   *
+   * @param list                        List for which the Categories are requested
+   *
+   * @returns                          The requested Categories
+   */
+  public async lookupCategories(list: List): Promise<Category[]> {
+    return await db.category.findMany({
+      orderBy: {
+        name: "asc",
+      },
+      where: {
+        listId: list.id,
+      },
+    });
+  }
+
+  /**
    * Look up and return the Category from the database that is associated
    * with the specified List, by name.
    *
-   * @param name                        Name of the Category that is requested
    * @param list                        List for which the Category is requested
+   * @param name                        Name of the Category that is requested
    */
-  public async lookupCategory(name: string, list: List): Promise<Category> {
+  public async lookupCategoryByName(list: List, name: string): Promise<Category> {
     const category = await db.category.findFirst({
       where: {
         listId: list.id,
@@ -37,7 +55,7 @@ export class ActionUtils extends BaseUtils {
       },
     });
     if (!category) {
-      throw new NotFoundError(`No Category found for name '${name}'`);
+      throw new NotFoundError(`No Category found for name '${name}' in list '${list.name}'`);
     }
     return category;
   }
@@ -46,10 +64,14 @@ export class ActionUtils extends BaseUtils {
    * Look up and return the Item from the database that is associated
    * with the specified Category, by name.
    *
-   * @param name                        Name of the Item that is requested
    * @param category                    Category for which the Item is requested
+   * @param name                        Name of the Item that is requested
+   *
+   * @returns                           The requested Item
+   *
+   * @throws NotFoundError              If no such Item exists
    */
-  public async lookupItem(name: string, category: Category): Promise<Item> {
+  public async lookupItemByName(category: Category, name: string): Promise<Item> {
     const item = await db.item.findFirst({
       where: {
         categoryId: category.id,
@@ -63,35 +85,6 @@ export class ActionUtils extends BaseUtils {
   }
 
   /**
-   * Look up and return a List from the database constrained by membership.
-   *
-   * @param name                        Name of the requested List
-   * @param profile                     Profile that must be a Member of the List
-   * @param role                        Role that the Profile must have in the List
-   *
-   * @returns                           The requested List
-   *
-   * @throws NotFoundError              If no such List exists
-   */
-  public async lookupList(name: string, profile: Profile, role: MemberRole): Promise<List> {
-    const list = await db.list.findFirst({
-      where: {
-        name,
-        members: {
-          some: {
-            profileId: profile.id,
-            role,
-          },
-        },
-      },
-    });
-    if (!list) {
-      throw new NotFoundError(`No List found for name '${name}' with role '${role}' for Profile '${profile.email}'`);
-    }
-    return list;
-  }
-
-  /**
    * Look up and return the List from the database.
    *
    * @param name                        Name of the requested List
@@ -100,6 +93,7 @@ export class ActionUtils extends BaseUtils {
    *
    * @throws NotFoundError              If no such List exists
    */
+  // TODO: Deprecate and remove usages
   public async lookupListByName(name: string): Promise<List> {
     const list = await db.list.findFirst({
       where: {
@@ -119,11 +113,13 @@ export class ActionUtils extends BaseUtils {
    * @param profile                     Profile that must be an ADMIN Member of the List
    * @param role                        Role that the Profile must have in the List (or null)
    *
-   * @returns                           The requested List (if any), or null
+   * @returns                           The requested List
+   *
+   * @throws NotFoundError              If no such List exists
    */
-  public async lookupListByRole(profile: Profile, role: MemberRole | null): Promise<List | null> {
+  public async lookupListByRole(profile: Profile, role: MemberRole | null): Promise<List> {
     if (role) {
-      return await db.list.findFirst({
+      const list = await db.list.findFirst({
         where: {
           members: {
             some: {
@@ -133,8 +129,13 @@ export class ActionUtils extends BaseUtils {
           },
         },
       });
+      if (list) {
+        return list;
+      } else {
+        throw new NotFoundError(`No List found for Profile '${profile.email}' with role '${role}'`);
+      }
     } else {
-      return await db.list.findFirst({
+      const list = await db.list.findFirst({
         where: {
           members: {
             none: {
@@ -143,6 +144,11 @@ export class ActionUtils extends BaseUtils {
           },
         },
       });
+      if (list) {
+        return list;
+      } else {
+        throw new NotFoundError(`No List found for Profile '${profile.email}' with no role`);
+      }
     }
   }
 
@@ -161,10 +167,11 @@ export class ActionUtils extends BaseUtils {
         email,
       },
     });
-    if (!profile) {
-      throw new NotFoundError(`No Profile found for email ${email}`);
+    if (profile) {
+      return profile;
+    } else {
+      throw new NotFoundError(`No Profile found for email '${email}'`);
     }
-    return profile;
   }
 
 }

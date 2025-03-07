@@ -8,14 +8,13 @@
 
 // External Modules ----------------------------------------------------------
 
-import {Category, List, MemberRole, Profile } from "@prisma/client";
+import {Category, List, MemberRole } from "@prisma/client";
 import { beforeEach, describe, expect, it } from "vitest";
 
 // Internal Modules ----------------------------------------------------------
 
 import { ERRORS } from "@/lib/ActionResult";
 import {createCategory, removeCategory, updateCategory } from "@/actions/CategoryActions";
-import { db } from "@/lib/db";
 import { setTestProfile } from "@/lib/ProfileHelpers";
 import { ActionUtils } from "@/test/ActionUtils";
 import { PROFILES } from "@/test/SeedData";
@@ -51,8 +50,9 @@ describe("CategoryActions", () => {
 
       const profile = await UTILS.lookupProfile(PROFILES[0].email!);
       setTestProfile(profile);
+      const list = await UTILS.lookupListByRole(profile, MemberRole.ADMIN);
       const category: CategoryCreateSchemaType = {
-        listId: lists[0].id,
+        listId: list.id,
         name: "",
       }
 
@@ -74,12 +74,13 @@ describe("CategoryActions", () => {
 
     });
 
-    it("should fail on not authorized", async () => {
+    it("should fail on non-MEMBER", async () => {
 
       const profile = await UTILS.lookupProfile(PROFILES[2].email!);
       setTestProfile(profile);
+      const list = await UTILS.lookupListByRole(profile, null);
       const category: CategoryCreateSchemaType = {
-        listId: lists[0].id,
+        listId: list.id,
         name: "New Category",
       }
 
@@ -88,12 +89,30 @@ describe("CategoryActions", () => {
 
     });
 
-    it("should pass on valid data", async () => {
+    it("should pass on ADMIN Member with valid data", async () => {
 
       const profile = await UTILS.lookupProfile(PROFILES[0].email!);
       setTestProfile(profile);
+      const list = await UTILS.lookupListByRole(profile, MemberRole.ADMIN);
       const category: CategoryCreateSchemaType = {
-        listId: lists[0].id,
+        listId: list.id,
+        name: "New Category",
+      }
+
+      const result = await createCategory(category);
+      expect(result.model).toBeDefined();
+      expect(result.model!.id).toBeDefined();
+      expect(result.model!.name).toBe(category.name);
+
+    });
+
+    it("should pass on GUEST Member with valid data", async () => {
+
+      const profile = await UTILS.lookupProfile(PROFILES[0].email!);
+      setTestProfile(profile);
+      const list = await UTILS.lookupListByRole(profile, MemberRole.GUEST);
+      const category: CategoryCreateSchemaType = {
+        listId: list.id,
         name: "New Category",
       }
 
@@ -117,27 +136,41 @@ describe("CategoryActions", () => {
 
     });
 
-    it("should fail on not authorized", async () => {
+    it("should fail on non-Member with valid data", async () => {
 
-      const profile = await UTILS.lookupProfile(PROFILES[2].email!);
+      const profile = await UTILS.lookupProfile(PROFILES[0].email!);
       setTestProfile(profile);
-      const category = await lookupCategory(profile, MemberRole.GUEST);
+      const list = await UTILS.lookupListByRole(profile, null);
+      const categories = await UTILS.lookupCategories(list);
 
-      const result = await removeCategory(category!.id);
+      const result = await removeCategory(categories[0].id);
       expect(result.message).toBe(ERRORS.NOT_ADMIN);
 
     });
 
-    it("should pass on existing Category", async () => {
+    it("should fail on GUEST Member with valid data", async () => {
 
       const profile = await UTILS.lookupProfile(PROFILES[0].email!);
       setTestProfile(profile);
-      const category = await lookupCategory(profile, MemberRole.ADMIN);
+      const list = await UTILS.lookupListByRole(profile, MemberRole.GUEST);
+      const categories = await UTILS.lookupCategories(list);
 
-      const result = await removeCategory(category!.id);
+      const result = await removeCategory(categories[0].id);
+      expect(result.message).toBe(ERRORS.NOT_ADMIN);
+
+    });
+
+    it("should pass on ADMIN Member with valid data", async () => {
+
+      const profile = await UTILS.lookupProfile(PROFILES[0].email!);
+      setTestProfile(profile);
+      const list = await UTILS.lookupListByRole(profile, MemberRole.ADMIN);
+      const categories = await UTILS.lookupCategories(list);
+
+      const result = await removeCategory(categories[0].id);
       expect(result.model).toBeDefined();
-      expect(result.model!.id).toBe(category!.id);
-      expect(result.model!.name).toBe(category!.name);
+      expect(result.model!.id).toBe(categories[0].id);
+      expect(result.model!.name).toBe(categories[0].name);
 
     });
 
@@ -154,29 +187,29 @@ describe("CategoryActions", () => {
 
     });
 
-    it("should fail on not authorized", async () => {
+    it("should fail on non-Member", async () => {
 
       const profile = await UTILS.lookupProfile(PROFILES[0].email!);
       setTestProfile(profile);
-//      const category = await lookupCategory(profile, MemberRole.GUEST);
-      const members = await db.member.findMany({
-        where: {
-          profileId: profile.id,
-        }
-      });
-      await db.member.delete({
-        where: {
-          id: members[0].id,
-        }
-      });
-      const categories = await db.category.findMany({
-        where: {
-          listId: members[0].listId
-        }
-      });
+      const list = await UTILS.lookupListByRole(profile, null);
+      const categories = await UTILS.lookupCategories(list);
 
       const result = await updateCategory(categories[0].id, { name: "New Name" });
       expect(result.message).toBe(ERRORS.NOT_MEMBER);
+
+    });
+
+    it("should pass on GUEST Member with valid data", async () => {
+
+      const profile = await UTILS.lookupProfile(PROFILES[0].email!);
+      setTestProfile(profile);
+      const list = await UTILS.lookupListByRole(profile, MemberRole.GUEST);
+      const categories = await UTILS.lookupCategories(list);
+
+      const NEW_NAME = "Brand New Name";
+      const result = await updateCategory(categories[0].id, { name: NEW_NAME });
+      expect(result.model).toBeDefined();
+      expect(result.model!.name).toBe(NEW_NAME);
 
     });
 
@@ -184,53 +217,43 @@ describe("CategoryActions", () => {
 
       const profile = await UTILS.lookupProfile(PROFILES[0].email!);
       setTestProfile(profile);
-      const category = await lookupCategory(profile, MemberRole.ADMIN);
+      const list = await UTILS.lookupListByRole(profile, MemberRole.ADMIN);
+      const categories = await UTILS.lookupCategories(list);
       const data:CategoryUpdateSchemaType = { name: "" };
 
-      const result = await updateCategory(category.id, data);
+      const result = await updateCategory(categories[0].id, data);
       expect(result.message).toBe(ERRORS.DATA_VALIDATION);
 
     });
 
-    it("should pass on existing Category", async () => {
+    it("should pass on GUEST Member with valid data", async () => {
 
       const profile = await UTILS.lookupProfile(PROFILES[0].email!);
       setTestProfile(profile);
-      const category = await lookupCategory(profile, MemberRole.ADMIN);
+      const list = await UTILS.lookupListByRole(profile, MemberRole.GUEST);
+      const categories = await UTILS.lookupCategories(list);
 
-      const data: CategoryUpdateSchemaType = { name: "New Name" };
-      const result = await updateCategory(category!.id, data);
+      const NEW_NAME = "Brand New Name";
+      const result = await updateCategory(categories[0].id, { name: NEW_NAME });
       expect(result.model).toBeDefined();
-      expect(result.model!.id).toBe(category!.id);
-      expect(result.model!.name).toBe(data.name);
+      expect(result.model!.name).toBe(NEW_NAME);
+
+    });
+
+    it("should pass on ADMIN Member with valid data", async () => {
+
+      const profile = await UTILS.lookupProfile(PROFILES[0].email!);
+      setTestProfile(profile);
+      const list = await UTILS.lookupListByRole(profile, MemberRole.ADMIN);
+      const categories = await UTILS.lookupCategories(list);
+
+      const NEW_NAME = "Brand New Name";
+      const result = await updateCategory(categories[0].id, { name: NEW_NAME });
+      expect(result.model).toBeDefined();
+      expect(result.model!.name).toBe(NEW_NAME);
 
     });
 
   });
 
 });
-
-// Private Objects -----------------------------------------------------------
-
-/**
- * Look up and return a Category for which the specified Profile is a
- * Member with the specified MemberRole.
- */
-async function lookupCategory(profile: Profile, role: MemberRole): Promise<Category> {
-
-  const member = await db.member.findFirst({
-    include: {
-      list: {
-        include: {
-          categories: true,
-        },
-      },
-    },
-    where: {
-      profileId: profile.id,
-      role: role,
-    },
-  });
-  return member!.list.categories[0];
-
-}
