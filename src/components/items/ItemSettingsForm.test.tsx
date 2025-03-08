@@ -5,7 +5,7 @@
 // External Modules ----------------------------------------------------------
 
 import { MemberRole } from "@prisma/client";
-import { render, screen } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -80,9 +80,11 @@ describe("ItemSettingsForm", () => {
       const categories = await UTILS.lookupCategories(list!);
       render(<ItemSettingsForm category={categories[0]} item={undefined} profile={profile} />);
 
-      const user = userEvent.setup();
-      const {  submitButton } = elements();
-      await user.click(submitButton);
+      await act(async () => {
+        const user = userEvent.setup();
+        const {  submitButton } = elements();
+        await user.click(submitButton);
+      });
 
       expect(screen.getByText("Name is required"));
 
@@ -95,13 +97,16 @@ describe("ItemSettingsForm", () => {
       const list = await UTILS.lookupListByRole(profile, null);
       const categories = await UTILS.lookupCategories(list!);
       render(<ItemSettingsForm category={categories[0]} item={undefined} profile={profile} />);
-
-      const user = userEvent.setup();
-      const { nameField, submitButton } = elements();
-      await user.clear(nameField);
       const NEW_NAME = "Brand New Item";
-      await user.type(nameField, NEW_NAME);
-      await user.click(submitButton);
+
+      await act(async () => {
+        const user = userEvent.setup();
+        const { nameField, submitButton } = elements();
+        await user.clear(nameField);
+        await user.type(nameField, NEW_NAME);
+        await user.click(submitButton);
+      });
+
       expect(screen.getByText(ERRORS.NOT_MEMBER));
 
     });
@@ -113,13 +118,15 @@ describe("ItemSettingsForm", () => {
       const list = await UTILS.lookupListByRole(profile, MemberRole.ADMIN);
       const categories = await UTILS.lookupCategories(list!);
       render(<ItemSettingsForm category={categories[0]} profile={profile}/>);
-
-      const user = userEvent.setup();
-      const { nameField, submitButton } = elements();
-      await user.clear(nameField);
       const NEW_NAME = "Brand New Item";
-      await user.type(nameField, NEW_NAME);
-      await user.click(submitButton);
+
+      await act(async () => {
+        const user = userEvent.setup();
+        const { nameField, submitButton } = elements();
+        await user.clear(nameField);
+        await user.type(nameField, NEW_NAME);
+        await user.click(submitButton);
+      });
 
       const item = await UTILS.lookupItemByName(categories[0], NEW_NAME);
       expect(item).toBeDefined();
@@ -133,13 +140,15 @@ describe("ItemSettingsForm", () => {
       const list = await UTILS.lookupListByRole(profile, MemberRole.GUEST);
       const categories = await UTILS.lookupCategories(list!);
       render(<ItemSettingsForm category={categories[0]} profile={profile}/>);
-
-      const user = userEvent.setup();
-      const { nameField, submitButton } = elements();
-      await user.clear(nameField);
       const NEW_NAME = "Brand New Item";
-      await user.type(nameField, NEW_NAME);
-      await user.click(submitButton);
+
+      await act(async () => {
+        const user = userEvent.setup();
+        const { nameField, submitButton } = elements();
+        await user.clear(nameField);
+        await user.type(nameField, NEW_NAME);
+        await user.click(submitButton);
+      });
 
       const item = await UTILS.lookupItemByName(categories[0], NEW_NAME);
       expect(item).toBeDefined();
@@ -173,10 +182,12 @@ describe("ItemSettingsForm", () => {
       const items = await UTILS.lookupItems(categories[0]);
       render(<ItemSettingsForm item={items[0]} profile={profile}/>);
 
-      const user = userEvent.setup();
-      const {  nameField, submitButton } = elements();
-      await user.clear(nameField);
-      await user.click(submitButton);
+      await act(async () => {
+        const user = userEvent.setup();
+        const { nameField, submitButton } = elements();
+        await user.clear(nameField);
+        await user.click(submitButton);
+      });
 
       expect(screen.getByText("Name is required"));
 
@@ -189,13 +200,15 @@ describe("ItemSettingsForm", () => {
       const input = await UTILS.lookupItemByRole(profile, null);
       const category = await UTILS.lookupCategory(input.categoryId);
       render(<ItemSettingsForm item={input} profile={profile}/>);
-
-      const user = userEvent.setup();
-      const { nameField, submitButton } = elements();
       const NEW_NAME = "Newly Updated Item";
-      await user.clear(nameField);
-      await user.type(nameField, NEW_NAME);
-      await user.click(submitButton);
+
+      await act(async () => {
+        const user = userEvent.setup();
+        const { nameField, submitButton } = elements();
+        await user.clear(nameField);
+        await user.type(nameField, NEW_NAME);
+        await user.click(submitButton);
+      });
 
       const items = await UTILS.lookupItems(category);
       expect(items.filter(item => item.name === NEW_NAME).length).toBe(0);
@@ -209,13 +222,15 @@ describe("ItemSettingsForm", () => {
       const input = await UTILS.lookupItemByRole(profile, MemberRole.ADMIN);
       const category = await UTILS.lookupCategory(input.categoryId);
       render(<ItemSettingsForm item={input} profile={profile}/>);
-
-      const user = userEvent.setup();
-      const { nameField, submitButton } = elements();
       const NEW_NAME = "Newly Updated Item";
-      await user.clear(nameField);
-      await user.type(nameField, NEW_NAME);
-      await user.click(submitButton);
+
+      await act(async () => {
+        const user = userEvent.setup();
+        const { nameField, submitButton } = elements();
+        await user.clear(nameField);
+        await user.type(nameField, NEW_NAME);
+        await user.click(submitButton);
+      });
 
       const output = await UTILS.lookupItemByName(category, NEW_NAME);
       expect(output.name).toBe(NEW_NAME);
@@ -230,13 +245,15 @@ describe("ItemSettingsForm", () => {
       const categories = await UTILS.lookupCategories(list!);
       const items = await UTILS.lookupItems(categories[0]);
       render(<ItemSettingsForm item={items[0]} profile={profile}/>);
-
-      const user = userEvent.setup();
-      const { nameField, submitButton } = elements();
       const NEW_NAME = "Newly Updated Item";
-      await user.clear(nameField);
-      await user.type(nameField, NEW_NAME);
-      await user.click(submitButton);
+
+      await act(async () => {
+        const user = userEvent.setup();
+        const { nameField, submitButton } = elements();
+        await user.clear(nameField);
+        await user.type(nameField, NEW_NAME);
+        await user.click(submitButton);
+      });
 
       const item = await UTILS.lookupItemByName(categories[0], NEW_NAME);
       expect(item).toBeDefined();
