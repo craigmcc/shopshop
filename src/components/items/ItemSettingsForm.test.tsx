@@ -191,7 +191,7 @@ describe("ItemSettingsForm", () => {
       render(<ItemSettingsForm item={input} profile={profile}/>);
 
       const user = userEvent.setup();
-      const {  nameField, submitButton } = elements();
+      const { nameField, submitButton } = elements();
       const NEW_NAME = "Newly Updated Item";
       await user.clear(nameField);
       await user.type(nameField, NEW_NAME);
@@ -211,7 +211,7 @@ describe("ItemSettingsForm", () => {
       render(<ItemSettingsForm item={input} profile={profile}/>);
 
       const user = userEvent.setup();
-      const {  nameField, submitButton } = elements();
+      const { nameField, submitButton } = elements();
       const NEW_NAME = "Newly Updated Item";
       await user.clear(nameField);
       await user.type(nameField, NEW_NAME);
@@ -232,7 +232,7 @@ describe("ItemSettingsForm", () => {
       render(<ItemSettingsForm item={items[0]} profile={profile}/>);
 
       const user = userEvent.setup();
-      const {  nameField, submitButton } = elements();
+      const { nameField, submitButton } = elements();
       const NEW_NAME = "Newly Updated Item";
       await user.clear(nameField);
       await user.type(nameField, NEW_NAME);
