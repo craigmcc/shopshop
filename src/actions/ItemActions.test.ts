@@ -8,7 +8,7 @@
 
 // External Modules ----------------------------------------------------------
 
-import { Category, Item, List, MemberRole, Profile } from "@prisma/client";
+import { Category, Item, List, MemberRole } from "@prisma/client";
 import { beforeEach, describe, expect, it } from "vitest";
 
 // Internal Modules ----------------------------------------------------------
@@ -92,44 +92,51 @@ describe("ItemActions", () => {
 
     });
 
-    it("should fail on not authorized", async () => {
+    it("should fail on valid data for a non-Member", async () => {
 
-      const profile = await UTILS.lookupProfile(PROFILES[2].email!);
+      const profile = await UTILS.lookupProfile(PROFILES[0].email!);
       setTestProfile(profile);
+      const category = await UTILS.lookupCategoryByRole(profile, null);
       const item: ItemCreateSchemaType = {
-        categoryId: categories[0].id,
-        listId: lists[0].id,
+        categoryId: category.id,
+        listId: category.listId,
         name: "New Item",
-      }
+      };
 
       const result = await createItem(item);
       expect(result.message).toBe(ERRORS.NOT_MEMBER);
 
     });
 
-    it("should pass on valid data", async () => {
+    it("should pass on valid data for an ADMIN Member", async () => {
 
       const profile = await UTILS.lookupProfile(PROFILES[0].email!);
       setTestProfile(profile);
-      const members = await db.member.findMany({
-        include: {
-          list: {
-            include: {
-              categories: true,
-            },
-          },
-
-        },
-        where: {
-          profileId: profile.id,
-        },
-      });
-
+      const category = await UTILS.lookupCategoryByRole(profile, MemberRole.ADMIN);
       const item: ItemCreateSchemaType = {
-        categoryId: members[0].list.categories[0].id,
-        listId: members[0].listId,
+        categoryId: category.id,
+        listId: category.listId,
         name: "New Item",
       };
+
+      const result = await createItem(item);
+      expect(result.model).toBeDefined();
+      expect(result.model!.id).toBeDefined();
+      expect(result.model!.name).toBe(item.name);
+
+    });
+
+    it("should pass on valid data for an GUEST Member", async () => {
+
+      const profile = await UTILS.lookupProfile(PROFILES[0].email!);
+      setTestProfile(profile);
+      const category = await UTILS.lookupCategoryByRole(profile, MemberRole.GUEST);
+      const item: ItemCreateSchemaType = {
+        categoryId: category.id,
+        listId: category.listId,
+        name: "New Item",
+      };
+
       const result = await createItem(item);
       expect(result.model).toBeDefined();
       expect(result.model!.id).toBeDefined();
@@ -150,22 +157,33 @@ describe("ItemActions", () => {
 
     });
 
-    // TODO - review the membership test in ItemActions.updateItem()
-    it.skip("should fail on not authorized", async () => {
-
-      const profile = await UTILS.lookupProfile(PROFILES[2].email!);
-      setTestProfile(profile);
-
-      const result = await removeItem(items[2].id);
-      expect(result.message).toBe(ERRORS.NOT_MEMBER);
-
-    });
-
-    it("should pass on valid data", async () => {
+    it("should fail on valid data for a non-Member", async () => {
 
       const profile = await UTILS.lookupProfile(PROFILES[0].email!);
       setTestProfile(profile);
-      const item = await lookupItem(profile, MemberRole.GUEST);
+      const item = await UTILS.lookupItemByRole(profile, null);
+
+      const result = await removeItem(item.id);
+      expect(result.message).toBe("This Profile is not a Member of the owning List");
+
+    });
+
+    it("should pass on valid data for an ADMIN Member", async () => {
+
+      const profile = await UTILS.lookupProfile(PROFILES[0].email!);
+      setTestProfile(profile);
+      const item = await UTILS.lookupItemByRole(profile, MemberRole.GUEST);
+
+      const result = await removeItem(item.id);
+      expect(result.model).toBeDefined();
+
+    });
+
+    it("should pass on valid data for a GUEST Member", async () => {
+
+      const profile = await UTILS.lookupProfile(PROFILES[0].email!);
+      setTestProfile(profile);
+      const item = await UTILS.lookupItemByRole(profile, MemberRole.GUEST);
 
       const result = await removeItem(item.id);
       expect(result.model).toBeDefined();
@@ -185,11 +203,40 @@ describe("ItemActions", () => {
 
     });
 
-    it("should pass on valid data", async () => {
+    it("should fail on valid data for a non-Member", async () => {
 
       const profile = await UTILS.lookupProfile(PROFILES[0].email!);
       setTestProfile(profile);
-      const item = await lookupItem(profile, MemberRole.GUEST);
+      const item = await UTILS.lookupItemByRole(profile, null);
+
+      const data: ItemUpdateSchemaType = {
+        name: "New Name",
+      };
+      const result = await updateItem(item.id, data);
+      expect(result.message).toBe("This Profile is not a Member of the owning List");
+
+    });
+
+    it("should pass on valid data for an ADMIN Member", async () => {
+
+      const profile = await UTILS.lookupProfile(PROFILES[0].email!);
+      setTestProfile(profile);
+      const item = await UTILS.lookupItemByRole(profile, MemberRole.ADMIN);
+
+      const data: ItemUpdateSchemaType = {
+        name: "New Name",
+      };
+      const result = await updateItem(item.id, data);
+      expect(result.model).toBeDefined();
+      expect(result.model!.name).toBe(data.name);
+
+    });
+
+    it("should pass on valid data for a GUEST Member", async () => {
+
+      const profile = await UTILS.lookupProfile(PROFILES[0].email!);
+      setTestProfile(profile);
+      const item = await UTILS.lookupItemByRole(profile, MemberRole.GUEST);
 
       const data: ItemUpdateSchemaType = {
         name: "New Name",
@@ -203,32 +250,3 @@ describe("ItemActions", () => {
   });
 
 });
-
-// Private Objects -----------------------------------------------------------
-
-/**
- * Look up and return an Iterm for which the specified Profile is a
- * Member with the specified MemberRole.
- */
-async function lookupItem(profile: Profile, role: MemberRole): Promise<Item> {
-
-  const member = await db.member.findFirst({
-    include: {
-      list: {
-        include: {
-          categories: {
-            include: {
-              items: true,
-            },
-          },
-        },
-      },
-    },
-    where: {
-      profileId: profile.id,
-      role: role,
-    },
-  });
-  return member!.list.categories[0].items[0];
-
-}

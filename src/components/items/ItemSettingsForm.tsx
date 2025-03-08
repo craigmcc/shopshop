@@ -65,7 +65,7 @@ export function ItemSettingsForm({ category, item, profile }: Props ) {
     name: item?.name ?? "",
     selected: item?.selected ?? false,
   }
-  logger.info({
+  logger.trace({
     context: "ItemSettingsForm",
     category: category,
     item: item,

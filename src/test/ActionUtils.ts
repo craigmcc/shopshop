@@ -41,6 +41,28 @@ export class ActionUtils extends BaseUtils {
   }
 
   /**
+   * Look up and return the Category from the database.
+   *
+   * @param categoryId                  ID of the requested Category
+   *
+   * @returns                           The requested Category
+   *
+   * @throws NotFoundError              If no such Category exists
+   */
+  public async lookupCategory(categoryId: string): Promise<Category> {
+    const category = await db.category.findUnique({
+      where: {
+        id: categoryId,
+      },
+    });
+    if (category) {
+      return category;
+    } else {
+      throw new NotFoundError(`No Category found for ID '${categoryId}'`);
+    }
+  }
+
+  /**
    * Look up and return the Category from the database that is associated
    * with the specified List, by name.
    *
@@ -58,6 +80,55 @@ export class ActionUtils extends BaseUtils {
       throw new NotFoundError(`No Category found for name '${name}' in list '${list.name}'`);
     }
     return category;
+  }
+
+  /**
+   * Look up and return the Category from the database.
+   *
+   * @param profile                     Profile that is signed in
+   * @param role                        Role that the Profile must have in the List (or null)
+   *
+   * @returns                           The requested Category
+   *
+   * @throws NotFoundError              If no such Category exists
+   */
+  public async lookupCategoryByRole(profile: Profile, role: MemberRole | null): Promise<Category> {
+    if (role) {
+      const category = await db.category.findFirst({
+        where: {
+          list: {
+            members: {
+              some: {
+                profileId: profile.id,
+                role,
+              },
+            },
+          },
+        },
+      });
+      if (category) {
+        return category;
+      } else {
+        throw new NotFoundError(`No Category found for Profile '${profile.email}' with role '${role}'`);
+      }
+    } else {
+      const category = await db.category.findFirst({
+        where: {
+          list: {
+            members: {
+              none: {
+                profileId: profile.id,
+              },
+            },
+          },
+        },
+      });
+      if (category) {
+        return category;
+      } else {
+        throw new NotFoundError(`No Category found for Profile '${profile.email}' with no role`);
+      }
+    }
   }
 
   /**
@@ -82,6 +153,77 @@ export class ActionUtils extends BaseUtils {
       throw new NotFoundError(`No Item found for name '${name}' in Category '${category.name}'`);
     }
     return item;
+  }
+
+  /**
+   * Look up and return the Item from the database.
+   *
+   * @param profile                     Profile that is signed in
+   * @param role                        Role that the Profile must have in the List (or null)
+   *
+   * @returns                           The requested Item
+   *
+   * @throws NotFoundError              If no such Item exists
+   */
+  public async lookupItemByRole(profile: Profile, role: MemberRole | null): Promise<Item> {
+    if (role) {
+      const item = await db.item.findFirst({
+        where: {
+          category: {
+            list: {
+              members: {
+                some: {
+                  profileId: profile.id,
+                  role,
+                },
+              },
+            },
+          },
+        },
+      });
+      if (item) {
+        return item;
+      } else {
+        throw new NotFoundError(`No Item found for Profile '${profile.email}' with role '${role}'`);
+      }
+    } else {
+      const item = await db.item.findFirst({
+        where: {
+          category: {
+            list: {
+              members: {
+                none: {
+                  profileId: profile.id,
+                },
+              },
+            },
+          },
+        },
+      });
+      if (item) {
+        return item;
+      } else {
+        throw new NotFoundError(`No Item found for Profile '${profile.email}' with no role`);
+      }
+    }
+  }
+
+  /**
+   * Look up and return the Items for the specified Category.
+   *
+   * @param category                   Category for which the Items are requested
+   *
+   * @returns                          The requested Items
+   */
+  public async lookupItems(category: Category): Promise<Item[]> {
+    return await db.item.findMany({
+      orderBy: {
+        name: "asc",
+      },
+      where: {
+        categoryId: category.id,
+      },
+    });
   }
 
   /**
@@ -110,7 +252,7 @@ export class ActionUtils extends BaseUtils {
    * Look up and return the first List for which the specified Profile is a Member
    * with the specified Role (or not a Member if role is null).
    *
-   * @param profile                     Profile that must be an ADMIN Member of the List
+   * @param profile                     Profile that is signed in
    * @param role                        Role that the Profile must have in the List (or null)
    *
    * @returns                           The requested List
