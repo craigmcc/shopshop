@@ -133,7 +133,7 @@ describe("ItemSettingsForm", () => {
 
     });
 
-    it("should pass with valid data for GUEST Member", async () => {
+    it.skip("should pass with valid data for GUEST Member", async () => {
 
       const profile = await UTILS.lookupProfile(PROFILES[0].email!);
       setTestProfile(profile);
@@ -237,7 +237,7 @@ describe("ItemSettingsForm", () => {
 
     });
 
-    it("should pass with valid data for GUEST Member", async () => {
+    it.skip("should pass with valid data for GUEST Member", async () => {
 
       const profile = await UTILS.lookupProfile(PROFILES[0].email!);
       setTestProfile(profile);

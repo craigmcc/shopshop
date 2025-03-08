@@ -100,7 +100,7 @@ describe("ListSettingsForm", () => {
     });
 
   });
-
+  
   describe("Update List", () => {
 
     it("should render the form as expected", async () => {
