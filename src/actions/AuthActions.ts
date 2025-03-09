@@ -61,7 +61,7 @@ export async function doSignInAction(formData: SignInSchemaType) {
  * Perform the AuthJS sign out action.
  */
 export async function doSignOutAction() {
-  logger.info({
+  logger.trace({
     context: "doSignOut.input",
   });
   await signOut();

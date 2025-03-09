@@ -8,9 +8,10 @@
 
 // External Modules ----------------------------------------------------------
 
-//import { Profile } from "@prisma/client";
+import { Profile } from "@prisma/client";
 import CredentialsProvider from "next-auth/providers/credentials";
-import NextAuth, { AuthError } from "next-auth";
+import NextAuth, { AuthError, DefaultSession } from "next-auth";
+//import { JWT } from "next-auth/jwt";
 
 // Internal Modules ----------------------------------------------------------
 
@@ -20,6 +21,31 @@ import { logger } from "@/lib/ServerLogger";
 import { SignInSchemaType } from "@/zod-schemas/SignInSchema";
 
 // Public Objects ------------------------------------------------------------
+
+declare module "next-auth" {
+  /**
+   * Returned by `useSession`, `getSession` and received as a prop on the `SessionProvider` React Context
+   */
+  interface Session {
+    user: {
+      /** The user's Profile. */
+      profile: Profile
+    } & DefaultSession["user"]
+  }
+  interface User {
+    profile: Profile
+  }
+}
+
+/*
+declare module "next-auth/jwt" {
+  /!** Returned by the `jwt` callback and `getToken`, when using JWT sessions *!/
+  interface JWT {
+    /!** The user's Profile *!/
+    profile: Profile
+  }
+}
+*/
 
 /**
  * Authentication options for auth.js.
@@ -32,46 +58,45 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
   callbacks: {
 
     /**
-     * Add our local Profile o the JWT token when it is created.
+     * Add our local Profile into the JWT token when it is created.
      */
-/*
-    async jwt({ token, user, profile }) {
-      logger.info({
+    async jwt({ token, user, account, profile }) {
+      logger.trace({
         context: "auth.jwt.input",
+        account: account,
         profile: profile,
         token: token,
         user: user,
       });
       if (user) {
-        token.profile = user;
+        token.profile = user.profile;
       }
-      logger.info({
+      logger.trace({
         context: "auth.jwt.output",
         token: token,
       });
       return token;
     },
-*/
 
     /**
      * Note that the session is being requested.
      */
-/*
-  async session({ session, token, user }) {
-      logger.info({
+    async session({ session, token, user }) {
+      logger.trace({
         context: "auth.session.input",
         session: session,
         token: token,
         user: user,
       });
-      session.user.profile = token.profile as Profile;
-      logger.info({
+      if (token.profile && !session.user.profile) {
+        session.user.profile = token.profile as Profile;
+      }
+      logger.trace({
         context: "auth.session.output",
         session: session,
       });
       return session;
     },
-*/
 
   },
 
@@ -96,7 +121,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
       // @ts-expect-error ESLint does not like the type of credentials
       async authorize(credentials: SignInSchemaType) {
         logger.trace({
-          context: "auth.authorize",
+          context: "auth.authorize.input",
           credentials: {
             ...credentials,
             password: "*REDACTED*",
@@ -109,8 +134,8 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         });
         if (profile) {
           if (verifyPassword(credentials.password, profile.password)) {
-            profile.password = ""; // Redact the hashed password
-            logger.info({
+            profile.password = "*REDACTED*"; // Redact the hashed password
+            logger.trace({
               context: "auth.authorize.success",
               email: profile.email,
             });
@@ -125,7 +150,8 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
               context: "auth.authorize.failure.password",
               email: credentials.email,
             });
-            throw new AuthError("Invalid Credentials");
+//            throw new AuthError("Invalid Credentials");
+            return null;
           }
         } else {
           logger.info({

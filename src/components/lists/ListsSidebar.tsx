@@ -30,7 +30,7 @@ export async function ListsSidebar() {
   if (!profile) {
     redirect("/auth/signIn");
   }
-  logger.trace({
+  logger.info({
     context: "ListsSidebar.findProfile",
     profile: {
       ...profile,

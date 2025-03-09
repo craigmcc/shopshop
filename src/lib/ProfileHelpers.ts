@@ -15,7 +15,7 @@ import { Profile } from "@prisma/client";
 // Internal Modules ----------------------------------------------------------
 
 import { auth } from "@/auth";
-import { db } from "@/lib/db";
+//import { db } from "@/lib/db";
 import { logger } from "@/lib/ServerLogger";
 
 const isTest = process.env.NODE_ENV === "test";
@@ -43,12 +43,19 @@ export async function findProfile(): Promise<Profile | null> {
     }
   }
 
-  // PRODUCTION MODE: Returned the signed in Profile (if any)
+  // PRODUCTION MODE: Returned the signed in Profile from the Session (if any)
   const session = await auth();
-  if (!session || !session.user || !session.user.email) {
+  if (!session || !session.user || !session.user.profile) {
     return null;
   }
+  logger.trace({
+    context: "findProfile",
+    profile: session.user.profile,
+  });
 
+  return session.user.profile;
+
+/*
   const profile = await db.profile.findUnique({
     where: {
       email: session.user.email,
@@ -66,6 +73,7 @@ export async function findProfile(): Promise<Profile | null> {
     });
     return null;
   }
+*/
 
 }
 
