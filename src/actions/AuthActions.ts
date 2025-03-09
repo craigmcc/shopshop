@@ -39,7 +39,7 @@ export async function doSignInAction(formData: SignInSchemaType) {
       password: formData.password,
       redirect: false,
     });
-    logger.info({
+    logger.trace({
       context: "doSignIn.output",
       response: response,
     });

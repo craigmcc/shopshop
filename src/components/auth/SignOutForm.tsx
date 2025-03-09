@@ -25,7 +25,7 @@ export function SignOutForm() {
   const router = useRouter();
 
   async function submitForm() {
-    logger.info({
+    logger.trace({
       context: "SignOutForm.submitForm",
       message: "Performing sign out",
     })
