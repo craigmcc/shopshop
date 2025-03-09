@@ -1,6 +1,6 @@
 "use client";
 
-// @/components/items/ItemSettingsForm.test.tsx
+// @/components/items/CategorySettingsForm.test.tsx
 
 // External Modules ----------------------------------------------------------
 
@@ -11,7 +11,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 // Internal Modules ----------------------------------------------------------
 
-import { ItemSettingsForm } from "@/components/items/ItemSettingsForm";
+import { CategorySettingsForm } from "@/components/categories/CategorySettingsForm";
 import { ERRORS } from "@/lib/ActionResult";
 import { setTestProfile } from "@/lib/ProfileHelpers";
 import { ActionUtils } from "@/test/ActionUtils";
@@ -29,7 +29,6 @@ beforeEach(async () => {
   vi.mock("next/navigation");
   await UTILS.loadData({
     withCategories: true,
-    withItems: true,
     withLists: true,
     withMembers: true,
     withProfiles: true,
@@ -42,7 +41,7 @@ function elements() {
 
   const form = screen.getByRole("form");
   expect(form).toBeDefined();
-  const nameField = screen.getByLabelText("Item Name");
+  const nameField = screen.getByLabelText("Category Name");
   expect(nameField).toBeDefined();
   const submitButton = screen.getByRole("button", { name: "Save" });
   expect(submitButton).toBeDefined();
@@ -57,32 +56,32 @@ function elements() {
 
 // Test Objects --------------------------------------------------------------
 
-describe("ItemSettingsForm", () => {
+describe("CategorySettingsForm", () => {
 
-  describe("Create Item", () => {
+  describe("Create Category", () => {
 
     it("should render the form as expected", async () => {
 
-      const profile = await UTILS.lookupProfile(PROFILES[0].email!);
+      const profile = await UTILS.lookupProfile(PROFILES[2].email!);
       setTestProfile(profile);
-      render(<ItemSettingsForm profile={profile}/>)
+      const list = await UTILS.lookupListByRole(profile, MemberRole.ADMIN);
+      render(<CategorySettingsForm list={list} profile={profile}/>);
 
       elements();
-      expect(screen.findByText("Create Item")).toBeDefined();
+      expect(screen.findByText("Create Category")).toBeDefined();
 
     });
 
-    it("should fail with invalid data", async () => {
+    it("should fail on invalid data", async () => {
 
-      const profile = await UTILS.lookupProfile(PROFILES[0].email!);
+      const profile = await UTILS.lookupProfile(PROFILES[2].email!);
       setTestProfile(profile);
       const list = await UTILS.lookupListByRole(profile, MemberRole.ADMIN);
-      const categories = await UTILS.lookupCategories(list!);
-      render(<ItemSettingsForm category={categories[0]} item={undefined} profile={profile} />);
+      render(<CategorySettingsForm list={list} profile={profile}/>);
 
       await act(async () => {
         const user = userEvent.setup();
-        const {  submitButton } = elements();
+        const { submitButton } = elements();
         await user.click(submitButton);
       });
 
@@ -92,12 +91,11 @@ describe("ItemSettingsForm", () => {
 
     it("should fail with valid data for non-Member", async () => {
 
-      const profile = await UTILS.lookupProfile(PROFILES[0].email!);
+      const profile = await UTILS.lookupProfile(PROFILES[2].email!);
       setTestProfile(profile);
       const list = await UTILS.lookupListByRole(profile, null);
-      const categories = await UTILS.lookupCategories(list!);
-      render(<ItemSettingsForm category={categories[0]} item={undefined} profile={profile} />);
-      const NEW_NAME = "Brand New Item";
+      render(<CategorySettingsForm list={list} profile={profile}/>);
+      const NEW_NAME = "Brand New Category";
 
       await act(async () => {
         const user = userEvent.setup();
@@ -116,71 +114,67 @@ describe("ItemSettingsForm", () => {
       const profile = await UTILS.lookupProfile(PROFILES[0].email!);
       setTestProfile(profile);
       const list = await UTILS.lookupListByRole(profile, MemberRole.ADMIN);
-      const categories = await UTILS.lookupCategories(list!);
-      render(<ItemSettingsForm category={categories[0]} profile={profile}/>);
-      const NEW_NAME = "Brand New Item";
+      render(<CategorySettingsForm list={list} profile={profile}/>);
+      const NEW_NAME = "Brand New Category";
 
       await act(async () => {
         const user = userEvent.setup();
-        const { nameField, submitButton } = elements();
+        const {nameField, submitButton} = elements();
         await user.clear(nameField);
         await user.type(nameField, NEW_NAME);
         await user.click(submitButton);
       });
 
-      const item = await UTILS.lookupItemByName(categories[0], NEW_NAME);
-      expect(item).toBeDefined();
+      const category = await UTILS.lookupCategoryByName(list, NEW_NAME);
+      expect(category).toBeDefined();
 
     });
 
-    it.skip("should pass with valid data for GUEST Member", async () => {
+    it("should pass with valid data for GUEST Member", async () => {
 
-      const profile = await UTILS.lookupProfile(PROFILES[0].email!);
+      const profile = await UTILS.lookupProfile(PROFILES[1].email!);
       setTestProfile(profile);
       const list = await UTILS.lookupListByRole(profile, MemberRole.GUEST);
-      const categories = await UTILS.lookupCategories(list!);
-      render(<ItemSettingsForm category={categories[0]} profile={profile}/>);
-      const NEW_NAME = "Brand New Item";
+      render(<CategorySettingsForm list={list} profile={profile}/>);
+      const NEW_NAME = "Brand New Category";
 
       await act(async () => {
         const user = userEvent.setup();
-        const { nameField, submitButton } = elements();
+        const {nameField, submitButton} = elements();
         await user.clear(nameField);
         await user.type(nameField, NEW_NAME);
         await user.click(submitButton);
       });
 
-      const item = await UTILS.lookupItemByName(categories[0], NEW_NAME);
-      expect(item).toBeDefined();
+      const category = await UTILS.lookupCategoryByName(list, NEW_NAME);
+      expect(category).toBeDefined();
 
     });
 
   });
 
-  describe("Update Item", () => {
+  describe("Update Category", () => {
 
     it("should render the form as expected", async () => {
 
-      const profile = await UTILS.lookupProfile(PROFILES[0].email!);
-      setTestProfile(profile);
-      const list = await UTILS.lookupListByRole(profile, MemberRole.GUEST);
-      const categories = await UTILS.lookupCategories(list!);
-      const items = await UTILS.lookupItems(categories[0]);
-      render(<ItemSettingsForm item={items[0]} profile={profile}/>);
-
-      elements();
-      expect(screen.findByText("Update Item")).toBeDefined();
-
-    });
-
-    it("should fail with invalid data", async () => {
-
-      const profile = await UTILS.lookupProfile(PROFILES[0].email!);
+      const profile = await UTILS.lookupProfile(PROFILES[2].email!);
       setTestProfile(profile);
       const list = await UTILS.lookupListByRole(profile, MemberRole.ADMIN);
       const categories = await UTILS.lookupCategories(list!);
-      const items = await UTILS.lookupItems(categories[0]);
-      render(<ItemSettingsForm item={items[0]} profile={profile}/>);
+      render(<CategorySettingsForm category={categories[0]} profile={profile}/>);
+
+      elements();
+      expect(screen.findByText("Update Category")).toBeDefined();
+
+    });
+
+    it("should fail on invalid data", async () => {
+
+      const profile = await UTILS.lookupProfile(PROFILES[1].email!);
+      setTestProfile(profile);
+      const list = await UTILS.lookupListByRole(profile, MemberRole.ADMIN);
+      const categories = await UTILS.lookupCategories(list!);
+      render(<CategorySettingsForm category={categories[0]} profile={profile}/>);
 
       await act(async () => {
         const user = userEvent.setup();
@@ -197,55 +191,10 @@ describe("ItemSettingsForm", () => {
 
       const profile = await UTILS.lookupProfile(PROFILES[0].email!);
       setTestProfile(profile);
-      const input = await UTILS.lookupItemByRole(profile, null);
-      const category = await UTILS.lookupCategory(input.categoryId);
-      render(<ItemSettingsForm item={input} profile={profile}/>);
-      const NEW_NAME = "Newly Updated Item";
-
-      await act(async () => {
-        const user = userEvent.setup();
-        const { nameField, submitButton } = elements();
-        await user.clear(nameField);
-        await user.type(nameField, NEW_NAME);
-        await user.click(submitButton);
-      });
-
-      const items = await UTILS.lookupItems(category);
-      expect(items.filter(item => item.name === NEW_NAME).length).toBe(0);
-
-    });
-
-    it("should pass with valid data for ADMIN Member", async () => {
-
-      const profile = await UTILS.lookupProfile(PROFILES[0].email!);
-      setTestProfile(profile);
-      const input = await UTILS.lookupItemByRole(profile, MemberRole.ADMIN);
-      const category = await UTILS.lookupCategory(input.categoryId);
-      render(<ItemSettingsForm item={input} profile={profile}/>);
-      const NEW_NAME = "Newly Updated Item";
-
-      await act(async () => {
-        const user = userEvent.setup();
-        const { nameField, submitButton } = elements();
-        await user.clear(nameField);
-        await user.type(nameField, NEW_NAME);
-        await user.click(submitButton);
-      });
-
-      const output = await UTILS.lookupItemByName(category, NEW_NAME);
-      expect(output.name).toBe(NEW_NAME);
-
-    });
-
-    it.skip("should pass with valid data for GUEST Member", async () => {
-
-      const profile = await UTILS.lookupProfile(PROFILES[0].email!);
-      setTestProfile(profile);
-      const list = await UTILS.lookupListByRole(profile, MemberRole.GUEST);
+      const list = await UTILS.lookupListByRole(profile, null);
       const categories = await UTILS.lookupCategories(list!);
-      const items = await UTILS.lookupItems(categories[0]);
-      render(<ItemSettingsForm item={items[0]} profile={profile}/>);
-      const NEW_NAME = "Newly Updated Item";
+      render(<CategorySettingsForm category={categories[0]} profile={profile}/>);
+      const NEW_NAME = "Updated Category";
 
       await act(async () => {
         const user = userEvent.setup();
@@ -255,8 +204,51 @@ describe("ItemSettingsForm", () => {
         await user.click(submitButton);
       });
 
-      const item = await UTILS.lookupItemByName(categories[0], NEW_NAME);
-      expect(item).toBeDefined();
+      expect(screen.getByText(ERRORS.NOT_MEMBER));
+
+    });
+
+    it("should pass with valid data for an ADMIN Member", async () => {
+
+      const profile = await UTILS.lookupProfile(PROFILES[2].email!);
+      setTestProfile(profile);
+      const list = await UTILS.lookupListByRole(profile, MemberRole.ADMIN);
+      const categories = await UTILS.lookupCategories(list!);
+      render(<CategorySettingsForm category={categories[0]} profile={profile}/>);
+      const NEW_NAME = "Updated Category";
+
+      await act(async () => {
+        const user = userEvent.setup();
+        const { nameField, submitButton } = elements();
+        await user.clear(nameField);
+        await user.type(nameField, NEW_NAME);
+        await user.click(submitButton);
+      });
+
+      const category = await UTILS.lookupCategoryByName(list, NEW_NAME);
+      expect(category).toBeDefined();
+
+    });
+
+    it("should pass with valid data for a GUEST Member", async () => {
+
+      const profile = await UTILS.lookupProfile(PROFILES[1].email!);
+      setTestProfile(profile);
+      const list = await UTILS.lookupListByRole(profile, MemberRole.ADMIN);
+      const categories = await UTILS.lookupCategories(list!);
+      render(<CategorySettingsForm category={categories[0]} profile={profile}/>);
+      const NEW_NAME = "Updated Category";
+
+      await act(async () => {
+        const user = userEvent.setup();
+        const { nameField, submitButton } = elements();
+        await user.clear(nameField);
+        await user.type(nameField, NEW_NAME);
+        await user.click(submitButton);
+      });
+
+      const category = await UTILS.lookupCategoryByName(list, NEW_NAME);
+      expect(category).toBeDefined();
 
     });
 

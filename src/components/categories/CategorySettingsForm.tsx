@@ -38,9 +38,9 @@ const isTesting = process.env.NODE_ENV === "test";
 /* The properties for this component */
 type Props = {
   /* The Category to be updated (for update only) */
-  category: Category | undefined,
+  category?: Category | undefined,
   /* The List owning this Category (for create only) */
-  list: List | undefined,
+  list?: List | undefined,
   /* The signed in Profile */
   profile: Profile,
 }
@@ -59,10 +59,13 @@ export function CategorySettingsForm({ category, list, profile }: Props ) {
   const defaultValuesUpdate: CategoryUpdateSchemaType = {
     name: category?.name ?? "",
   }
-  logger.info({
+  logger.trace({
     context: "CategoryForm",
     category: category,
-    profile,
+    profile: {
+      ...profile,
+      password: "REDACTED",
+    },
     defaultValues: isCreating ? defaultValuesCreate : defaultValuesUpdate,
   });
   const methods = useForm<CategoryCreateSchemaType | CategoryUpdateSchemaType>({
@@ -87,6 +90,11 @@ export function CategorySettingsForm({ category, list, profile }: Props ) {
       ? await createCategory(formData as CategoryCreateSchemaType)
       : await updateCategory(category.id, formData as CategoryUpdateSchemaType);
     setIsSaving(false);
+
+    logger.trace({
+      context: "CategorySettingsForm.submitForm.response",
+      response,
+    });
 
     if (response.model) {
       setResult(null);
