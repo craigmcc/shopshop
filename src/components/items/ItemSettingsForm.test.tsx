@@ -222,7 +222,7 @@ describe("ItemSettingsForm", () => {
       const input = await UTILS.lookupItemByRole(profile, MemberRole.ADMIN);
       const category = await UTILS.lookupCategory(input.categoryId);
       render(<ItemSettingsForm item={input} profile={profile}/>);
-      const NEW_NAME = "Newly Updated Item";
+      const NEW_NAME = "Updated Item";
 
       await act(async () => {
         const user = userEvent.setup();
@@ -245,7 +245,7 @@ describe("ItemSettingsForm", () => {
       const categories = await UTILS.lookupCategories(list!);
       const items = await UTILS.lookupItems(categories[0]);
       render(<ItemSettingsForm item={items[0]} profile={profile}/>);
-      const NEW_NAME = "Newly Updated Item";
+      const NEW_NAME = "Updated Item";
 
       await act(async () => {
         const user = userEvent.setup();
