@@ -1,14 +1,14 @@
-// @/app/(ss)/lists/[listId]/remove/page.tsx
+// @/app/(ss)/lists/[listId]/settings/page.test.tsx
 
 // External Modules ----------------------------------------------------------
 
 import { MemberRole } from "@prisma/client";
-import { render, screen } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it } from "vitest";
 
 // Internal Modules ----------------------------------------------------------
 
-import ListRemovePage from "@/app/(ss)/lists/[listId]/remove/page";
+import ListSettingsPage from "@/app/(ss)/lists/[listId]/settings/page";
 import { setTestProfile } from "@/lib/ProfileHelpers";
 import { ActionUtils } from "@/test/ActionUtils";
 import { LISTS, PROFILES } from "@/test/SeedData";
@@ -17,7 +17,7 @@ const UTILS = new ActionUtils();
 
 // Test Objects --------------------------------------------------------------
 
-describe("ListRemovePage", () => {
+describe("ListSettingsPage", () => {
 
     // Test Hooks -----------------------------------------------------------
 
@@ -36,7 +36,9 @@ describe("ListRemovePage", () => {
         it("should redirect to sign in", async () => {
 
             setTestProfile(null);
-            render(<ListRemovePage params={Promise.resolve({ listId: "new" })} />);
+            act(async () => {
+                await render(<ListSettingsPage params={Promise.resolve({listId: "new"})}/>);
+            });
 
             expect(screen.findByText("Sign In to ShopShop")).toBeDefined();
 
@@ -46,24 +48,35 @@ describe("ListRemovePage", () => {
 
     describe("signed in", () => {
 
+        it("Renders a create list page", async () => {
+
+            const profile = await UTILS.lookupProfile(PROFILES[0].email!);
+            setTestProfile(profile);
+            render(<ListSettingsPage params={Promise.resolve({listId: "new"})}/>);
+
+            expect(screen.findByText("Create List")).toBeDefined();
+
+        });
+
         it("Renders an error for GUEST Member", async () => {
 
             const profile = await UTILS.lookupProfile(PROFILES[1].email!);
             setTestProfile(profile);
-            render(<ListRemovePage params={Promise.resolve({listId: LISTS[0].id!})}/>);
+            const list = await UTILS.lookupListByName(LISTS[0].name!);
+            render(<ListSettingsPage params={Promise.resolve({listId: list.id})}/>);
 
-            expect(screen.findByText("You are not an admin of this List, so you cannot remove it")).toBeDefined();
+            expect(screen.findByText("You are not an admin")).toBeDefined();
 
         });
 
-        it("Renders a remove list page for ADMIN Member", async () => {
+        it("Renders an update list page for ADMIN Member", async () => {
 
             const profile = await UTILS.lookupProfile(PROFILES[0].email!);
             setTestProfile(profile);
-            const list = await UTILS.lookupListByRole(profile, MemberRole.ADMIN );
-            render(<ListRemovePage params={Promise.resolve({listId: list.id})}/>);
+            const list = await UTILS.lookupListByRole(profile, MemberRole.ADMIN);
+            render(<ListSettingsPage params={Promise.resolve({listId: list.id})}/>);
 
-            expect(screen.findByText(`Are you sure you want to remove List "${list.name}"}`)).toBeDefined();
+            expect(screen.findByText("Update List")).toBeDefined();
 
         });
 

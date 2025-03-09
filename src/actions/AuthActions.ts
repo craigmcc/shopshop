@@ -45,7 +45,7 @@ export async function doSignInAction(formData: SignInSchemaType) {
     });
     return response;
   } catch (error) {
-    logger.error({
+    logger.trace({
       context: "doSignIn.error",
       error: error,
     });

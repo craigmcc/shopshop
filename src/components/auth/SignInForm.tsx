@@ -44,7 +44,7 @@ export function SignInForm() {
   const errors = formState.errors;
 
   async function submitForm(formData: SignInSchemaType) {
-    logger.info({
+    logger.trace({
       context: "SignInForm.submitForm",
       formData: {
         ...formData,
@@ -53,14 +53,14 @@ export function SignInForm() {
     });
     try {
       await doSignInAction(formData);
-      logger.info({
+      logger.trace({
         context: "SignInForm.submitForm.success",
         email: formData.email,
       });
       toast.success("Welcome back to ShopShop!");
       router.push("/lists");
     } catch (error) {
-      logger.info({
+      logger.trace({
         context: "SignInForm.submitForm.error",
         email: formData.email,
         error: error,

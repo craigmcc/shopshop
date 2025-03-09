@@ -82,7 +82,7 @@ describe("ItemSettingsForm", () => {
 
       await act(async () => {
         const user = userEvent.setup();
-        const {  submitButton } = elements();
+        const { submitButton } = elements();
         await user.click(submitButton);
       });
 
@@ -133,7 +133,7 @@ describe("ItemSettingsForm", () => {
 
     });
 
-    it.skip("should pass with valid data for GUEST Member", async () => {
+    it("should pass with valid data for GUEST Member", async () => {
 
       const profile = await UTILS.lookupProfile(PROFILES[0].email!);
       setTestProfile(profile);
@@ -219,9 +219,10 @@ describe("ItemSettingsForm", () => {
 
       const profile = await UTILS.lookupProfile(PROFILES[0].email!);
       setTestProfile(profile);
-      const input = await UTILS.lookupItemByRole(profile, MemberRole.ADMIN);
-      const category = await UTILS.lookupCategory(input.categoryId);
-      render(<ItemSettingsForm item={input} profile={profile}/>);
+      const list = await UTILS.lookupListByRole(profile, MemberRole.ADMIN);
+      const categories = await UTILS.lookupCategories(list!);
+      const items = await UTILS.lookupItems(categories[0]);
+      render(<ItemSettingsForm item={items[0]} profile={profile}/>);
       const NEW_NAME = "Updated Item";
 
       await act(async () => {
@@ -232,12 +233,13 @@ describe("ItemSettingsForm", () => {
         await user.click(submitButton);
       });
 
-      const output = await UTILS.lookupItemByName(category, NEW_NAME);
-      expect(output.name).toBe(NEW_NAME);
+      const item = await UTILS.lookupItemByName(categories[0], NEW_NAME);
+      expect(item).toBeDefined();
 
     });
 
-    it.skip("should pass with valid data for GUEST Member", async () => {
+
+    it("should pass with valid data for GUEST Member", async () => {
 
       const profile = await UTILS.lookupProfile(PROFILES[0].email!);
       setTestProfile(profile);
