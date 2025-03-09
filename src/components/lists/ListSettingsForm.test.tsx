@@ -73,7 +73,7 @@ describe("ListSettingsForm", () => {
 
     it("should fail with invalid data", async () => {
 
-      render(<ListSettingsForm list={undefined}/>);
+      render(<ListSettingsForm/>);
 
       await act(async () => {
         const user = userEvent.setup();
@@ -89,7 +89,7 @@ describe("ListSettingsForm", () => {
 
       const profile = await UTILS.lookupProfile(PROFILES[0].email!);
       setTestProfile(profile);
-      render(<ListSettingsForm list={undefined}/>);
+      render(<ListSettingsForm/>);
       const NEW_NAME = "Brand New List";
 
       await act(async () => {

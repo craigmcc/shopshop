@@ -38,7 +38,7 @@ const isTesting = process.env.NODE_ENV === "test";
 
 type Props = {
   // List to be updated (or undefined for create)
-  list: List | undefined,
+  list?: List,
 }
 
 export function ListSettingsForm({ list }: Props ) {
