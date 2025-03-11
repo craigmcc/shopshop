@@ -132,6 +132,28 @@ export class ActionUtils extends BaseUtils {
   }
 
   /**
+   * Look up and return the Item from the database with the specified id.
+   *
+   * @param itemId                      ID of the requested Item
+   *
+   * @returns                           The requested Item
+   *
+   * @throws NotFoundError              If no such Item exists
+   */
+  public async lookupItemById(itemId: string): Promise<Item> {
+    const item = await db.item.findUnique({
+      where: {
+        id: itemId,
+      },
+    });
+    if (item) {
+      return item;
+    } else {
+      throw new NotFoundError(`No Item found for ID '${itemId}'`);
+    }
+  }
+
+  /**
    * Look up and return the Item from the database that is associated
    * with the specified Category, by name.
    *
