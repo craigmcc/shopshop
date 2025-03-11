@@ -74,14 +74,15 @@ describe("CategorySettingsForm", () => {
 
     it("should fail on invalid data", async () => {
 
-      const profile = await UTILS.lookupProfile(PROFILES[2].email!);
+      const profile = await UTILS.lookupProfile(PROFILES[0].email!);
       setTestProfile(profile);
       const list = await UTILS.lookupListByRole(profile, MemberRole.ADMIN);
       render(<CategorySettingsForm list={list} profile={profile}/>);
 
       await act(async () => {
         const user = userEvent.setup();
-        const { submitButton } = elements();
+        const { nameField, submitButton } = elements();
+        await user.clear(nameField);
         await user.click(submitButton);
       });
 
@@ -91,7 +92,7 @@ describe("CategorySettingsForm", () => {
 
     it("should fail with valid data for non-Member", async () => {
 
-      const profile = await UTILS.lookupProfile(PROFILES[2].email!);
+      const profile = await UTILS.lookupProfile(PROFILES[1].email!);
       setTestProfile(profile);
       const list = await UTILS.lookupListByRole(profile, null);
       render(<CategorySettingsForm list={list} profile={profile}/>);
@@ -112,7 +113,7 @@ describe("CategorySettingsForm", () => {
 
     it("should pass with valid data for ADMIN Member", async () => {
 
-      const profile = await UTILS.lookupProfile(PROFILES[0].email!);
+      const profile = await UTILS.lookupProfile(PROFILES[2].email!);
       setTestProfile(profile);
       const list = await UTILS.lookupListByRole(profile, MemberRole.ADMIN);
       render(<CategorySettingsForm list={list} profile={profile}/>);
@@ -133,7 +134,7 @@ describe("CategorySettingsForm", () => {
 
     it("should pass with valid data for GUEST Member", async () => {
 
-      const profile = await UTILS.lookupProfile(PROFILES[1].email!);
+      const profile = await UTILS.lookupProfile(PROFILES[0].email!);
       setTestProfile(profile);
       const list = await UTILS.lookupListByRole(profile, MemberRole.GUEST);
       render(<CategorySettingsForm list={list} profile={profile}/>);
@@ -158,11 +159,10 @@ describe("CategorySettingsForm", () => {
 
     it("should render the form as expected", async () => {
 
-      const profile = await UTILS.lookupProfile(PROFILES[2].email!);
+      const profile = await UTILS.lookupProfile(PROFILES[1].email!);
       setTestProfile(profile);
-      const list = await UTILS.lookupListByRole(profile, MemberRole.ADMIN);
-      const categories = await UTILS.lookupCategories(list!);
-      render(<CategorySettingsForm category={categories[0]} profile={profile}/>);
+      const category = await UTILS.lookupCategoryByRole(profile, MemberRole.ADMIN);
+      render(<CategorySettingsForm category={category} profile={profile}/>);
 
       elements();
       expect(screen.findByText("Update Category")).toBeDefined();
@@ -171,11 +171,10 @@ describe("CategorySettingsForm", () => {
 
     it("should fail on invalid data", async () => {
 
-      const profile = await UTILS.lookupProfile(PROFILES[1].email!);
+      const profile = await UTILS.lookupProfile(PROFILES[2].email!);
       setTestProfile(profile);
-      const list = await UTILS.lookupListByRole(profile, MemberRole.ADMIN);
-      const categories = await UTILS.lookupCategories(list!);
-      render(<CategorySettingsForm category={categories[0]} profile={profile}/>);
+      const category = await UTILS.lookupCategoryByRole(profile, MemberRole.ADMIN);
+      render(<CategorySettingsForm category={category} profile={profile}/>);
 
       await act(async () => {
         const user = userEvent.setup();
@@ -192,9 +191,8 @@ describe("CategorySettingsForm", () => {
 
       const profile = await UTILS.lookupProfile(PROFILES[0].email!);
       setTestProfile(profile);
-      const list = await UTILS.lookupListByRole(profile, null);
-      const categories = await UTILS.lookupCategories(list!);
-      render(<CategorySettingsForm category={categories[0]} profile={profile}/>);
+      const category = await UTILS.lookupCategoryByRole(profile, null);
+      render(<CategorySettingsForm category={category} profile={profile}/>);
       const NEW_NAME = "Updated Category";
 
       await act(async () => {
@@ -211,11 +209,10 @@ describe("CategorySettingsForm", () => {
 
     it("should pass with valid data for an ADMIN Member", async () => {
 
-      const profile = await UTILS.lookupProfile(PROFILES[2].email!);
+      const profile = await UTILS.lookupProfile(PROFILES[1].email!);
       setTestProfile(profile);
-      const list = await UTILS.lookupListByRole(profile, MemberRole.ADMIN);
-      const categories = await UTILS.lookupCategories(list!);
-      render(<CategorySettingsForm category={categories[0]} profile={profile}/>);
+      const input = await UTILS.lookupCategoryByRole(profile, MemberRole.ADMIN);
+      render(<CategorySettingsForm category={input} profile={profile}/>);
       const NEW_NAME = "Updated Category";
 
       await act(async () => {
@@ -226,18 +223,17 @@ describe("CategorySettingsForm", () => {
         await user.click(submitButton);
       });
 
-      const category = await UTILS.lookupCategoryByName(list, NEW_NAME);
-      expect(category).toBeDefined();
+      const output = await UTILS.lookupCategoryById(input.id);
+      expect(output).toBeDefined();
 
     });
 
     it("should pass with valid data for a GUEST Member", async () => {
 
-      const profile = await UTILS.lookupProfile(PROFILES[1].email!);
+      const profile = await UTILS.lookupProfile(PROFILES[2].email!);
       setTestProfile(profile);
-      const list = await UTILS.lookupListByRole(profile, MemberRole.ADMIN);
-      const categories = await UTILS.lookupCategories(list!);
-      render(<CategorySettingsForm category={categories[0]} profile={profile}/>);
+      const input = await UTILS.lookupCategoryByRole(profile, MemberRole.GUEST);
+      render(<CategorySettingsForm category={input} profile={profile}/>);
       const NEW_NAME = "Updated Category";
 
       await act(async () => {
@@ -248,8 +244,8 @@ describe("CategorySettingsForm", () => {
         await user.click(submitButton);
       });
 
-      const category = await UTILS.lookupCategoryByName(list, NEW_NAME);
-      expect(category).toBeDefined();
+      const output = await UTILS.lookupCategoryById(input.id);
+      expect(output).toBeDefined();
 
     });
 

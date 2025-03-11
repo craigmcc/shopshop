@@ -41,7 +41,7 @@ export class ActionUtils extends BaseUtils {
   }
 
   /**
-   * Look up and return the Category from the database.
+   * Look up and return the Category from the database with the specified id.
    *
    * @param categoryId                  ID of the requested Category
    *
@@ -49,7 +49,7 @@ export class ActionUtils extends BaseUtils {
    *
    * @throws NotFoundError              If no such Category exists
    */
-  public async lookupCategory(categoryId: string): Promise<Category> {
+  public async lookupCategoryById(categoryId: string): Promise<Category> {
     const category = await db.category.findUnique({
       where: {
         id: categoryId,
