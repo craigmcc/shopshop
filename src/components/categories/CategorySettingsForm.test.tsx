@@ -84,6 +84,7 @@ describe("CategorySettingsForm", () => {
         const { nameField, submitButton } = elements();
         await user.clear(nameField);
         await user.click(submitButton);
+        await UTILS.pause(1000);
       });
 
       expect(screen.getByText("Name is required"));
@@ -104,6 +105,7 @@ describe("CategorySettingsForm", () => {
         await user.clear(nameField);
         await user.type(nameField, NEW_NAME);
         await user.click(submitButton);
+        await UTILS.pause(1000);
       });
 
       expect(screen.getByText(ERRORS.NOT_MEMBER));
@@ -125,6 +127,7 @@ describe("CategorySettingsForm", () => {
         await user.clear(nameField);
         await user.type(nameField, NEW_NAME);
         await user.click(submitButton);
+        await UTILS.pause(1000);
       });
 
       const category = await UTILS.lookupCategoryByName(list, NEW_NAME);
@@ -146,6 +149,7 @@ describe("CategorySettingsForm", () => {
         await user.clear(nameField);
         await user.type(nameField, NEW_NAME);
         await user.click(submitButton);
+        await UTILS.pause(1000);
       });
 
       const category = await UTILS.lookupCategoryByName(list, NEW_NAME);
@@ -181,6 +185,7 @@ describe("CategorySettingsForm", () => {
         const { nameField, submitButton } = elements();
         await user.clear(nameField);
         await user.click(submitButton);
+        await UTILS.pause(1000);
       });
 
       expect(screen.getByText("Name is required"));
@@ -201,6 +206,7 @@ describe("CategorySettingsForm", () => {
         await user.clear(nameField);
         await user.type(nameField, NEW_NAME);
         await user.click(submitButton);
+        await UTILS.pause(1000);
       });
 
       expect(screen.getByText(ERRORS.NOT_MEMBER));
@@ -221,6 +227,7 @@ describe("CategorySettingsForm", () => {
         await user.clear(nameField);
         await user.type(nameField, NEW_NAME);
         await user.click(submitButton);
+        await UTILS.pause(1000);
       });
 
       const output = await UTILS.lookupCategoryById(input.id);
@@ -242,6 +249,7 @@ describe("CategorySettingsForm", () => {
         await user.clear(nameField);
         await user.type(nameField, NEW_NAME);
         await user.click(submitButton);
+        await UTILS.pause(1000);
       });
 
       const output = await UTILS.lookupCategoryById(input.id);
