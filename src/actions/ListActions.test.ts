@@ -9,7 +9,7 @@
 // External Modules ----------------------------------------------------------
 
 import { MemberRole } from "@prisma/client";
-import { beforeEach, describe, expect, it, should } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 
 // Internal Modules ----------------------------------------------------------
 
@@ -52,6 +52,7 @@ describe("ListActions", () => {
       }
 
       const result = await createList(list);
+
       expect(result.message).toBe(ERRORS.DATA_VALIDATION);
 
     });
@@ -64,6 +65,7 @@ describe("ListActions", () => {
       }
 
       const result = await createList(list);
+
       expect(result.message).toBe(ERRORS.AUTHENTICATION);
 
     });
@@ -72,17 +74,15 @@ describe("ListActions", () => {
 
       const profile = await UTILS.lookupProfile(PROFILES[1].email!);
       setTestProfile(profile);
+
       const list: ListCreateSchemaType = {
         name: "New List",
       }
+      const result = await createList(list);
 
-      try {
-        const created = await createList(list);
-        should().exist(created.model!.id);
-        expect(created.model!.name).toBe(list.name);
-      } catch (error) {
-        should().fail(`Should not have thrown '${error}'`);
-      }
+      expect(result.model).toBeDefined();
+      expect(result.model!.id).toBeDefined();
+      expect(result.model!.name).toBe(list.name);
 
     });
 
@@ -97,6 +97,7 @@ describe("ListActions", () => {
       const list = await UTILS.lookupListByRole(profile, MemberRole.GUEST);
 
       const result = await removeList(list.id);
+
       expect(result.message).toBe(ERRORS.NOT_ADMIN);
 
     });
@@ -108,31 +109,34 @@ describe("ListActions", () => {
       const list = await UTILS.lookupListByName(LISTS[2].name!);
 
       const result = await removeList(list.id);
+
       expect(result.message).toBe(ERRORS.NOT_ADMIN);
 
     });
 
     it("should fail on not authenticated", async () => {
 
-      setTestProfile(null);
-      const list = await UTILS.lookupListByName(LISTS[0].name!);
+      const profile = await UTILS.lookupProfile(PROFILES[0].email!);
+      setTestProfile(null); // This is deliberate
+      const list = await UTILS.lookupListByRole(profile, MemberRole.ADMIN);
 
       const result = await removeList(list.id);
+
       expect(result.message).toBe(ERRORS.AUTHENTICATION);
 
     });
 
-    it("should pass on an existing List", async () => {
+    it("should pass on ADMIN Member with valid data", async () => {
 
       const profile = await UTILS.lookupProfile(PROFILES[0].email!);
       setTestProfile(profile);
       const list = await UTILS.lookupListByRole(profile, MemberRole.ADMIN);
 
-      try {
-        await removeList(list.id);
-      } catch (error) {
-        should().fail(`Should not have thrown '${error}'`);
-      }
+      const result = await removeList(list.id);
+
+      expect(result.model).toBeDefined();
+      expect(result.model!.id).toBe(list.id);
+      expect(result.model!.name).toBe(list.name);
 
     });
 
@@ -140,95 +144,91 @@ describe("ListActions", () => {
 
   describe("updateList", () => {
 
-    it("should fail on invalid data", async () => {
-
-      // Pick a Profile that is an ADMIN Member of this List
-      const profile = await UTILS.lookupProfile(PROFILES[0].email!);
-      setTestProfile(profile);
-      const list = await UTILS.lookupListByRole(profile, MemberRole.ADMIN);
-      const update: ListUpdateSchemaType = {
-        name: "",
-      }
-
-      const result = await updateList(list.id, update);
-      expect(result.message).toBe(ERRORS.DATA_VALIDATION);
-
-    });
-
-    it("should fail on non-ADMIN Member", async () => {
-
-      const profile = await UTILS.lookupProfile(PROFILES[0].email!);
-      setTestProfile(profile);
-      const list = await UTILS.lookupListByRole(profile, MemberRole.GUEST);
-      const update: ListUpdateSchemaType = {
-        name: "Updated List",
-      }
-
-      const result = await updateList(list.id, update);
-      expect(result.message).toBe(ERRORS.NOT_ADMIN);
-
-    });
-
-    it("should fail on non-Member", async () => {
-
-      // Pick a Profile that is not a Member
-      const profile = await UTILS.lookupProfile(PROFILES[0].email!);
-      setTestProfile(profile);
-      const list = await UTILS.lookupListByName(LISTS[2].name!);
-      const update: ListUpdateSchemaType = {
-        name: "Updated List",
-      }
-
-      const result = await updateList(list.id, update);
-      expect(result.message).toBe(ERRORS.NOT_ADMIN);
-
-    });
-
     it("should fail on not authenticated", async () => {
 
-      setTestProfile(null);
-      const list = await UTILS.lookupListByName(LISTS[0].name!);
+      const profile = await UTILS.lookupProfile(PROFILES[0].email!);
+      setTestProfile(null); // This is deliberate
+      const list = await UTILS.lookupListByRole(profile, MemberRole.ADMIN);
+
       const update: ListUpdateSchemaType = {
         name: "Updated List",
       }
-
       const result = await updateList(list.id, update);
+
       expect(result.message).toBe(ERRORS.AUTHENTICATION);
 
     });
 
-    it("should pass on empty update", async () => {
+    it("should fail on invalid data", async () => {
 
-      // Pick a Profile that is an ADMIN Member of this List
       const profile = await UTILS.lookupProfile(PROFILES[0].email!);
       setTestProfile(profile);
       const list = await UTILS.lookupListByRole(profile, MemberRole.ADMIN);
-      const update: ListUpdateSchemaType = {};
 
-      try {
-        const result = await updateList(list.id, update);
-        expect(result.model!.name).toBe(list.name);
-      } catch (error) {
-        should().fail(`Should not have thrown '${error}'`);
+      const update: ListUpdateSchemaType = {
+        name: "",
       }
+      const result = await updateList(list.id, update);
+
+      expect(result.message).toBe(ERRORS.DATA_VALIDATION);
 
     });
 
-    it("should pass on valid data", async () => {
+    it("should fail on non-Member with valid data", async () => {
+
+      const profile = await UTILS.lookupProfile(PROFILES[0].email!);
+      setTestProfile(profile);
+      const list = await UTILS.lookupListByRole(profile, null);
+
+      const update: ListUpdateSchemaType = {
+        name: "Updated List",
+      }
+      const result = await updateList(list.id, update);
+
+      expect(result.message).toBe(ERRORS.NOT_ADMIN);
+
+    });
+
+    it("should fail on GUEST Member with valid data", async () => {
+
+      const profile = await UTILS.lookupProfile(PROFILES[0].email!);
+      setTestProfile(profile);
+      const list = await UTILS.lookupListByRole(profile, MemberRole.GUEST);
+
+      const update: ListUpdateSchemaType = {
+        name: "Updated List",
+      }
+      const result = await updateList(list.id, update);
+
+      expect(result.message).toBe(ERRORS.NOT_ADMIN);
+
+    });
+
+    it("should pass on ADMIN member with empty update", async () => {
 
       const profile = await UTILS.lookupProfile(PROFILES[0].email!);
       setTestProfile(profile);
       const list = await UTILS.lookupListByRole(profile, MemberRole.ADMIN);
+
+      const update: ListUpdateSchemaType = {};
+      const result = await updateList(list.id, update);
+
+      expect(result.model!.name).toBe(list.name);
+
+    });
+
+    it("should pass on ADMIN member with valid data", async () => {
+
+      const profile = await UTILS.lookupProfile(PROFILES[0].email!);
+      setTestProfile(profile);
+      const list = await UTILS.lookupListByRole(profile, MemberRole.ADMIN);
+
       const update: ListUpdateSchemaType = {
         name: "Updated List",
       }
+      const result = await updateList(list.id, update);
 
-      try {
-        const result = await updateList(list.id, update);
-        expect(result.model!.name).toBe(update.name);
-      } catch (error) {
-        should().fail(`Should not have thrown '${error}'`);
-      }
+      expect(result.model!.name).toBe(update.name);
 
     });
 

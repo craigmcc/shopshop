@@ -32,13 +32,13 @@ describe("ItemActions", () => {
   // Test Hooks --------------------------------------------------------------
 
   beforeEach(async () => {
-    (await UTILS.loadData({
+    await UTILS.loadData({
       withCategories: true,
       withItems: true,
       withLists: true,
       withMembers: true,
       withProfiles: true,
-    }));
+    });
   });
 
   // Test Methods ------------------------------------------------------------

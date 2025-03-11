@@ -32,12 +32,12 @@ describe("CategoryActions", () => {
   // Test Hooks --------------------------------------------------------------
 
   beforeEach(async () => {
-    (await UTILS.loadData({
+    await UTILS.loadData({
       withCategories: true,
       withLists: true,
       withMembers: true,
       withProfiles: true,
-    }));
+    });
   });
 
   // Test Methods ------------------------------------------------------------
