@@ -8,13 +8,13 @@
 
 // External Modules ----------------------------------------------------------
 
-import {Category, List, MemberRole } from "@prisma/client";
+import { MemberRole } from "@prisma/client";
 import { beforeEach, describe, expect, it } from "vitest";
 
 // Internal Modules ----------------------------------------------------------
 
+import { createCategory, removeCategory, updateCategory } from "@/actions/CategoryActions";
 import { ERRORS } from "@/lib/ActionResult";
-import {createCategory, removeCategory, updateCategory } from "@/actions/CategoryActions";
 import { setTestProfile } from "@/lib/ProfileHelpers";
 import { ActionUtils } from "@/test/ActionUtils";
 import { PROFILES } from "@/test/SeedData";
@@ -24,8 +24,6 @@ import {
 } from "@/zod-schemas/CategorySchema";
 
 const UTILS = new ActionUtils();
-let categories: Category[]= [];
-let lists: List[] = [];
 
 // Test Specifications -------------------------------------------------------
 
@@ -34,7 +32,7 @@ describe("CategoryActions", () => {
   // Test Hooks --------------------------------------------------------------
 
   beforeEach(async () => {
-    ({ categories, lists } = await UTILS.loadData({
+    (await UTILS.loadData({
       withCategories: true,
       withLists: true,
       withMembers: true,
@@ -51,11 +49,11 @@ describe("CategoryActions", () => {
       const profile = await UTILS.lookupProfile(PROFILES[0].email!);
       setTestProfile(profile);
       const list = await UTILS.lookupListByRole(profile, MemberRole.ADMIN);
+
       const category: CategoryCreateSchemaType = {
         listId: list.id,
         name: "",
       }
-
       const result = await createCategory(category);
 
       expect(result.message).toBe(ERRORS.DATA_VALIDATION);
@@ -64,12 +62,14 @@ describe("CategoryActions", () => {
 
     it("should fail on not authenticated", async () => {
 
-      setTestProfile(null);
+      const profile = await UTILS.lookupProfile(PROFILES[0].email!);
+      setTestProfile(null); // This is deliberate
+      const list = await UTILS.lookupListByRole(profile, MemberRole.ADMIN);
+
       const category: CategoryCreateSchemaType = {
-        listId: lists[0].id,
+        listId: list.id,
         name: "New Category",
       }
-
       const result = await createCategory(category);
 
       expect(result.message).toBe(ERRORS.AUTHENTICATION);
@@ -78,14 +78,14 @@ describe("CategoryActions", () => {
 
     it("should fail on non-MEMBER with valid data", async () => {
 
-      const profile = await UTILS.lookupProfile(PROFILES[2].email!);
+      const profile = await UTILS.lookupProfile(PROFILES[1].email!);
       setTestProfile(profile);
       const list = await UTILS.lookupListByRole(profile, null);
+
       const category: CategoryCreateSchemaType = {
         listId: list.id,
         name: "New Category",
       }
-
       const result = await createCategory(category);
 
       expect(result.message).toBe(ERRORS.NOT_MEMBER);
@@ -94,14 +94,14 @@ describe("CategoryActions", () => {
 
     it("should pass on ADMIN Member with valid data", async () => {
 
-      const profile = await UTILS.lookupProfile(PROFILES[0].email!);
+      const profile = await UTILS.lookupProfile(PROFILES[2].email!);
       setTestProfile(profile);
       const list = await UTILS.lookupListByRole(profile, MemberRole.ADMIN);
+
       const category: CategoryCreateSchemaType = {
         listId: list.id,
         name: "New Category",
       }
-
       const result = await createCategory(category);
 
       expect(result.model).toBeDefined();
@@ -115,11 +115,11 @@ describe("CategoryActions", () => {
       const profile = await UTILS.lookupProfile(PROFILES[0].email!);
       setTestProfile(profile);
       const list = await UTILS.lookupListByRole(profile, MemberRole.GUEST);
+
       const category: CategoryCreateSchemaType = {
         listId: list.id,
         name: "New Category",
       }
-
       const result = await createCategory(category);
 
       expect(result.model).toBeDefined();
@@ -134,9 +134,11 @@ describe("CategoryActions", () => {
 
     it("should fail on not authenticated", async () => {
 
-      setTestProfile(null);
+      const profile = await UTILS.lookupProfile(PROFILES[1].email!);
+      setTestProfile(null); // This is deliberate
+      const category = await UTILS.lookupCategoryByRole(profile, MemberRole.ADMIN);
 
-      const result = await removeCategory(categories[0].id);
+      const result = await removeCategory(category.id);
 
       expect(result.message).toBe(ERRORS.AUTHENTICATION);
 
@@ -144,7 +146,7 @@ describe("CategoryActions", () => {
 
     it("should fail on non-Member with valid data", async () => {
 
-      const profile = await UTILS.lookupProfile(PROFILES[0].email!);
+      const profile = await UTILS.lookupProfile(PROFILES[1].email!);
       setTestProfile(profile);
       const category = await UTILS.lookupCategoryByRole(profile, null);
 
@@ -156,7 +158,7 @@ describe("CategoryActions", () => {
 
     it("should pass on ADMIN Member with valid data", async () => {
 
-      const profile = await UTILS.lookupProfile(PROFILES[0].email!);
+      const profile = await UTILS.lookupProfile(PROFILES[2].email!);
       setTestProfile(profile);
       const category = await UTILS.lookupCategoryByRole(profile, MemberRole.ADMIN);
 
@@ -186,9 +188,11 @@ describe("CategoryActions", () => {
 
     it("should fail on not authenticated", async () => {
 
-      setTestProfile(null);
+      const profile = await UTILS.lookupProfile(PROFILES[2].email!);
+      setTestProfile(null); // This is deliberate
+      const category = await UTILS.lookupCategoryByRole(profile, MemberRole.ADMIN);
 
-      const result = await updateCategory(categories[0].id, { name: "New Name" });
+      const result = await updateCategory(category.id, { name: "New Name" });
 
       expect(result.message).toBe(ERRORS.AUTHENTICATION);
 
@@ -196,11 +200,11 @@ describe("CategoryActions", () => {
 
     it("should fail on invalid data", async () => {
 
-      const profile = await UTILS.lookupProfile(PROFILES[0].email!);
+      const profile = await UTILS.lookupProfile(PROFILES[1].email!);
       setTestProfile(profile);
       const category = await UTILS.lookupCategoryByRole(profile, MemberRole.ADMIN);
-      const data:CategoryUpdateSchemaType = { name: "" };
 
+      const data:CategoryUpdateSchemaType = { name: "" };
       const result = await updateCategory(category.id, data);
 
       expect(result.message).toBe(ERRORS.DATA_VALIDATION);
@@ -209,7 +213,7 @@ describe("CategoryActions", () => {
 
     it("should fail on non-Member", async () => {
 
-      const profile = await UTILS.lookupProfile(PROFILES[0].email!);
+      const profile = await UTILS.lookupProfile(PROFILES[2].email!);
       setTestProfile(profile);
       const category = await UTILS.lookupCategoryByRole(profile, null);
 
@@ -224,8 +228,8 @@ describe("CategoryActions", () => {
       const profile = await UTILS.lookupProfile(PROFILES[0].email!);
       setTestProfile(profile);
       const category = await UTILS.lookupCategoryByRole(profile, MemberRole.ADMIN);
-      const NEW_NAME = "Brand New Name";
 
+      const NEW_NAME = "Brand New Name";
       const result = await updateCategory(category.id, { name: NEW_NAME });
 
       expect(result.model).toBeDefined();
@@ -235,11 +239,11 @@ describe("CategoryActions", () => {
 
     it("should pass on GUEST Member with valid data", async () => {
 
-      const profile = await UTILS.lookupProfile(PROFILES[0].email!);
+      const profile = await UTILS.lookupProfile(PROFILES[1].email!);
       setTestProfile(profile);
       const category = await UTILS.lookupCategoryByRole(profile, MemberRole.GUEST);
-      const NEW_NAME = "Brand New Name";
 
+      const NEW_NAME = "Brand New Name";
       const result = await updateCategory(category.id, { name: NEW_NAME });
 
       expect(result.model).toBeDefined();
