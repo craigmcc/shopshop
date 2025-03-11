@@ -48,7 +48,7 @@ export function ProfileSettingsForm({ profile }: Props) {
     email: profile.email,
     name: profile.name,
   }
-  logger.info({
+  logger.trace({
     context: "ProfileSettingsForm",
     profile,
     defaultValues: defaultValuesUpdate,
@@ -63,7 +63,7 @@ export function ProfileSettingsForm({ profile }: Props) {
 
   async function submitForm(formData: ProfileUpdateSchemaType): Promise<void> {
 
-    logger.info({
+    logger.trace({
       context: "ProfileSettingsForm.submitForm",
       formData,
     })
