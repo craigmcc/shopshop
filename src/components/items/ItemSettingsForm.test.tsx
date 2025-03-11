@@ -74,7 +74,7 @@ describe("ItemSettingsForm", () => {
 
     it("should fail with invalid data", async () => {
 
-      const profile = await UTILS.lookupProfile(PROFILES[0].email!);
+      const profile = await UTILS.lookupProfile(PROFILES[1].email!);
       setTestProfile(profile);
       const category = await UTILS.lookupCategoryByRole(profile, null);
       render(<ItemSettingsForm category={category} profile={profile} />);
@@ -91,7 +91,7 @@ describe("ItemSettingsForm", () => {
 
     it("should fail with valid data for non-Member", async () => {
 
-      const profile = await UTILS.lookupProfile(PROFILES[0].email!);
+      const profile = await UTILS.lookupProfile(PROFILES[2].email!);
       setTestProfile(profile);
       const category = await UTILS.lookupCategoryByRole(profile, null);
       render(<ItemSettingsForm category={category} profile={profile} />);
@@ -132,9 +132,9 @@ describe("ItemSettingsForm", () => {
 
     it("should pass with valid data for GUEST Member", async () => {
 
-      const profile = await UTILS.lookupProfile(PROFILES[0].email!);
+      const profile = await UTILS.lookupProfile(PROFILES[1].email!);
       setTestProfile(profile);
-      const category = await UTILS.lookupCategoryByRole(profile, MemberRole.ADMIN);
+      const category = await UTILS.lookupCategoryByRole(profile, MemberRole.GUEST);
       render(<ItemSettingsForm category={category} profile={profile}/>);
       const NEW_NAME = "Brand New Item";
 
@@ -157,7 +157,7 @@ describe("ItemSettingsForm", () => {
 
     it("should render the form as expected", async () => {
 
-      const profile = await UTILS.lookupProfile(PROFILES[0].email!);
+      const profile = await UTILS.lookupProfile(PROFILES[2].email!);
       setTestProfile(profile);
       const item = await UTILS.lookupItemByRole(profile, MemberRole.ADMIN);
       render(<ItemSettingsForm item={item} profile={profile}/>);
@@ -187,7 +187,7 @@ describe("ItemSettingsForm", () => {
 
     it("should fail with valid data for non-Member", async () => {
 
-      const profile = await UTILS.lookupProfile(PROFILES[0].email!);
+      const profile = await UTILS.lookupProfile(PROFILES[1].email!);
       setTestProfile(profile);
       const item = await UTILS.lookupItemByRole(profile, null);
       render(<ItemSettingsForm item={item} profile={profile}/>);
@@ -207,7 +207,7 @@ describe("ItemSettingsForm", () => {
 
     it("should pass with valid data for ADMIN Member", async () => {
 
-      const profile = await UTILS.lookupProfile(PROFILES[0].email!);
+      const profile = await UTILS.lookupProfile(PROFILES[2].email!);
       setTestProfile(profile);
       const input = await UTILS.lookupItemByRole(profile, MemberRole.ADMIN);
       render(<ItemSettingsForm item={input} profile={profile}/>);
