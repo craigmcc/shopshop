@@ -29,6 +29,7 @@ export class ActionUtils extends BaseUtils {
    *
    * @returns                          The requested Categories
    */
+/*
   public async lookupCategories(list: List): Promise<Category[]> {
     return await db.category.findMany({
       orderBy: {
@@ -39,6 +40,7 @@ export class ActionUtils extends BaseUtils {
       },
     });
   }
+*/
 
   /**
    * Look up and return the Category from the database with the specified id.
@@ -237,6 +239,7 @@ export class ActionUtils extends BaseUtils {
    *
    * @returns                          The requested Items
    */
+/*
   public async lookupItems(category: Category): Promise<Item[]> {
     return await db.item.findMany({
       orderBy: {
@@ -247,6 +250,7 @@ export class ActionUtils extends BaseUtils {
       },
     });
   }
+*/
 
   /**
    * Look up and return the List from the database.
