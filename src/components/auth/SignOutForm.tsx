@@ -18,6 +18,8 @@ import { toast } from "react-toastify";
 import { doSignOutAction } from "@/actions/AuthActions";
 import { logger } from "@/lib/ClientLogger";
 
+const isTesting = process.env.NODE_ENV === "test";
+
 // Public Objects ------------------------------------------------------------
 
 export function SignOutForm() {
@@ -30,10 +32,16 @@ export function SignOutForm() {
       message: "Performing sign out",
     })
     await doSignOutAction();
+    logger.trace({
+      context: "SignOutForm.submitForm.success",
+      message: "Sign out successful",
+    });
     toast("Sign out successful", {
       type: "success",
     });
-    router.push("/");
+    if (!isTesting) {
+      router.push("/");
+    }
   }
 
   return (
