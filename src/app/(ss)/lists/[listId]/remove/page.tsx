@@ -13,6 +13,7 @@ import { redirect } from "next/navigation";
 
 // Internal Modules ----------------------------------------------------------
 
+import { SubHeader } from "@/components/layout/SubHeader";
 import { ListRemoveForm } from "@/components/lists/ListRemoveForm";
 import { ServerResponse } from "@/components/shared/ServerResponse";
 import { db } from "@/lib/db";
@@ -58,7 +59,13 @@ export default async function ListRemovePage(props: Props) {
   }
 
   return (
-    <ListRemoveForm list={member.list}/>
+    <div className="flex flex-col">
+      <SubHeader
+        hrefBack="/lists"
+        title="Remove List"
+      />
+      <ListRemoveForm list={member.list}/>
+    </div>
   )
 
 }
