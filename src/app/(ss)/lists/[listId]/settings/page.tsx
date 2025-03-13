@@ -13,6 +13,7 @@ import { redirect } from "next/navigation";
 
 // Internal Modules ----------------------------------------------------------
 
+import { SubHeader } from "@/components/layout/SubHeader";
 import { ListSettingsForm } from "@/components/lists/ListSettingsForm";
 import { ServerResponse } from "@/components/shared/ServerResponse";
 import { db } from "@/lib/db";
@@ -65,6 +66,10 @@ export default async function ListSettingsPage(props: Props) {
 
   return (
     <div>
+      <SubHeader
+        hrefBack="/lists"
+        title={list ? "Edit List Settings" : "Create New List"}
+      />
       <ListSettingsForm list={list}/>
     </div>
   );

@@ -102,7 +102,7 @@ export function ListSettingsForm({ list }: Props ) {
   return (
     <div className="card bg-base-300 shadow-xl">
       <div className="card-body">
-        <h2 className="card-title justify-center">{ isCreating ? "Create List" : "Update List" }</h2>
+        {/*<h2 className="card-title justify-center">{ isCreating ? "Create List" : "Update List" }</h2>*/}
         {result && <ServerResponse result={result} />}
         <FormProvider {...methods}>
           <form

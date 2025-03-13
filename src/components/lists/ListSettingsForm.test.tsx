@@ -67,7 +67,6 @@ describe("ListSettingsForm", () => {
       render(<ListSettingsForm list={undefined}/>);
 
       elements();
-      expect(screen.findByText("Create List")).toBeDefined();
 
     });
 
@@ -116,9 +115,6 @@ describe("ListSettingsForm", () => {
       render(<ListSettingsForm list={list}/>);
 
       elements();
-      expect(screen.getByText("Update List"));
-      // TODO - Doesn't see the name field value having been set, either here or when inspecting
-      // expect(screen.getByText(list.name));
 
     });
 
