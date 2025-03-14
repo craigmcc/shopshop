@@ -10,7 +10,7 @@
 
 // External Modules ----------------------------------------------------------
 
-import { Item } from "@prisma/client";
+import { Category, Item } from "@prisma/client";
 import { LoaderCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -27,11 +27,13 @@ const isTesting = process.env.NODE_ENV === "test";
 // Public Objects ------------------------------------------------------------
 
 type Props = {
+  // Category that owns this Item
+  category: Category,
   // Item to be removed
   item: Item,
 }
 
-export function ItemRemoveForm({ item }: Props) {
+export function ItemRemoveForm({ category, item }: Props) {
 
   const router = useRouter();
   const [isRemoving, setIsRemoving] = useState<boolean>(false);
@@ -55,8 +57,7 @@ export function ItemRemoveForm({ item }: Props) {
       if (isTesting) {
         setResult("Success");
       } else {
-        // TODO - decide where to go after removing an Item
-        router.push("/lists");
+        router.push(`/lists/${category.listId}/categories/${category.id}/items`);
       }
     } else {
       setResult(response.message!);

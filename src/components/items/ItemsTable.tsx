@@ -1,16 +1,16 @@
 "use client";
 
-// @/components/categories/CategoriesTable.tsx
+// @components/items/ItemsTable.tsx
 
 /**
- * Table of available Categories for a List.
+ * Table of available Items for a Category.
  *
  * @packageDocumentation
  */
 
 // External Modules ----------------------------------------------------------
 
-import { Category, MemberRole } from "@prisma/client";
+import { Category, Item } from "@prisma/client";
 import { MoreHorizontal } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
@@ -20,13 +20,13 @@ import { useEffect, useRef, useState } from "react";
 // Public Objects ------------------------------------------------------------
 
 type Props = {
-  // Categories for this List
-  categories: Category[],
-  // Current Profile's MemberRole for this List
-  memberRole: MemberRole,
+  // Category that owns this Item
+  category: Category,
+  // Items for this Category
+  items: Item[],
 }
 
-export function CategoriesTable({ categories, memberRole }: Props) {
+export function ItemsTable({ category, items }: Props) {
 
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const dropdownRefs = useRef<(HTMLDetailsElement | null)[]>([]);
@@ -56,41 +56,40 @@ export function CategoriesTable({ categories, memberRole }: Props) {
         </tr>
         </thead>
         <tbody>
-        {categories.map((category, index) => (
+        {items.map((item, index) => (
           <tr key={index}>
-            <td>
-              {category.name}
+            <td className="p-2">
+              {item.name}
             </td>
-            <td className="text-right">
+            <td className="p-2 text-right">
               <details
                 className="dropdown dropdown-end"
-                open={openDropdown === category.id}
-                onClick={() => {
-                  setOpenDropdown(openDropdown === category.id ? null : category.id);
-                }}
+                open={openDropdown === item.id}
                 ref={el => { dropdownRefs.current[index] = el; }}
               >
-                <summary className="btn btn-ghost btn-circle">
-                  <MoreHorizontal />
+                <summary
+                  className="btn btn-ghost btn-circle"
+                  onClick={() => setOpenDropdown(openDropdown === item.id ? null : item.id)}
+                >
+                  <MoreHorizontal className="h-5 w-5" />
                 </summary>
-                <ul className="menu dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52">
+                <ul className="menu dropdown-content mt-2 w-52 rounded-lg bg-base-100 p-2 shadow">
                   <li>
-                    <Link href={`/lists/${category.listId}/categories/${category.id}/settings`}>
+                    <Link
+                      className="flex items-center"
+                      href={`/lists/${category.listId}/categories/${category.id}/items/${item.id}/settings`}
+                    >
                       Edit Settings
                     </Link>
                   </li>
                   <li>
-                    <Link href={`/lists/${category.listId}/categories/${category.id}/items`}>
-                      Manage Items
+                    <Link
+                      className="flex items-center"
+                      href={`/lists/${category.listId}/categories/${category.id}/items/${item.id}/remove`}
+                    >
+                      Remove Item
                     </Link>
                   </li>
-                  {(memberRole === MemberRole.ADMIN) && (
-                    <li>
-                      <Link href={`/lists/${category.listId}/categories/${category.id}/remove`}>
-                        Remove Category
-                      </Link>
-                    </li>
-                  )}
                 </ul>
               </details>
             </td>

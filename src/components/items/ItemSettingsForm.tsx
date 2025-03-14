@@ -11,7 +11,7 @@
 // External Modules ----------------------------------------------------------
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Category, Item, Profile } from "@prisma/client";
+import { Category, Item } from "@prisma/client";
 import { LoaderCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -38,14 +38,12 @@ const isTesting = process.env.NODE_ENV === "test";
 /* The properties for this component */
 type Props = {
   /* The Category owning this Item (for create only) */
-  category?: Category,
+  category: Category,
   /* The Item to be updated (for update only) */
   item?: Item,
-  /* The signed in Profile */
-  profile: Profile,
 }
 
-export function ItemSettingsForm({ category, item, profile }: Props ) {
+export function ItemSettingsForm({ category, item }: Props ) {
 
   const isCreating = !item;
   const router = useRouter();
@@ -69,10 +67,6 @@ export function ItemSettingsForm({ category, item, profile }: Props ) {
     context: "ItemSettingsForm",
     category: category,
     item: item,
-    profile: {
-      ...profile,
-      password: "*REDACTED*",
-    },
     defaultValues: isCreating ? defaultValuesCreate : defaultValuesUpdate,
   });
   const methods = useForm<ItemCreateSchemaType | ItemUpdateSchemaType>({
@@ -105,7 +99,7 @@ export function ItemSettingsForm({ category, item, profile }: Props ) {
       if (isTesting) {
         setResult("Success");
       } else {
-        router.push("/lists");
+        router.push(`/lists/${category.listId}/categories/${category?.id}/items`);
       }
     } else {
       setResult(response.message!);
@@ -116,7 +110,6 @@ export function ItemSettingsForm({ category, item, profile }: Props ) {
   return (
     <div className={"card bg-base-300 shadow-xl"}>
       <div className="card-body">
-        <h2 className="card-title justify-center">{ isCreating ? "Create Item" : "Update Item" }</h2>
         {result && <ServerResponse result={result} />}
         <FormProvider {...methods}>
           <form
@@ -132,8 +125,8 @@ export function ItemSettingsForm({ category, item, profile }: Props ) {
                 placeholder="Item Name"
                 type="text"
               />
-              {isCreating && <input type="hidden" name="categoryId" value={category?.id}/>}
-              {isCreating && <input type="hidden" name="listId" value={category?.listId}/>}
+              {isCreating && <input type="hidden" name="categoryId" value={category.id}/>}
+              {isCreating && <input type="hidden" name="listId" value={category.listId}/>}
               <button
                 className="btn btn-primary"
                 disabled={Object.keys(errors).length > 0}

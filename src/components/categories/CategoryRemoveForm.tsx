@@ -57,7 +57,6 @@ export function CategoryRemoveForm({ category, list }: Props) {
       if (isTesting) {
         setResult("Success");
       } else {
-        // TODO - decide where to go after removing a Category
         router.push(`/lists/${list.id}/categories`);
       }
     } else {

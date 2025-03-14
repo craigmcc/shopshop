@@ -13,8 +13,8 @@ import { redirect } from "next/navigation";
 
 // Internal Modules ----------------------------------------------------------
 
-import { SubHeader } from "@/components/layout/SubHeader";
 import { CategorySettingsForm } from "@/components/categories/CategorySettingsForm";
+import { SubHeader } from "@/components/layout/SubHeader";
 import { ServerResponse } from "@/components/shared/ServerResponse";
 import { db } from "@/lib/db";
 import { findProfile } from "@/lib/ProfileHelpers";
