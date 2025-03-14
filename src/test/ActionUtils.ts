@@ -261,6 +261,27 @@ export class ActionUtils extends BaseUtils {
    *
    * @throws NotFoundError              If no such List exists
    */
+  public async lookupListById(listId: string): Promise<List> {
+    const list = await db.list.findFirst({
+      where: {
+        id: listId,
+      },
+    });
+    if (!list) {
+      throw new NotFoundError(`No List found for ID '${listId}'`);
+    }
+    return list;
+  }
+
+  /**
+   * Look up and return the List from the database.
+   *
+   * @param name                        Name of the requested List
+   *
+   * @returns                           The requested List
+   *
+   * @throws NotFoundError              If no such List exists
+   */
   // TODO: Deprecate and remove usages
   public async lookupListByName(name: string): Promise<List> {
     const list = await db.list.findFirst({

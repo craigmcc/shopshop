@@ -11,7 +11,7 @@
 // External Modules ----------------------------------------------------------
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Category, List, Profile } from "@prisma/client";
+import { Category, List } from "@prisma/client";
 import { LoaderCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -39,13 +39,11 @@ const isTesting = process.env.NODE_ENV === "test";
 type Props = {
   /* The Category to be updated (for update only) */
   category?: Category | undefined,
-  /* The List owning this Category (for create only) */
-  list?: List | undefined,
-  /* The signed in Profile */
-  profile: Profile,
+  /* List that owns this Category */
+  list: List,
 }
 
-export function CategorySettingsForm({ category, list, profile }: Props ) {
+export function CategorySettingsForm({ category, list }: Props ) {
 
   const isCreating = !category;
   const router = useRouter();
@@ -62,10 +60,6 @@ export function CategorySettingsForm({ category, list, profile }: Props ) {
   logger.trace({
     context: "CategoryForm",
     category: category,
-    profile: {
-      ...profile,
-      password: "REDACTED",
-    },
     defaultValues: isCreating ? defaultValuesCreate : defaultValuesUpdate,
   });
   const methods = useForm<CategoryCreateSchemaType | CategoryUpdateSchemaType>({
@@ -103,7 +97,7 @@ export function CategorySettingsForm({ category, list, profile }: Props ) {
       if (isTesting) {
         setResult("Success");
       } else {
-        router.push("/lists");
+        router.push(`/lists/${list.id}/categories`);
       }
     } else {
       setResult(response.message!);
@@ -114,7 +108,6 @@ export function CategorySettingsForm({ category, list, profile }: Props ) {
   return (
     <div className={"card bg-base-300 shadow-xl"}>
       <div className="card-body">
-        <h2 className="card-title justify-center">{ isCreating ? "Create Category" : "Update Category" }</h2>
         {result && <ServerResponse result={result} />}
         <FormProvider {...methods}>
           <form

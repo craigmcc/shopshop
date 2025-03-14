@@ -10,7 +10,7 @@
 
 // External Modules ----------------------------------------------------------
 
-import { Category } from "@prisma/client";
+import { Category, List } from "@prisma/client";
 import { LoaderCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -29,9 +29,11 @@ const isTesting = process.env.NODE_ENV === "test";
 type Props = {
   // Category to be removed
   category: Category,
+  // List that owns this Category
+  list: List,
 }
 
-export function CategoryRemoveForm({ category }: Props) {
+export function CategoryRemoveForm({ category, list }: Props) {
 
   const router = useRouter();
   const [isRemoving, setIsRemoving] = useState<boolean>(false);
@@ -56,7 +58,7 @@ export function CategoryRemoveForm({ category }: Props) {
         setResult("Success");
       } else {
         // TODO - decide where to go after removing a Category
-        router.push("/lists");
+        router.push(`/lists/${list.id}/categories`);
       }
     } else {
       setResult(response.message!);

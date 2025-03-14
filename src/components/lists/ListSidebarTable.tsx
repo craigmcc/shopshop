@@ -83,6 +83,7 @@ export function ListSidebarTable({ lists, members }: Props) {
                     tabIndex={0}
                   >
                     <li><Link href={`/lists/${list.id}/settings`}>Edit Settings</Link></li>
+                    <li><Link href={`/lists/${list.id}/categories`}>Manage Categories</Link></li>
                     <li><Link href={`/lists/${list.id}/remove`}>Remove List</Link></li>
                   </ul>
                 </details>

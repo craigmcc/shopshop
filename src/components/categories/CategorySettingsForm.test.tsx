@@ -65,10 +65,9 @@ describe("CategorySettingsForm", () => {
       const profile = await UTILS.lookupProfile(PROFILES[2].email!);
       setTestProfile(profile);
       const list = await UTILS.lookupListByRole(profile, MemberRole.ADMIN);
-      render(<CategorySettingsForm list={list} profile={profile}/>);
+      render(<CategorySettingsForm list={list}/>);
 
       elements();
-      expect(screen.findByText("Create Category")).toBeDefined();
 
     });
 
@@ -77,7 +76,7 @@ describe("CategorySettingsForm", () => {
       const profile = await UTILS.lookupProfile(PROFILES[0].email!);
       setTestProfile(profile);
       const list = await UTILS.lookupListByRole(profile, MemberRole.ADMIN);
-      render(<CategorySettingsForm list={list} profile={profile}/>);
+      render(<CategorySettingsForm list={list}/>);
 
       await act(async () => {
         const user = userEvent.setup();
@@ -96,7 +95,7 @@ describe("CategorySettingsForm", () => {
       const profile = await UTILS.lookupProfile(PROFILES[1].email!);
       setTestProfile(profile);
       const list = await UTILS.lookupListByRole(profile, null);
-      render(<CategorySettingsForm list={list} profile={profile}/>);
+      render(<CategorySettingsForm list={list}/>);
       const NEW_NAME = "Brand New Category";
 
       await act(async () => {
@@ -118,7 +117,7 @@ describe("CategorySettingsForm", () => {
       const profile = await UTILS.lookupProfile(PROFILES[2].email!);
       setTestProfile(profile);
       const list = await UTILS.lookupListByRole(profile, MemberRole.ADMIN);
-      render(<CategorySettingsForm list={list} profile={profile}/>);
+      render(<CategorySettingsForm list={list}/>);
       const NEW_NAME = "Brand New Category";
 
       await act(async () => {
@@ -140,7 +139,7 @@ describe("CategorySettingsForm", () => {
       const profile = await UTILS.lookupProfile(PROFILES[0].email!);
       setTestProfile(profile);
       const list = await UTILS.lookupListByRole(profile, MemberRole.GUEST);
-      render(<CategorySettingsForm list={list} profile={profile}/>);
+      render(<CategorySettingsForm list={list}/>);
       const NEW_NAME = "Brand New Category";
 
       await act(async () => {
@@ -166,10 +165,10 @@ describe("CategorySettingsForm", () => {
       const profile = await UTILS.lookupProfile(PROFILES[1].email!);
       setTestProfile(profile);
       const category = await UTILS.lookupCategoryByRole(profile, MemberRole.ADMIN);
-      render(<CategorySettingsForm category={category} profile={profile}/>);
+      const list = await UTILS.lookupListById(category.listId);
+      render(<CategorySettingsForm category={category} list={list}/>);
 
       elements();
-      expect(screen.findByText("Update Category")).toBeDefined();
 
     });
 
@@ -178,7 +177,8 @@ describe("CategorySettingsForm", () => {
       const profile = await UTILS.lookupProfile(PROFILES[2].email!);
       setTestProfile(profile);
       const category = await UTILS.lookupCategoryByRole(profile, MemberRole.ADMIN);
-      render(<CategorySettingsForm category={category} profile={profile}/>);
+      const list = await UTILS.lookupListById(category.listId);
+      render(<CategorySettingsForm category={category} list={list}/>);
 
       await act(async () => {
         const user = userEvent.setup();
@@ -197,7 +197,8 @@ describe("CategorySettingsForm", () => {
       const profile = await UTILS.lookupProfile(PROFILES[0].email!);
       setTestProfile(profile);
       const category = await UTILS.lookupCategoryByRole(profile, null);
-      render(<CategorySettingsForm category={category} profile={profile}/>);
+      const list = await UTILS.lookupListById(category.listId);
+      render(<CategorySettingsForm category={category} list={list}/>);
       const NEW_NAME = "Updated Category";
 
       await act(async () => {
@@ -218,7 +219,8 @@ describe("CategorySettingsForm", () => {
       const profile = await UTILS.lookupProfile(PROFILES[1].email!);
       setTestProfile(profile);
       const input = await UTILS.lookupCategoryByRole(profile, MemberRole.ADMIN);
-      render(<CategorySettingsForm category={input} profile={profile}/>);
+      const list = await UTILS.lookupListById(input.listId);
+      render(<CategorySettingsForm category={input} list={list}/>);
       const NEW_NAME = "Updated Category";
 
       await act(async () => {
@@ -240,7 +242,8 @@ describe("CategorySettingsForm", () => {
       const profile = await UTILS.lookupProfile(PROFILES[2].email!);
       setTestProfile(profile);
       const input = await UTILS.lookupCategoryByRole(profile, MemberRole.GUEST);
-      render(<CategorySettingsForm category={input} profile={profile}/>);
+      const list = await UTILS.lookupListById(input.listId);
+      render(<CategorySettingsForm category={input} list={list}/>);
       const NEW_NAME = "Updated Category";
 
       await act(async () => {
