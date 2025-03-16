@@ -16,6 +16,7 @@ import { ToastContainer } from "react-toastify";
 
 import "./globals.css";
 import { Header } from "@/components/layout/Header";
+import { CurrentListContextProvider } from "@/contexts/CurrentListContext";
 import { ThemeWrapper } from "@/components/layout/ThemeWrapper";
 import { ThemeContextProvider } from "@/contexts/ThemeContext";
 
@@ -28,25 +29,27 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({
-  children,
-}: Readonly<{
+                                     children,
+                                   }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
     <html lang="en">
     <body className={inter.className}>
-    <ThemeContextProvider>
-      <ThemeWrapper>
-        <Header />
-        {children}
-      </ThemeWrapper>
-      <ToastContainer
-        autoClose={5000}
-        hideProgressBar={true}
-        position="bottom-right"
-        theme="colored"
-      />
-    </ThemeContextProvider>
+    <CurrentListContextProvider>
+      <ThemeContextProvider>
+        <ThemeWrapper>
+          <Header />
+          {children}
+        </ThemeWrapper>
+        <ToastContainer
+          autoClose={5000}
+          hideProgressBar={true}
+          position="bottom-right"
+          theme="colored"
+        />
+      </ThemeContextProvider>
+    </CurrentListContextProvider>
     </body>
     </html>
   );

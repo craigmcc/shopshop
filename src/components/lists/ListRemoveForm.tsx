@@ -20,6 +20,7 @@ import { toast } from "react-toastify";
 
 import { removeList } from "@/actions/ListActions";
 import { ServerResponse } from "@/components/shared/ServerResponse";
+import { useCurrentListContext } from "@/contexts/CurrentListContext";
 import { logger } from "@/lib/ClientLogger";
 
 const isTesting = process.env.NODE_ENV === "test";
@@ -37,12 +38,14 @@ export function ListRemoveForm({ list }: Props) {
   const [isRemoving, setIsRemoving] = useState<boolean>(false);
   const [result, setResult] = useState<string | Error | null>(null);
 
-  const performRemove = async () => {
+  logger.info({
+    context: "ListRemoveForm.settingCurrentList",
+    list,
+  });
+  const { setCurrentList } = useCurrentListContext();
+  setCurrentList(list);
 
-    logger.trace({
-      context: "ListRemoveForm.performRemove",
-      list,
-    });
+  const performRemove = async () => {
 
     setIsRemoving(true);
     const response = await removeList(list.id);
@@ -55,6 +58,10 @@ export function ListRemoveForm({ list }: Props) {
       if (isTesting) {
         setResult("Success");
       } else {
+        logger.info({
+          context: "ListRemoveForm.resettingCurrentList",
+        });
+        setCurrentList(null);
         router.push("/lists");
       }
     } else {

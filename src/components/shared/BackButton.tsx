@@ -15,7 +15,9 @@ import { useRouter } from "next/navigation";
 
 // Internal Modules ----------------------------------------------------------
 
+import { useCurrentListContext } from "@/contexts/CurrentListContext";
 import { logger } from "@/lib/ClientLogger";
+//import { setCurrentList } from "@/lib/CurrentListManager";
 
 // Public Objects ------------------------------------------------------------
 
@@ -28,6 +30,7 @@ type Props = {
 
 export function BackButton({ className, href }: Props) {
 
+  const { setCurrentList } = useCurrentListContext();
   const router = useRouter();
 
   const handleClick = () => {
@@ -35,6 +38,12 @@ export function BackButton({ className, href }: Props) {
       context: "BackButton.handleClick",
       href: href,
     });
+    if (href === "/lists") {
+      logger.info({
+        context: "BackButton.resettingCurrentList",
+      });
+      setCurrentList(null);
+    }
     router.push(href);
   }
 

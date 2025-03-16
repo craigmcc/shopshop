@@ -17,6 +17,9 @@ import { useEffect, useRef, useState } from "react";
 
 // Internal Modules ----------------------------------------------------------
 
+import { useCurrentListContext } from "@/contexts/CurrentListContext";
+import { logger } from "@/lib/ClientLogger";
+
 // Public Objects ------------------------------------------------------------
 
 type Props = {
@@ -28,6 +31,11 @@ type Props = {
 
 export function ListSidebarTable({ lists, members }: Props) {
 
+  const { currentList } = useCurrentListContext();
+  logger.info({
+    context: "ListSidebarTable.gettingCurrentList",
+    currentList,
+  })
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const dropdownRefs = useRef<(HTMLDetailsElement | null)[]>([]);
 
@@ -58,10 +66,14 @@ export function ListSidebarTable({ lists, members }: Props) {
             <tr key={index}>
               {isAdmin(list.id, members) ? (
                 <td className="font-bold">
+                  {(currentList && (currentList.id === list.id)) &&
+                    <span className="font-bold text-accent pr-1">*</span>}
                   <Link href={`/lists/${list.id}/entries`}>{list.name}</Link>
                 </td>
               ) : (
                 <td>
+                  {(currentList && (currentList.id === list.id)) &&
+                    <span className="font-bold text-accent pr-1">*</span>}
                   <Link href={`/lists/${list.id}/entries`}>{list.name}</Link>
                 </td>
               )}

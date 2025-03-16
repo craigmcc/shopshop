@@ -10,26 +10,38 @@
 
 // External Modules ----------------------------------------------------------
 
-import { Category, MemberRole } from "@prisma/client";
+import { Category, List, MemberRole } from "@prisma/client";
 import { MoreHorizontal } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
 // Internal Modules ----------------------------------------------------------
 
+import { logger } from "@/lib/ClientLogger";
+import { useCurrentListContext } from "@/contexts/CurrentListContext";
+
 // Public Objects ------------------------------------------------------------
 
 type Props = {
   // Categories for this List
   categories: Category[],
+  // List that owns these Categories
+  list: List,
   // Current Profile's MemberRole for this List
   memberRole: MemberRole,
 }
 
-export function CategoriesTable({ categories, memberRole }: Props) {
+export function CategoriesTable({ categories, list, memberRole }: Props) {
 
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const dropdownRefs = useRef<(HTMLDetailsElement | null)[]>([]);
+
+  logger.info({
+    context: "CategoriesTable.settingCurrentList",
+    list,
+  })
+  const { setCurrentList } = useCurrentListContext();
+  setCurrentList(list);
 
   useEffect(() => {
 

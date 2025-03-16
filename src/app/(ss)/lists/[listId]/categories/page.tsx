@@ -1,7 +1,7 @@
 // @/app/(ss)/lists/[listId]/categories/page.tsx
 
 /**
- * Catalogs Table page for a List.
+ * Categories Table page for a List.
  *
  * @packageDocumentation
  */
@@ -79,6 +79,7 @@ export default async function CatalogsTablePage(props: Props) {
       />
       <CategoriesTable
         categories={categories}
+        list={member.list}
         memberRole={member.role}
       />
     </div>

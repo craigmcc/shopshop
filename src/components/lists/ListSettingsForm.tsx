@@ -23,6 +23,7 @@ import { toast } from "react-toastify";
 import { createList, updateList } from "@/actions/ListActions";
 import { InputField } from "@/components/daisyui/InputField";
 import { ServerResponse } from "@/components/shared/ServerResponse";
+import { useCurrentListContext } from "@/contexts/CurrentListContext";
 import { ActionResult } from "@/lib/ActionResult";
 import { logger } from "@/lib/ClientLogger";
 import {
@@ -47,6 +48,13 @@ export function ListSettingsForm({ list }: Props ) {
   const router = useRouter();
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [result, setResult] = useState<string | Error | null>(null);
+
+  const { setCurrentList } = useCurrentListContext();
+  logger.info({
+    context: "ListSettingsForm.settingCurrentList",
+    list,
+  });
+  setCurrentList(list ?? null);
 
   const defaultValuesCreate: ListCreateSchemaType = {
     name: "",
@@ -91,6 +99,10 @@ export function ListSettingsForm({ list }: Props ) {
       if (isTesting) {
         setResult("Success");
       } else {
+        logger.info({
+          context: "ListSettingsForm.resettingCurrentList",
+        })
+        setCurrentList(null);
         router.push("/lists");
       }
     } else {
