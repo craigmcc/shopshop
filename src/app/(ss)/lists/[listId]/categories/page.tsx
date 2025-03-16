@@ -73,7 +73,7 @@ export default async function CatalogsTablePage(props: Props) {
   return (
     <div>
       <SubHeader
-        hrefAdd="/lists/[listId]/categories/new/settings"
+        hrefAdd={`/lists/${listId}/categories/new/settings`}
         hrefBack="/lists"
         title={`Manage Categories for '${member.list.name}'`}
       />
