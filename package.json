@@ -53,6 +53,6 @@
     "ts-node": "^10.9.2",
     "typescript": "^5",
     "vite-tsconfig-paths": "^5.1.4",
-    "vitest": "^3.0.7"
+    "vitest": "^3.0.9"
   }
 }
