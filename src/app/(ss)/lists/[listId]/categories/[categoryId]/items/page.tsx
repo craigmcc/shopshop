@@ -86,8 +86,8 @@ export default async function ItemsTablePage(props: Props) {
         title={`Manage Items for '${member.list.categories[0].name}'`}
       />
       <ItemsTable
-        category={member.list.categories[0]}
         items={items}
+        memberRole={member.role}
       />
     </div>
   )

@@ -111,7 +111,7 @@ export function CategoriesTable({ categories, list, memberRole }: Props) {
 //  const columns = useMemo(() => [
   const columns = [
     columnHelper.accessor("name", {
-      header: () => <span className="font-bold">Name</span>,
+      header: () => <span className="font-bold">Category Name</span>,
       cell: info => info.getValue(),
     }),
     columnHelper.display({
