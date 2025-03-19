@@ -5,6 +5,10 @@
 /**
  * Table of available Categories for a List.
  *
+ * NOTE:  Following a blog series on how to make dynamically changing
+ * and editable tables with TanStack Table:
+ * https://muhimasri.com/blogs/react-editable-table/
+ *
  * @packageDocumentation
  */
 
@@ -20,12 +24,14 @@ import {
 } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
 import Link from "next/link";
-import { useEffect,/* useMemo,*/ useRef, useState } from "react";
+import React, { useEffect, useRef, useState} from "react";
 
 // Internal Modules ----------------------------------------------------------
 
-import { logger } from "@/lib/ClientLogger";
+import { EditCell } from "@/components/tables/EditCell";
+import { TableCell } from "@/components/tables/TableCell";
 import { useCurrentListContext } from "@/contexts/CurrentListContext";
+import { logger } from "@/lib/ClientLogger";
 
 // Public Objects ------------------------------------------------------------
 
@@ -42,11 +48,14 @@ const fallbackData: Category[] = [];
 
 export function CategoriesTable({ categories, list, memberRole }: Props) {
 
-  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const [data, setData] = useState<Category[]>(categories);
   const dropdownRefs = useRef<(HTMLDetailsElement | null)[]>([]);
-  const [data] = useState<Category[]>(categories);
+  const [editedRows, setEditedRows] = useState({});
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const [originalData, setOriginalData] = useState(() => [...categories]);
 
-  logger.info({
+
+  logger.trace({
     context: "CategoriesTable.settingCurrentList",
     list,
   })
@@ -68,8 +77,8 @@ export function CategoriesTable({ categories, list, memberRole }: Props) {
 
   }, []);
 
-  // RowActions definition
-  const RowActions = ({ row }: CellContext<Category, unknown>) => {
+  // ActionsCell definition
+  const ActionsCell = ({ row }: CellContext<Category, unknown>) => {
     return (
       <details
         className="dropdown dropdown-center"
@@ -104,57 +113,107 @@ export function CategoriesTable({ categories, list, memberRole }: Props) {
       </details>
     );
   }
-  RowActions.displayName = "RowActions";
+  ActionsCell.displayName = "ActionsCell";
 
   // Column definitions
   const columnHelper = createColumnHelper<Category>();
 //  const columns = useMemo(() => [
   const columns = [
     columnHelper.accessor("name", {
+      cell: TableCell,
       header: () => <span className="font-bold">Category Name</span>,
-      cell: info => info.getValue(),
+      meta: {
+        // NOTE - type can be "date", "select", "type", ...
+//        editable: true, // TODO - add this to the cell?
+        type: "text",
+      }
     }),
     columnHelper.display({
-      id: "actions",
+      cell: EditCell,
+      header: "Edit",
+      id: "edit",
+    }),
+    columnHelper.display({
+      cell: ActionsCell,
       header: () => <span className="font-bold">Actions</span>,
-      cell: RowActions,
+      id: "actions",
     }),
   ]
-    //, []);
 
   // Overall table instance
   const table = useReactTable({
     columns,
     data: data ?? fallbackData,
     getCoreRowModel: getCoreRowModel(),
+    meta: {
+      editedRows,
+      revertData: (rowIndex: number, revert: boolean) => {
+        if (revert) {
+          setData((old) =>
+            old.map((row, index) =>
+              index === rowIndex ? originalData[rowIndex] : row
+            )
+          );
+        } else {
+          setOriginalData((old) =>
+            old.map((row, index) => (index === rowIndex ? data[rowIndex] : row))
+          );
+        }
+      },
+      setEditedRows,
+      updateData: (rowIndex: number, columnId: string, value: string) => {
+        setData((old) =>
+          old.map((row, index) => {
+            if (index === rowIndex) {
+              return {
+                ...old[rowIndex],
+                [columnId]: value,
+              };
+            }
+            return row;
+          })
+        );
+      },
+    },
   });
 
   return (
     <div className={"card bg-base-300 shadow-xl"}>
+
       <table className="mt-4 rounded-lg border border-border">
+
         <thead>
         {table.getHeaderGroups().map(headerGroup => (
           <tr key={headerGroup.id}>
             {headerGroup.headers.map(header => (
               <th key={header.id} colSpan={header.colSpan}>
-                {flexRender(header.column.columnDef.header, header.getContext())}
+                {flexRender(
+                  header.column.columnDef.header,
+                  header.getContext()
+                )}
               </th>
             ))}
           </tr>
         ))}
         </thead>
+
         <tbody>
         {table.getRowModel().rows.map(row => (
           <tr key={row.id}>
             {row.getVisibleCells().map(cell => (
               <td key={cell.id} className="p-1">
-                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                {flexRender(
+                  cell.column.columnDef.cell,
+                  cell.getContext()
+                )}
               </td>
             ))}
           </tr>
         ))}
         </tbody>
+
       </table>
+
     </div>
   )
 
