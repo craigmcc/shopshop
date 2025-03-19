@@ -9,7 +9,7 @@
 
 // External Modules ----------------------------------------------------------
 
-import {Check, Pencil, X} from "lucide-react";
+import {Check, Pencil, SquareX, Undo } from "lucide-react";
 import React from "react";
 
 // Internal Modules ----------------------------------------------------------
@@ -20,6 +20,10 @@ import React from "react";
 export function EditCell({ row, table }) {
 
   const meta = table.options.meta
+
+  const removeRow = () => {
+    meta?.removeRow(row.index);
+  }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const setEditedRows = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -35,13 +39,17 @@ export function EditCell({ row, table }) {
 
   return meta?.editedRows[row.id] ? (
     <>
-      <button className="btn btn-outline" onClick={setEditedRows} name="done">
+      <button className="btn btn-outline mr-1" onClick={setEditedRows} name="done">
         {/*✔*/}
         <Check/>
       </button>{" "}
-      <button className="btn btn-outline p-2" onClick={setEditedRows} name="cancel">
+      <button className="btn btn-outline mr-2" onClick={setEditedRows} name="cancel">
         {/*X*/}
-        <X/>
+        <Undo/>
+      </button>
+      <button className="btn btn-outline btn-error" onClick={removeRow} name="remove">
+        {/*✕*/}
+        <SquareX/>
       </button>
     </>
   ) : (

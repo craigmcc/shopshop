@@ -29,6 +29,7 @@ import React, { useEffect, useRef, useState} from "react";
 // Internal Modules ----------------------------------------------------------
 
 import { EditCell } from "@/components/tables/EditCell";
+import { FooterCell } from "@/components/tables/FooterCell";
 import { TableCell } from "@/components/tables/TableCell";
 import { useCurrentListContext } from "@/contexts/CurrentListContext";
 import { logger } from "@/lib/ClientLogger";
@@ -115,6 +116,8 @@ export function CategoriesTable({ categories, list, memberRole }: Props) {
   }
   ActionsCell.displayName = "ActionsCell";
 
+
+
   // Column definitions
   const columnHelper = createColumnHelper<Category>();
 //  const columns = useMemo(() => [
@@ -146,7 +149,28 @@ export function CategoriesTable({ categories, list, memberRole }: Props) {
     data: data ?? fallbackData,
     getCoreRowModel: getCoreRowModel(),
     meta: {
+      addRow: () => {
+        const newRow: Category = {
+          id: "",
+          name: "",
+          listId: list.id,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        };
+        const setFunc = (old: Category[]) => {
+          return [...old, newRow];
+        }
+        setData(setFunc);
+        setOriginalData(setFunc);
+      },
       editedRows,
+      removeRow: (rowIndex: number) => {
+        const setFilterFunc = (old: Category[]) => {
+          return old.filter((_row: Category, index) => index !== rowIndex);
+        }
+        setData(setFilterFunc);
+        setOriginalData(setFilterFunc);
+      },
       revertData: (rowIndex: number, revert: boolean) => {
         if (revert) {
           setData((old) =>
@@ -211,6 +235,14 @@ export function CategoriesTable({ categories, list, memberRole }: Props) {
           </tr>
         ))}
         </tbody>
+
+        <tfoot>
+        <tr>
+          <th colSpan={table.getCenterLeafColumns().length} align="right">
+            <FooterCell table={table} />
+          </th>
+        </tr>
+        </tfoot>
 
       </table>
 
