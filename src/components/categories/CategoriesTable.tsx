@@ -148,7 +148,7 @@ export function CategoriesTable({ categories, list, memberRole }: Props) {
   ]
 
   // Overall table instance
-  const table = useReactTable({
+  const table = useReactTable<Category>({
     columns,
     data: data ?? fallbackData,
     getCoreRowModel: getCoreRowModel(),
