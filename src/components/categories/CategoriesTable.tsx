@@ -126,6 +126,10 @@ export function CategoriesTable({ categories, list, memberRole }: Props) {
       cell: TableCell,
       header: () => <span className="font-bold">Category Name</span>,
       meta: {
+        autoFocus: true,
+        // pattern: Regex expression for pattern validation
+        // placeholder: Placeholder text
+        required: true,
         // NOTE - type can be "date", "select", "type", ...
 //        editable: true, // TODO - add this to the cell?
         type: "text",

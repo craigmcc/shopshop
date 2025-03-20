@@ -27,18 +27,32 @@ export function TableCell({ getValue, row, column, table }) {
   const columnMeta = column.columnDef.meta;
   const initialValue = getValue()
   const tableMeta = table.options.meta;
+  const [validationMessage, setValidationMessage] = useState<string>("");
   const [value, setValue] = useState(initialValue)
 
   useEffect(() => {
     setValue(initialValue)
   }, [initialValue])
 
-  const onBlur = () => {
+  const displayValidationMessage = <
+    T extends HTMLInputElement | HTMLSelectElement
+  >(
+    e: ChangeEvent<T>
+  ) => {
+    if (e.target.validity.valid) {
+      setValidationMessage("");
+    } else {
+      setValidationMessage(e.target.validationMessage);
+    }
+  };
+  const onBlur = (e: ChangeEvent<HTMLInputElement>) => {
+    displayValidationMessage(e);
     tableMeta.updateData(row.index, column.id, value)
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const onSelectChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    displayValidationMessage(e);
     setValue(e.target.value);
     tableMeta?.updateData(row.index, column.id, e.target.value);
   };
@@ -47,7 +61,13 @@ export function TableCell({ getValue, row, column, table }) {
 
     return columnMeta?.type === "select" ? (
 
-      <select onChange={onSelectChange} value={initialValue}>
+      <select
+        autoFocus={columnMeta?.autoFocus}
+        onChange={onSelectChange}
+        required={!columnMeta?.required}
+        title={validationMessage}
+        value={initialValue}
+      >
         {columnMeta?.options?.map((option: Option) => (
           <option key={option.value} value={option.value}>
             {option.label}
@@ -58,9 +78,14 @@ export function TableCell({ getValue, row, column, table }) {
     ) : (
 
       <input
+        autoFocus={columnMeta?.autoFocus}
         className="input input-bordered w-full"
         onChange={e => setValue(e.target.value)}
         onBlur={onBlur}
+        pattern={columnMeta?.pattern}
+        placeholder={columnMeta?.placeholder}
+        required={columnMeta?.required}
+        title={validationMessage}
         type={columnMeta?.type || "text"}
         value={value}
       />
