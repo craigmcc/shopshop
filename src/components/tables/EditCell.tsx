@@ -19,7 +19,9 @@ import React from "react";
 // @ts-expect-error "any" types should maybe be replaced
 export function EditCell({ row, table }) {
 
-  const meta = table.options.meta
+  const meta = table.options.meta;
+  const validRow = meta?.validRows[row.id];
+  const disableSubmit = validRow ? Object.values(validRow)?.some(item => !item) : false;
 
   const removeRow = () => {
     meta?.removeRow(row.index);
@@ -39,7 +41,12 @@ export function EditCell({ row, table }) {
 
   return meta?.editedRows[row.id] ? (
     <>
-      <button className="btn btn-outline mr-1" onClick={setEditedRows} name="done">
+      <button
+        className="btn btn-outline mr-1"
+        disabled={disableSubmit}
+        name="done"
+        onClick={setEditedRows}
+      >
         {/*✔*/}
         <Check/>
       </button>{" "}

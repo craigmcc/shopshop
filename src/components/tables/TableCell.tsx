@@ -39,22 +39,32 @@ export function TableCell({ getValue, row, column, table }) {
   >(
     e: ChangeEvent<T>
   ) => {
-    if (e.target.validity.valid) {
+    if (columnMeta?.validate) {
+      const isValid = columnMeta.validate(e.target.value);
+      if (isValid) {
+        e.target.setCustomValidity("");
+        setValidationMessage("");
+      } else {
+        e.target.setCustomValidity(columnMeta.validationMessage);
+        setValidationMessage(columnMeta.validationMessage);
+      }
+    } else if (e.target.validity.valid) {
       setValidationMessage("");
     } else {
       setValidationMessage(e.target.validationMessage);
     }
   };
+
   const onBlur = (e: ChangeEvent<HTMLInputElement>) => {
     displayValidationMessage(e);
-    tableMeta.updateData(row.index, column.id, value)
+    tableMeta.updateData(row.index, column.id, value, e.target.validity.valid);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const onSelectChange = (e: ChangeEvent<HTMLSelectElement>) => {
     displayValidationMessage(e);
     setValue(e.target.value);
-    tableMeta?.updateData(row.index, column.id, e.target.value);
+    tableMeta?.updateData(row.index, column.id, e.target.value, e.target.validity.valid);
   };
 
   if (tableMeta?.editedRows[row.id]) {

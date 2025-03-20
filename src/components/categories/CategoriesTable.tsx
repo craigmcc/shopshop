@@ -54,6 +54,7 @@ export function CategoriesTable({ categories, list, memberRole }: Props) {
   const [editedRows, setEditedRows] = useState({});
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [originalData, setOriginalData] = useState(() => [...categories]);
+  const [validRows, setValidRows] = useState({}); // TODO: See Part 3 of the blog series for the shape of this
 
 
   logger.trace({
@@ -133,6 +134,10 @@ export function CategoriesTable({ categories, list, memberRole }: Props) {
         // NOTE - type can be "date", "select", "type", ...
 //        editable: true, // TODO - add this to the cell?
         type: "text",
+        validate: (value: string) => {
+          return value.length > 0;
+        },
+        validationMessage: "Category name is required",
       }
     }),
     columnHelper.display({
@@ -189,7 +194,8 @@ export function CategoriesTable({ categories, list, memberRole }: Props) {
         }
       },
       setEditedRows,
-      updateData: (rowIndex: number, columnId: string, value: string) => {
+      setValidRows,
+      updateData: (rowIndex: number, columnId: string, value: string, isValid: boolean) => {
         setData((old) =>
           old.map((row, index) => {
             if (index === rowIndex) {
@@ -201,7 +207,13 @@ export function CategoriesTable({ categories, list, memberRole }: Props) {
             return row;
           })
         );
+        setValidRows((old) => ({
+          ...old,
+          // @ts-expect-error ignore "any" type warning
+          [rowIndex]: { ...old[rowIndex], [columnId]: isValid },
+        }));
       },
+      validRows,
     },
   });
 
