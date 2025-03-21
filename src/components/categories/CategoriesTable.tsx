@@ -24,7 +24,7 @@ import {
 } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
 import Link from "next/link";
-import React, { useEffect, useRef, useState} from "react";
+import React, { useEffect, useMemo, useRef, useState} from "react";
 
 // Internal Modules ----------------------------------------------------------
 
@@ -53,7 +53,7 @@ export function CategoriesTable({ categories, list, memberRole }: Props) {
   const dropdownRefs = useRef<(HTMLDetailsElement | null)[]>([]);
   const [editedRows, setEditedRows] = useState({});
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
-  const [originalData, setOriginalData] = useState(() => [...categories]);
+  const [originalData, setOriginalData] = useState<Category[]>(() => [...categories]);
   const [validRows, setValidRows] = useState({}); // TODO: See Part 3 of the blog series for the shape of this
 
 
@@ -122,7 +122,7 @@ export function CategoriesTable({ categories, list, memberRole }: Props) {
   // Column definitions
   const columnHelper = createColumnHelper<Category>();
 //  const columns = useMemo(() => [
-  const columns = [
+  const columns = useMemo(() => [
     columnHelper.accessor("name", {
       cell: TableCell,
       header: () => <span className="font-bold">Category Name</span>,
@@ -150,7 +150,7 @@ export function CategoriesTable({ categories, list, memberRole }: Props) {
       header: () => <span className="font-bold">Actions</span>,
       id: "actions",
     }),
-  ]
+  ], []);
 
   // Overall table instance
   const table = useReactTable<Category>({
