@@ -21,7 +21,7 @@
     "bcrypt-edge": "^0.1.0",
     "dotenv-cli": "^8.0.0",
     "lucide-react": "^0.475.0",
-    "next": "15.2.1",
+    "next": "15.2.3",
     "next-auth": "^5.0.0-beta.25",
     "next-safe-action": "^7.10.4",
     "pino": "^9.6.0",
