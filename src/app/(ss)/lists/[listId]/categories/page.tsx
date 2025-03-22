@@ -62,9 +62,10 @@ export default async function CatalogsTablePage(props: Props) {
     orderBy: {
       name: "asc",
     },
-    // TODO - need pagination support
+/*
     skip: 0,
     take: 10,
+*/
     where: {
       listId: listId,
     },

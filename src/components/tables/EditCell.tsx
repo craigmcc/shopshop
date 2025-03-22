@@ -27,7 +27,6 @@ export function EditCell({ row, table }) {
     meta?.removeRow(row.index);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const setEditedRows = (e: React.MouseEvent<HTMLButtonElement>) => {
     const elName = e.currentTarget.name
     meta?.setEditedRows((old: []) => ({
@@ -41,29 +40,37 @@ export function EditCell({ row, table }) {
 
   return meta?.editedRows[row.id] ? (
     <>
-      <button
-        className="btn btn-outline mr-1"
-        disabled={disableSubmit}
-        name="done"
-        onClick={setEditedRows}
-      >
-        {/*✔*/}
-        <Check/>
-      </button>{" "}
-      <button className="btn btn-outline mr-2" onClick={setEditedRows} name="cancel">
-        {/*X*/}
-        <Undo/>
-      </button>
-      <button className="btn btn-outline btn-error" onClick={removeRow} name="remove">
-        {/*✕*/}
-        <SquareX/>
-      </button>
+      <div className="tooltip" data-tip="Save Changes">
+        <button
+          className="btn btn-outline mr-1"
+          disabled={disableSubmit}
+          name="done"
+          onClick={setEditedRows}
+        >
+          {/*✔*/}
+          <Check/>
+        </button>{" "}
+      </div>
+      <div className="tooltip" data-tip="Cancel Changes">
+        <button className="btn btn-outline mr-2" onClick={setEditedRows} name="cancel">
+          {/*X*/}
+          <Undo/>
+        </button>
+      </div>
+      <div className="tooltip" data-tip="Remove Row">
+        <button className="btn btn-outline btn-error" onClick={removeRow} name="remove">
+          {/*✕*/}
+          <SquareX/>
+        </button>
+      </div>
     </>
   ) : (
-    <button className="btn btn-outline" onClick={setEditedRows} name="edit">
-      {/*✐*/}
-      <Pencil/>
-    </button>
+    <div className="tooltip" data-tip="Edit or Remove Row">
+      <button className="btn btn-outline" onClick={setEditedRows} name="edit">
+        {/*✐*/}
+        <Pencil/>
+      </button>
+    </div>
   )
 
 }

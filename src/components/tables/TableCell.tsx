@@ -60,7 +60,6 @@ export function TableCell({ getValue, row, column, table }) {
     tableMeta.updateData(row.index, column.id, value, e.target.validity.valid);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const onSelectChange = (e: ChangeEvent<HTMLSelectElement>) => {
     displayValidationMessage(e);
     setValue(e.target.value);

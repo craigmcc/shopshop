@@ -32,7 +32,7 @@ type Props = {
 export function ListSidebarTable({ lists, members }: Props) {
 
   const { currentList } = useCurrentListContext();
-  logger.info({
+  logger.trace({
     context: "ListSidebarTable.gettingCurrentList",
     currentList,
   })

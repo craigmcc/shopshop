@@ -17,14 +17,20 @@
 import { Category, List, MemberRole } from "@prisma/client";
 import {
   CellContext,
+//  Column,
+//  ColumnDef,
   createColumnHelper,
   flexRender,
   getCoreRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  PaginationState,
+//  Table,
   useReactTable,
 } from "@tanstack/react-table";
-import { MoreHorizontal } from "lucide-react";
+import { ArrowDownAZ, ArrowUpAZ, MoreHorizontal } from "lucide-react";
 import Link from "next/link";
-import React, { useEffect, useMemo, useRef, useState} from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState} from "react";
 
 // Internal Modules ----------------------------------------------------------
 
@@ -54,8 +60,13 @@ export function CategoriesTable({ categories, list, memberRole }: Props) {
   const [editedRows, setEditedRows] = useState({});
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [originalData, setOriginalData] = useState<Category[]>(() => [...categories]);
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 10,
+  });
   const [validRows, setValidRows] = useState({}); // TODO: See Part 3 of the blog series for the shape of this
 
+//  const rerender = React.useReducer(() => ({}), {})[1] // TODO ???
 
   logger.trace({
     context: "CategoriesTable.settingCurrentList",
@@ -80,7 +91,7 @@ export function CategoriesTable({ categories, list, memberRole }: Props) {
   }, []);
 
   // ActionsCell definition
-  const ActionsCell = ({ row }: CellContext<Category, unknown>) => {
+  const ActionsCell = useCallback(({ row }: CellContext<Category, unknown>) => {
     return (
       <details
         className="dropdown dropdown-center"
@@ -114,10 +125,8 @@ export function CategoriesTable({ categories, list, memberRole }: Props) {
         </ul>
       </details>
     );
-  }
-  ActionsCell.displayName = "ActionsCell";
-
-
+  }, [memberRole, openDropdown]);
+//  ActionsCell.displayName = "ActionsCell";
 
   // Column definitions
   const columnHelper = createColumnHelper<Category>();
@@ -125,7 +134,8 @@ export function CategoriesTable({ categories, list, memberRole }: Props) {
   const columns = useMemo(() => [
     columnHelper.accessor("name", {
       cell: TableCell,
-      header: () => <span className="font-bold">Category Name</span>,
+      enableSorting: true,
+      header: "Category Name",
       meta: {
         autoFocus: true,
         // pattern: Regex expression for pattern validation
@@ -137,26 +147,40 @@ export function CategoriesTable({ categories, list, memberRole }: Props) {
         validate: (value: string) => {
           return value.length > 0;
         },
-        validationMessage: "Category name is required",
+        validationMessage: "Category Name is required",
       }
     }),
     columnHelper.display({
       cell: EditCell,
+      enableSorting: false,
       header: "Edit",
       id: "edit",
     }),
     columnHelper.display({
       cell: ActionsCell,
-      header: () => <span className="font-bold">Actions</span>,
+      enableSorting: false,
+      header: "Actions",
       id: "actions",
     }),
-  ], []);
+  ], [ActionsCell, columnHelper]);
 
   // Overall table instance
   const table = useReactTable<Category>({
     columns,
     data: data ?? fallbackData,
     getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+/*
+    initialState: {
+      sorting: [
+        {
+          id: "name",
+          desc: false,
+        },
+      ],
+    },
+*/
     meta: {
       addRow: () => {
         const newRow: Category = {
@@ -215,6 +239,10 @@ export function CategoriesTable({ categories, list, memberRole }: Props) {
       },
       validRows,
     },
+    onPaginationChange: setPagination,
+    state: {
+      pagination, // Calculated automatically for client side pagination
+    },
   });
 
   return (
@@ -231,6 +259,16 @@ export function CategoriesTable({ categories, list, memberRole }: Props) {
                   header.column.columnDef.header,
                   header.getContext()
                 )}
+                {/*// TODO - should only show these controls on sortable columns*/}
+                <span>
+                  {header.column.getIsSorted() === "asc" ? (
+                    <ArrowUpAZ className="icon" onClick={header.column.getToggleSortingHandler()} />
+                  ) : header.column.getIsSorted() === "desc" ? (
+                    <ArrowDownAZ className="icon" onClick={header.column.getToggleSortingHandler()} />
+                  ) : (
+                    <MoreHorizontal className="icon" onClick={header.column.getToggleSortingHandler()} />
+                  )}
+                </span>
               </th>
             ))}
           </tr>
@@ -254,13 +292,54 @@ export function CategoriesTable({ categories, list, memberRole }: Props) {
 
         <tfoot>
         <tr>
-          <th colSpan={table.getCenterLeafColumns().length} align="right">
+          <th colSpan={table.getCenterLeafColumns().length}>
             <FooterCell table={table} />
           </th>
         </tr>
         </tfoot>
 
       </table>
+
+      {/*      <div className="h-2" />
+      <div className="flex items-center gap-2">
+
+        <span className="flex items-center gap-1">
+          | Go to page:
+          <input
+            type="number"
+            min="1"
+            max={table.getPageCount()}
+            defaultValue={table.getState().pagination.pageIndex + 1}
+            onChange={e => {
+              const page = e.target.value ? Number(e.target.value) - 1 : 0
+              table.setPageIndex(page)
+            }}
+            className="border p-1 rounded w-16"
+          />
+        </span>
+*/}
+      {/*
+        <select
+          value={table.getState().pagination.pageSize}
+          onChange={e => {
+            table.setPageSize(Number(e.target.value))
+          }}
+        >
+          {[10, 20, 30, 40, 50].map(pageSize => (
+            <option key={pageSize} value={pageSize}>
+              Show {pageSize}
+            </option>
+          ))}
+        </select>
+
+      </div>
+*/}
+{/*
+    <div>
+      Showing {table.getRowModel().rows.length.toLocaleString()} of{' '}
+      {table.getRowCount().toLocaleString()} Rows
+    </div>
+*/}
 
     </div>
   )
