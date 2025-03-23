@@ -60,6 +60,6 @@ export function ValidationActionResult<M>(error: ZodError, message?: string): Ac
   return {
     fieldErrors: flattened.fieldErrors || undefined,
     formErrors: flattened.formErrors || undefined,
-    message: message ? message : "Request data does not pass validation",
+    message: message ? message : ERRORS.DATA_VALIDATION,
   }
 }

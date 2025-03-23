@@ -22,7 +22,7 @@ import { toast } from "react-toastify";
 
 import { createList, updateList } from "@/actions/ListActions";
 import { InputField } from "@/components/daisyui/InputField";
-import { ServerResponse } from "@/components/shared/ServerResponse";
+import { ServerResult } from "@/components/shared/ServerResult";
 import { useCurrentListContext } from "@/contexts/CurrentListContext";
 import { ActionResult } from "@/lib/ActionResult";
 import { logger } from "@/lib/ClientLogger";
@@ -38,8 +38,8 @@ const isTesting = process.env.NODE_ENV === "test";
 // Public Objects ------------------------------------------------------------
 
 type Props = {
-  // List to be updated (or undefined for create)
-  list?: List,
+  // List to be updated (for update only)
+  list: List | undefined,
 }
 
 export function ListSettingsForm({ list }: Props ) {
@@ -47,10 +47,10 @@ export function ListSettingsForm({ list }: Props ) {
   const isCreating = !list;
   const router = useRouter();
   const [isSaving, setIsSaving] = useState<boolean>(false);
-  const [result, setResult] = useState<string | Error | null>(null);
+  const [result, setResult] = useState<ActionResult<List> | null>(null);
 
   const { setCurrentList } = useCurrentListContext();
-  logger.info({
+  logger.trace({
     context: "ListSettingsForm.settingCurrentList",
     list,
   });
@@ -64,11 +64,7 @@ export function ListSettingsForm({ list }: Props ) {
     name: list?.name ?? "",
     private: list?.private ?? false,
   }
-  logger.trace({
-    context: "ListSettingsForm",
-    list,
-    defaultValues: isCreating ? defaultValuesCreate : defaultValuesUpdate,
-  });
+
   const methods = useForm<ListCreateSchemaType | ListUpdateSchemaType>({
     defaultValues: isCreating ? defaultValuesCreate : defaultValuesUpdate,
     mode: "onBlur",
@@ -81,7 +77,7 @@ export function ListSettingsForm({ list }: Props ) {
   async function submitForm(formData: ListCreateSchemaType | ListUpdateSchemaType) {
 
     logger.trace({
-      context: "ListSettingsForm.submitForm",
+      context: "ListSettingsForm.submitForm.input",
       formData,
       isCreating,
     });
@@ -92,21 +88,26 @@ export function ListSettingsForm({ list }: Props ) {
       : await updateList(list!.id, formData as ListUpdateSchemaType);
     setIsSaving(false);
 
+    logger.trace({
+      context: "ListSettingsForm.submitForm.output",
+      response,
+    });
+
     if (response.model) {
       setResult(null);
       toast.success(`List '${formData.name}' was successfully ${isCreating ? "created" : "updated"}`);
       // Work around testing issue with mock router
       if (isTesting) {
-        setResult("Success");
+        setResult({message: "Success"});
       } else {
-        logger.info({
+        logger.trace({
           context: "ListSettingsForm.resettingCurrentList",
         })
-        setCurrentList(null);
+        setCurrentList(response.model);
         router.push("/lists");
       }
     } else {
-      setResult(response.message!);
+      setResult(response);
     }
 
   }
@@ -114,8 +115,9 @@ export function ListSettingsForm({ list }: Props ) {
   return (
     <div className="card bg-base-300 shadow-xl">
       <div className="card-body">
-        {/*<h2 className="card-title justify-center">{ isCreating ? "Create List" : "Update List" }</h2>*/}
-        {result && <ServerResponse result={result} />}
+        <h2 className="card-title justify-center">
+          <ServerResult result={result} />
+        </h2>
         <FormProvider {...methods}>
           <form
             className="flex flex-col gap-2"

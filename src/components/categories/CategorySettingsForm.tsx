@@ -22,7 +22,8 @@ import { toast } from "react-toastify";
 
 import { createCategory, updateCategory } from "@/actions/CategoryActions";
 import { InputField } from "@/components/daisyui/InputField";
-import { ServerResponse } from "@/components/shared/ServerResponse";
+import { ServerResult } from "@/components/shared/ServerResult";
+import { ActionResult } from "@/lib/ActionResult";
 import { logger } from "@/lib/ClientLogger";
 import {
   CategoryCreateSchema,
@@ -35,9 +36,8 @@ const isTesting = process.env.NODE_ENV === "test";
 
 // Public Objects ------------------------------------------------------------
 
-/* The properties for this component */
 type Props = {
-  /* The Category to be updated (for update only) */
+  /* Category to be updated (for update only) */
   category?: Category | undefined,
   /* List that owns this Category */
   list: List,
@@ -48,7 +48,13 @@ export function CategorySettingsForm({ category, list }: Props ) {
   const isCreating = !category;
   const router = useRouter();
   const [isSaving, setIsSaving] = useState<boolean>(false);
-  const [result, setResult] = useState<string | Error | null>(null);
+  const [result, setResult] = useState<ActionResult<Category> | null>(null);
+
+  logger.trace({
+    context:  "CategorySettingsForm",
+    category,
+    list,
+  });
 
   const defaultValuesCreate: CategoryCreateSchemaType = {
     listId: list?.id ?? "",
@@ -57,11 +63,7 @@ export function CategorySettingsForm({ category, list }: Props ) {
   const defaultValuesUpdate: CategoryUpdateSchemaType = {
     name: category?.name ?? "",
   }
-  logger.trace({
-    context: "CategoryForm",
-    category: category,
-    defaultValues: isCreating ? defaultValuesCreate : defaultValuesUpdate,
-  });
+
   const methods = useForm<CategoryCreateSchemaType | CategoryUpdateSchemaType>({
     defaultValues: isCreating ? defaultValuesCreate : defaultValuesUpdate,
     mode: "onBlur",
@@ -74,7 +76,7 @@ export function CategorySettingsForm({ category, list }: Props ) {
   async function submitForm(formData: CategoryCreateSchemaType | CategoryUpdateSchemaType) {
 
     logger.trace({
-      context: "CategorySettingsForm.submitForm",
+      context: "CategorySettingsForm.submitForm.input",
       formData,
       isCreating,
     });
@@ -86,7 +88,7 @@ export function CategorySettingsForm({ category, list }: Props ) {
     setIsSaving(false);
 
     logger.trace({
-      context: "CategorySettingsForm.submitForm.response",
+      context: "CategorySettingsForm.submitForm.output",
       response,
     });
 
@@ -95,12 +97,12 @@ export function CategorySettingsForm({ category, list }: Props ) {
       toast.success(`Category "${formData.name}" was successfully ${isCreating ? "created" : "updated"}`);
       // Work around testing issue with mock router
       if (isTesting) {
-        setResult("Success");
+        setResult({message: "Success"});
       } else {
         router.push(`/lists/${list.id}/categories`);
       }
     } else {
-      setResult(response.message!);
+      setResult(response);
     }
 
   }
@@ -108,7 +110,9 @@ export function CategorySettingsForm({ category, list }: Props ) {
   return (
     <div className={"card bg-base-300 shadow-xl"}>
       <div className="card-body">
-        {result && <ServerResponse result={result} />}
+        <h2 className="card-title justify-center">
+          <ServerResult result={result} />
+        </h2>
         <FormProvider {...methods}>
           <form
             className="flex flex-col gap-2"

@@ -22,7 +22,8 @@ import { toast } from "react-toastify";
 
 import { createItem, updateItem } from "@/actions/ItemActions";
 import { InputField } from "@/components/daisyui/InputField";
-import { ServerResponse } from "@/components/shared/ServerResponse";
+import { ServerResult } from "@/components/shared/ServerResult";
+import { ActionResult } from "@/lib/ActionResult";
 import { logger } from "@/lib/ClientLogger";
 import {
   ItemCreateSchema,
@@ -35,12 +36,11 @@ const isTesting = process.env.NODE_ENV === "test";
 
 // Public Objects ------------------------------------------------------------
 
-/* The properties for this component */
 type Props = {
-  /* The Category owning this Item (for create only) */
+  /* Category owning this Item */
   category: Category,
-  /* The Item to be updated (for update only) */
-  item?: Item,
+  /* Item to be updated (for update only) */
+  item: Item | undefined,
 }
 
 export function ItemSettingsForm({ category, item }: Props ) {
@@ -48,7 +48,13 @@ export function ItemSettingsForm({ category, item }: Props ) {
   const isCreating = !item;
   const router = useRouter();
   const [isSaving, setIsSaving] = useState<boolean>(false);
-  const [result, setResult] = useState<string | Error | null>(null);
+  const [result, setResult] = useState<ActionResult<Item> | null>(null);
+
+  logger.trace({
+    context: "ItemSettingsForm",
+    category,
+    item,
+  });
 
   const defaultValuesCreate: ItemCreateSchemaType = {
     categoryId: category?.id ?? "",
@@ -63,12 +69,7 @@ export function ItemSettingsForm({ category, item }: Props ) {
     name: item?.name ?? "",
     selected: item?.selected ?? false,
   }
-  logger.trace({
-    context: "ItemSettingsForm",
-    category: category,
-    item: item,
-    defaultValues: isCreating ? defaultValuesCreate : defaultValuesUpdate,
-  });
+
   const methods = useForm<ItemCreateSchemaType | ItemUpdateSchemaType>({
     defaultValues: isCreating ? defaultValuesCreate : defaultValuesUpdate,
     mode: "onBlur",
@@ -81,7 +82,7 @@ export function ItemSettingsForm({ category, item }: Props ) {
   async function submitForm(formData: ItemCreateSchemaType | ItemUpdateSchemaType) {
 
     logger.trace({
-      context: "ItemSettingsForm.submitForm",
+      context: "ItemSettingsForm.submitForm.input",
       formData,
       isCreating,
     });
@@ -92,17 +93,22 @@ export function ItemSettingsForm({ category, item }: Props ) {
       : await updateItem(item.id, formData as ItemUpdateSchemaType);
     setIsSaving(false);
 
+    logger.trace({
+      context: "ItemSettingsForm.submitForm.output",
+      response,
+    });
+
     if (response.model) {
       setResult(null);
       toast.success(`Item "${formData.name}" was successfully ${isCreating ? "created" : "updated"}`);
       // Work around testing issue with mock router
       if (isTesting) {
-        setResult("Success");
+        setResult({message: "Success"});
       } else {
         router.push(`/lists/${category.listId}/categories/${category?.id}/items`);
       }
     } else {
-      setResult(response.message!);
+      setResult(response);
     }
 
   }
@@ -110,7 +116,9 @@ export function ItemSettingsForm({ category, item }: Props ) {
   return (
     <div className={"card bg-base-300 shadow-xl"}>
       <div className="card-body">
-        {result && <ServerResponse result={result} />}
+        <h2 className="card-title justify-center">
+          <ServerResult result={result} />
+        </h2>
         <FormProvider {...methods}>
           <form
             className="flex flex-col gap-2"

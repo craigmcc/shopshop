@@ -19,7 +19,8 @@ import { toast } from "react-toastify";
 // Internal Modules ----------------------------------------------------------
 
 import { removeCategory } from "@/actions/CategoryActions";
-import { ServerResponse } from "@/components/shared/ServerResponse";
+import { ServerResult } from "@/components/shared/ServerResult";
+import { ActionResult } from "@/lib/ActionResult";
 import { logger } from "@/lib/ClientLogger";
 
 const isTesting = process.env.NODE_ENV === "test";
@@ -37,30 +38,36 @@ export function CategoryRemoveForm({ category, list }: Props) {
 
   const router = useRouter();
   const [isRemoving, setIsRemoving] = useState<boolean>(false);
-  const [result, setResult] = useState<string | Error | null>(null);
+  const [result, setResult] = useState<ActionResult<Category> | null>(null);
 
   const performRemove = async () => {
 
     logger.trace({
-      context: "CategoryRemoveForm.performRemove",
+      context: "CategoryRemoveForm.performRemove.input",
       category,
+      list,
     });
 
     setIsRemoving(true);
     const response = await removeCategory(category.id);
     setIsRemoving(false);
 
+    logger.trace({
+      context: "CategoryRemoveForm.performRemove.output",
+      response,
+    });
+
     if (response.model) {
       setResult(null);
       toast.success(`Category '${category.name}' was successfully removed`);
       // Work around testing issue with mock router
       if (isTesting) {
-        setResult("Success");
+        setResult({ message: "Success" });
       } else {
         router.push(`/lists/${list.id}/categories`);
       }
     } else {
-      setResult(response.message!);
+      setResult(response);
     }
 
   }
@@ -69,7 +76,7 @@ export function CategoryRemoveForm({ category, list }: Props) {
     <div className="card bg-base-300 shadow-xl">
       <div className="card-body">
         <h2 className="card-title justify-center">
-          {result && <ServerResponse result={result} />}
+          <ServerResult result={result} />
         </h2>
         { category && (
           <>

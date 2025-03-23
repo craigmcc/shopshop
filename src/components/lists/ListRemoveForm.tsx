@@ -19,8 +19,9 @@ import { toast } from "react-toastify";
 // Internal Modules ----------------------------------------------------------
 
 import { removeList } from "@/actions/ListActions";
-import { ServerResponse } from "@/components/shared/ServerResponse";
+import { ServerResult } from "@/components/shared/ServerResult";
 import { useCurrentListContext } from "@/contexts/CurrentListContext";
+import { ActionResult } from "@/lib/ActionResult";
 import { logger } from "@/lib/ClientLogger";
 
 const isTesting = process.env.NODE_ENV === "test";
@@ -36,7 +37,7 @@ export function ListRemoveForm({ list }: Props) {
 
   const router = useRouter();
   const [isRemoving, setIsRemoving] = useState<boolean>(false);
-  const [result, setResult] = useState<string | Error | null>(null);
+  const [result, setResult] = useState<ActionResult<List> | null>(null);
 
   logger.info({
     context: "ListRemoveForm.settingCurrentList",
@@ -47,25 +48,35 @@ export function ListRemoveForm({ list }: Props) {
 
   const performRemove = async () => {
 
+    logger.trace({
+      context: "ListRemoveForm.performRemove.input",
+      list,
+    });
+
     setIsRemoving(true);
     const response = await removeList(list.id);
     setIsRemoving(false);
+
+    logger.trace({
+      context: "ListRemoveForm.performRemove.output",
+      response,
+    });
 
     if (response.model) {
       setResult(null);
       toast.success(`List '${list.name}' was successfully removed`);
       // Work around testing issue with mock router
       if (isTesting) {
-        setResult("Success");
+        setResult({ message: "Success"});
       } else {
-        logger.info({
+        logger.trace({
           context: "ListRemoveForm.resettingCurrentList",
         });
         setCurrentList(null);
         router.push("/lists");
       }
     } else {
-      setResult(response.message!);
+      setResult(response);
     }
 
   }
@@ -74,7 +85,7 @@ export function ListRemoveForm({ list }: Props) {
     <div className="card bg-base-300 shadow-xl">
       <div className="card-body">
         <h2 className="card-title justify-center">
-          {result && <ServerResponse result={result} />}
+          <ServerResult result={result} />
         </h2>
         { list && (
           <>

@@ -22,7 +22,8 @@ import { toast } from "react-toastify";
 
 import { updateProfile } from "@/actions/ProfileActions";
 import { InputField } from "@/components/daisyui/InputField";
-import { ServerResponse } from "@/components/shared/ServerResponse";
+import { ServerResult } from "@/components/shared/ServerResult";
+import { ActionResult } from "@/lib/ActionResult";
 import { logger } from "@/lib/ClientLogger";
 import {
   ProfileUpdateSchema,
@@ -42,7 +43,12 @@ export function ProfileSettingsForm({ profile }: Props) {
 
   const router = useRouter();
   const [isSaving, setIsSaving] = useState<boolean>(false);
-  const [result, setResult] = useState<string | Error | null>(null);
+  const [result, setResult] = useState<ActionResult<Profile> | null>(null);
+
+  logger.trace({
+    context: "ProfileSettingsForm",
+    profile,
+  });
 
   const defaultValuesUpdate: ProfileUpdateSchemaType = {
     email: profile.email,
@@ -64,7 +70,7 @@ export function ProfileSettingsForm({ profile }: Props) {
   async function submitForm(formData: ProfileUpdateSchemaType): Promise<void> {
 
     logger.trace({
-      context: "ProfileSettingsForm.submitForm",
+      context: "ProfileSettingsForm.submitForm.input",
       formData,
     })
 
@@ -72,17 +78,22 @@ export function ProfileSettingsForm({ profile }: Props) {
     const response = await updateProfile(profile.id, formData);
     setIsSaving(false);
 
+    logger.trace({
+      context: "ProfileSettingsForm.submitForm.output",
+      response,
+    });
+
     if (response.model) {
       setResult(null);
       toast.success(`Profile '${formData.name}' was successfully updated`);
       // Work around testing issue with mock router
       if (isTesting) {
-        setResult("Success");
+        setResult({message: "Success"});
       } else {
         router.push("/");
       }
     } else {
-      setResult(response.message!);
+      setResult(response);
     }
 
   }
@@ -90,8 +101,10 @@ export function ProfileSettingsForm({ profile }: Props) {
   return (
     <div className="card bg-base-300 shadow-xl">
       <div className="card-body">
-        <h2 className="card-title justify-center">Update Profile</h2>
-        {result && <ServerResponse result={result} />}
+        <h2 className="card-title justify-center">
+          <ServerResult result={result} />
+          <div>Update Profile</div>
+        </h2>
         <FormProvider {...methods}>
           <form
             className="flex flex-col w-full"
