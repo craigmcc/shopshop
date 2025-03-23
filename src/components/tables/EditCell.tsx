@@ -42,7 +42,7 @@ export function EditCell({ row, table }) {
     <>
       <div className="tooltip" data-tip="Save Changes">
         <button
-          className="btn btn-outline mr-1"
+          className="btn btn-outline btn-sm mr-2"
           disabled={disableSubmit}
           name="done"
           onClick={setEditedRows}
@@ -52,13 +52,13 @@ export function EditCell({ row, table }) {
         </button>{" "}
       </div>
       <div className="tooltip" data-tip="Cancel Changes">
-        <button className="btn btn-outline mr-2" onClick={setEditedRows} name="cancel">
+        <button className="btn btn-outline btn-sm mr-4" onClick={setEditedRows} name="cancel">
           {/*X*/}
           <Undo/>
         </button>
       </div>
       <div className="tooltip" data-tip="Remove Row">
-        <button className="btn btn-outline btn-error" onClick={removeRow} name="remove">
+        <button className="btn btn-outline btn-error btn-sm" onClick={removeRow} name="remove">
           {/*✕*/}
           <SquareX/>
         </button>
@@ -66,7 +66,7 @@ export function EditCell({ row, table }) {
     </>
   ) : (
     <div className="tooltip" data-tip="Edit or Remove Row">
-      <button className="btn btn-outline" onClick={setEditedRows} name="edit">
+      <button className="btn btn-outline btn-sm" onClick={setEditedRows} name="edit">
         {/*✐*/}
         <Pencil/>
       </button>

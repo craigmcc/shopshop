@@ -62,7 +62,7 @@ export function CategoriesTable({ categories, list, memberRole }: Props) {
   const [originalData, setOriginalData] = useState<Category[]>(() => [...categories]);
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
-    pageSize: 10,
+    pageSize: 15,
   });
   const [validRows, setValidRows] = useState({}); // TODO: See Part 3 of the blog series for the shape of this
 
@@ -168,10 +168,11 @@ export function CategoriesTable({ categories, list, memberRole }: Props) {
   const table = useReactTable<Category>({
     columns,
     data: data ?? fallbackData,
+//    debugAll: true,
+    enableSortingRemoval: false, // Only show asc and desc, never none
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
-/*
     initialState: {
       sorting: [
         {
@@ -180,7 +181,6 @@ export function CategoriesTable({ categories, list, memberRole }: Props) {
         },
       ],
     },
-*/
     meta: {
       addRow: () => {
         const newRow: Category = {
@@ -246,29 +246,33 @@ export function CategoriesTable({ categories, list, memberRole }: Props) {
   });
 
   return (
-    <div className={"card bg-base-300 shadow-xl"}>
+    <div className={"card bg-base-300 shadow-xl min-w-200"}>
 
-      <table className="mt-4 rounded-lg border border-border">
+      <table className="rounded-lg border border-border">
 
         <thead>
         {table.getHeaderGroups().map(headerGroup => (
           <tr key={headerGroup.id}>
             {headerGroup.headers.map(header => (
-              <th key={header.id} colSpan={header.colSpan}>
+              <th key={header.id} colSpan={header.colSpan} className="w-3/4">
+                <div className="flex flex-row justify-center">
                 {flexRender(
                   header.column.columnDef.header,
                   header.getContext()
                 )}
-                {/*// TODO - should only show these controls on sortable columns*/}
-                <span>
-                  {header.column.getIsSorted() === "asc" ? (
-                    <ArrowUpAZ className="icon" onClick={header.column.getToggleSortingHandler()} />
-                  ) : header.column.getIsSorted() === "desc" ? (
-                    <ArrowDownAZ className="icon" onClick={header.column.getToggleSortingHandler()} />
-                  ) : (
-                    <MoreHorizontal className="icon" onClick={header.column.getToggleSortingHandler()} />
-                  )}
-                </span>
+                {header.column.getCanSort() ? (
+                  <>
+                    {header.column.getIsSorted() === "asc" ? (
+                      <ArrowUpAZ className="icon pl-1 text-primary" size="32" onClick={header.column.getToggleSortingHandler()} />
+                    ) : header.column.getIsSorted() === "desc" ? (
+                      <ArrowDownAZ className="icon pl-1 text-primary" size="32" onClick={header.column.getToggleSortingHandler()} />
+                    ) : (
+                      // This should never happen because of enableSortingRemoval: false
+                      <MoreHorizontal className="icon pl-1 text-primary" size="32" onClick={header.column.getToggleSortingHandler()} />
+                    )}
+                  </>
+                ) : null}
+                </div>
               </th>
             ))}
           </tr>
@@ -279,7 +283,7 @@ export function CategoriesTable({ categories, list, memberRole }: Props) {
         {table.getRowModel().rows.map(row => (
           <tr key={row.id}>
             {row.getVisibleCells().map(cell => (
-              <td key={cell.id} className="p-1">
+              <td key={cell.id} className="px-2 py-0">
                 {flexRender(
                   cell.column.columnDef.cell,
                   cell.getContext()
@@ -334,7 +338,7 @@ export function CategoriesTable({ categories, list, memberRole }: Props) {
 
       </div>
 */}
-{/*
+      {/*
     <div>
       Showing {table.getRowModel().rows.length.toLocaleString()} of{' '}
       {table.getRowCount().toLocaleString()} Rows
