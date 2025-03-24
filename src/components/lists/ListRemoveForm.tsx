@@ -39,7 +39,7 @@ export function ListRemoveForm({ list }: Props) {
   const [isRemoving, setIsRemoving] = useState<boolean>(false);
   const [result, setResult] = useState<ActionResult<List> | null>(null);
 
-  logger.info({
+  logger.trace({
     context: "ListRemoveForm.settingCurrentList",
     list,
   });
@@ -92,7 +92,7 @@ export function ListRemoveForm({ list }: Props) {
             <h5
               className="gap-2"
             >
-              Are you sure you want to remove  List &quot;{list.name}&quot;?
+              Are you sure you want to remove List &quot;{list.name}&quot;?
             </h5>
             <button
               className="btn btn-warning justify-center"

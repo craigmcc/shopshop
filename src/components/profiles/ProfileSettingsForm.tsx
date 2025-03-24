@@ -54,11 +54,6 @@ export function ProfileSettingsForm({ profile }: Props) {
     email: profile.email,
     name: profile.name,
   }
-  logger.trace({
-    context: "ProfileSettingsForm",
-    profile,
-    defaultValues: defaultValuesUpdate,
-  });
   const methods = useForm<ProfileUpdateSchemaType>({
     defaultValues: defaultValuesUpdate,
     mode: "onBlur",

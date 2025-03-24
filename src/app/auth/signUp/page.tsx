@@ -9,17 +9,20 @@
 // Internal Modules ----------------------------------------------------------
 
 import { SignUpForm } from "@/components/auth/SignUpForm";
+import { SubHeader } from "@/components/layout/SubHeader";
 
 // Public Objects ------------------------------------------------------------
 
 export default function SignUpPage() {
   return (
-    <div>
-      <main>
-        <div className="flex flex-col  max-w-3xl mx-auto h-dvh">
+    <main className="flex w-full items-center justify-center h-[calc(100vh-80px)] p-4">
+        <div className="flex flex-col">
+          <SubHeader
+            hrefBack="/"
+            title="Sign Up for ShopShop"
+          />
           <SignUpForm />
         </div>
       </main>
-    </div>
   )
 }

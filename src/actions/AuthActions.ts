@@ -10,11 +10,13 @@
 
 // External Modules ----------------------------------------------------------
 
+import { Profile } from "@prisma/client";
 import { AuthError } from "next-auth";
 
 // Internal Modules ----------------------------------------------------------
 
 import { signIn, signOut } from "@/auth";
+import { ActionResult } from "@/lib/ActionResult";
 import { logger } from "@/lib/ServerLogger";
 import{ type SignInSchemaType } from "@/zod-schemas/SignInSchema";
 
@@ -60,9 +62,21 @@ export async function doSignInAction(formData: SignInSchemaType) {
 /**
  * Perform the AuthJS sign out action.
  */
-export async function doSignOutAction() {
+export async function doSignOutAction(): Promise<ActionResult<Profile>> {
+
   logger.trace({
     context: "doSignOut.input",
   });
-  await signOut();
+
+  try {
+    await signOut();
+    logger.trace({
+      context: "doSignOut.output",
+    });
+    return ({ message: "Success" });
+  } catch (error) {
+    return ({ message: (error as Error).message });
+  }
+
 }
+
