@@ -25,10 +25,12 @@ type Props = {
   // Optional CSS class(es) for additional styling
   className?: string;
   // URL of the page to return to
-  href: string;
+  href?: string;
+  // Optional function to call when the button is clicked
+  onClick?: () => void;
 }
 
-export function BackButton({ className, href }: Props) {
+export function BackButton({ className, href, onClick }: Props) {
 
   const { setCurrentList } = useCurrentListContext();
   const router = useRouter();
@@ -44,7 +46,11 @@ export function BackButton({ className, href }: Props) {
       });
       setCurrentList(null);
     }
-    router.push(href);
+    if (onClick) {
+      onClick();
+    } else if (href) {
+      router.push(href);
+    }
   }
 
   return (

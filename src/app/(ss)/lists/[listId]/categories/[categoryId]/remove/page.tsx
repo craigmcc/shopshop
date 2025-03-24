@@ -80,7 +80,7 @@ export default async function CategoryRemovePage(props: Props) {
   return (
     <div>
       <SubHeader
-        hrefBack={`/lists/${listId}/categories`}
+        hrefBack={true}
         title={`Remove Category for List '${member.list.name}'`}
       />
       <CategoryRemoveForm

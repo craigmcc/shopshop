@@ -82,7 +82,7 @@ export default async function CategorySettingsPage(props: Props) {
   return (
     <div>
       <SubHeader
-        hrefBack={`/lists/${listId}/categories`}
+        hrefBack={true}
         title={category ? "Edit Category" : "Create New Category"}
       />
       <CategorySettingsForm

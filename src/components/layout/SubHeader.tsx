@@ -1,3 +1,5 @@
+"use client";
+
 // @/components/layout/SubHeader.tsx
 
 /**
@@ -7,6 +9,8 @@
  */
 
 // External Modules ----------------------------------------------------------
+
+import { useRouter } from "next/navigation";
 
 // Internal Modules ----------------------------------------------------------
 
@@ -18,19 +22,29 @@ import { BackButton } from "@/components/shared/BackButton";
 export type Props = {
   // URL of the "Add" page to navigate to, if any
   hrefAdd?: string;
-  // URL of the "Back" page to return to, if any
-  hrefBack?: string;
+  // URL of the "Back" page to return to, if any (or true for the previous page)
+  hrefBack?: string | boolean;
   // Title for the sub-header
   title: string;
 }
 
-export async function SubHeader({ hrefAdd, hrefBack, title }: Props) {
+export function SubHeader({ hrefAdd, hrefBack, title }: Props) {
+
+  const router = useRouter();
+
+  function onBack() {
+    if (hrefBack === true) {
+      router.back();
+    } else if (typeof hrefBack === "string") {
+      router.push(hrefBack);
+    }
+  }
 
   return (
     <div className="flex justify-between items-center gap-3 pb-2">
       <div>
         {hrefBack ? (
-          <BackButton href={hrefBack} />
+          <BackButton onClick={onBack} />
         ) : ( <span></span>)}
       </div>
       <h2 className="font-semibold text-2xl">{title}</h2>
