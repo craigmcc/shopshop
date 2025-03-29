@@ -10,19 +10,16 @@
 
 // External Modules ----------------------------------------------------------
 
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Profile } from "@prisma/client";
-import { LoaderCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { FormProvider, useForm } from "react-hook-form";
+import {  useState } from "react";
 import { toast } from "react-toastify";
 
 // Internal Modules ----------------------------------------------------------
 
 import { signUpProfile } from "@/actions/ProfileActions";
-import { InputField } from "@/components/daisyui/InputField";
 import { ServerResult } from "@/components/shared/ServerResult";
+import { useAppForm } from "@/components/tanstack-form/useAppForm";
 import { ActionResult } from "@/lib/ActionResult";
 import { logger } from "@/lib/ClientLogger";
 import { SignUpSchema, type SignUpSchemaType } from "@/zod-schemas/SignUpSchema";
@@ -32,7 +29,6 @@ import { SignUpSchema, type SignUpSchemaType } from "@/zod-schemas/SignUpSchema"
 export function SignUpForm() {
 
   const router = useRouter();
-  const [isSaving, setIsSaving] = useState<boolean>(false);
   const [result, setResult] = useState<ActionResult<Profile> | null>(null);
 
   logger.trace({
@@ -45,13 +41,17 @@ export function SignUpForm() {
     name: "",
     password: "",
   }
-  const methods = useForm({
+
+  const form = useAppForm({
     defaultValues,
-    mode: "onBlur",
-    resolver: zodResolver(SignUpSchema),
+    onSubmit: async ({ value }) => {
+      await submitForm(value);
+    },
+    validators: {
+      onBlur: SignUpSchema,
+      onChange: SignUpSchema,
+    },
   });
-  const formState = methods.formState;
-  const errors = formState.errors;
 
   async function submitForm(formData: SignUpSchemaType) {
 
@@ -64,10 +64,7 @@ export function SignUpForm() {
       }
     });
 
-    setIsSaving(true);
     const response = await signUpProfile(formData);
-    setIsSaving(false);
-
     if (response.model) {
       setResult(null);
       toast.success(`Profile for '${formData.name}' was successfully created`);
@@ -84,54 +81,57 @@ export function SignUpForm() {
         <h2 className="card-title justify-center">
           <ServerResult result={result} />
         </h2>
-        <FormProvider {...methods}>
-          <form
-            className="flex flex-row gap-2"
-            name="SignUpForm"
-            onSubmit={methods.handleSubmit(submitForm)}
-          >
-            <div className="flex flex-col w-full gap-2">
-              <InputField
-                autoFocus
-                label="Name"
-                name="name"
-                placeholder="Your Name"
-                type="text"
-              />
-              <InputField
-                label="Email"
-                name="email"
-                placeholder="Your Email Address"
-                type="email"
-              />
-            </div>
-            <div className=" flex flex-col w-full gap-2">
-              <InputField
-                label="Password"
-                name="password"
-                placeholder="Your Password"
-                type="password"
-              />
-              <InputField
-                label="Confirm Password"
-                name="confirmPassword"
-                placeholder="Confirm Your Password"
-                type="password"
-              />
-              <button
-                className="btn btn-primary"
-                disabled={Object.keys(errors).length > 0}
-                type="submit"
-              >
-                {isSaving ? (
-                  <>
-                    <LoaderCircle className="animate-spin"/>Saving
-                  </>
-                ) : "Sign Up"}
-              </button>
-            </div>
-          </form>
-        </FormProvider>
+        <form
+          className="flex flex-row gap-2"
+          name="SignUpForm"
+          onSubmit={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            form.handleSubmit();
+          }}
+        >
+          <div className="flex flex-col 2-full gap-2">
+            <form.AppField name="name">
+              {(field) =>
+                <field.InputField
+                  autoFocus
+                  label="Name"
+                  placeholder="Your Name"
+                />}
+            </form.AppField>
+            <form.AppField name="email">
+              {(field) =>
+                <field.InputField
+                  label="Email"
+                  placeholder="Your email address"
+                />}
+            </form.AppField>
+          </div>
+          <div className="flex flex-col 2-full gap-2">
+            <form.AppField name="password">
+              {(field) =>
+                <field.InputField
+                  label="Password"
+                  placeholder="Your Password"
+                  type="password"
+                />}
+            </form.AppField>
+            <form.AppField name="confirmPassword">
+              {(field) =>
+                <field.InputField
+                  label="Confirm Password"
+                  placeholder="Confirm Your Password"
+                  type="password"
+                />}
+            </form.AppField>
+            <form.AppForm>
+              <div className="flex flex-row justify-between">
+                <form.ResetButton/>
+                <form.SubmitButton/>
+              </div>
+            </form.AppForm>
+          </div>
+        </form>
       </div>
     </div>
   )

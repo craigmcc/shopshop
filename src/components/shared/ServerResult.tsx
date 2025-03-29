@@ -35,7 +35,7 @@ export function ServerResult<M>({ result }: Props<M>) {
   }
 
   return (
-    <div className="bg-error text-error px-4 py-2 my-2 border rounded">
+    <div className="bg-error text-error-content px-4 py-2 my-2 border rounded">
       <div>{result.message}</div>
       <ul>
         {result.formErrors?.map((error, index) => (
