@@ -1,16 +1,16 @@
 "use client";
 
-// @/components/tanstack-form/InputField.tsx
+// @/components/tanstack-form/TextareaField.tsx
 
 /**
- * TanStack Form input field for a text field with a label.
+ * TanStack Form textarea field for a textarea with a label.
  *
  * @packageDocumentation
  */
 
 // External Modules ----------------------------------------------------------
 
-import { InputHTMLAttributes } from "react";
+import { TextareaHTMLAttributes } from "react";
 
 // Internal Modules ----------------------------------------------------------
 
@@ -19,26 +19,23 @@ import { useFieldContext } from "@/components/tanstack-form/useAppContexts";
 // Public Objects ------------------------------------------------------------
 
 type Props = {
-  // Optional CSS classes to apply to the input field.
-  className?: string,
-  // The label for the input field.
-  label: string,
-  // Optional placeholder text for the input field.
-  placeholder?: string,
-  // Optional HTML type for the input field. [text]
-  type?: string,
-} & InputHTMLAttributes<HTMLInputElement>;
+  // Optional CSS classes to apply to the textarea field.
+  className?: string;
+  // The label for the textarea field.
+  label: string;
+  // Optional placeholder text for the textarea field.
+  placeholder?: string;
+} & TextareaHTMLAttributes<HTMLTextAreaElement>;
 
-export function InputField({className, label, placeholder, type, ...props}: Props) {
+export function TextareaField({ className, label, placeholder, ...props }: Props) {
 
-const field = useFieldContext<string>();
+  const field = useFieldContext<string>();
   const {
     state: {
       meta: { errors, isTouched },
       value,
     },
   } = useFieldContext<string>();
-
 
   const errorMessage = isTouched
     ? errors.map((e) => e.message).join(", ")
@@ -47,12 +44,11 @@ const field = useFieldContext<string>();
   return (
     <fieldset className="fieldset w-full">
       <legend className="fieldset-legend">{label}</legend>
-      <input
-        className={`input input-bordered w-full max-w-xs ${className}`}
+      <textarea
+        className={`textarea w-full max-w-xs ${className}`}
         name={field.name}
         onChange={(e) => field.handleChange(e.target.value)}
         placeholder={placeholder ? placeholder : undefined}
-        type={type ? type : "text"}
         value={value}
         {...props}
       />
