@@ -39,6 +39,7 @@ export function SubmitButton({ className, label }: Props) {
         <button
           className={`btn btn-primary ${className}`}
           disabled={!canSubmit}
+          role="button"
           type="submit"
         >
           {isSubmitting

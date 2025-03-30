@@ -35,6 +35,7 @@ export function ResetButton({ className, label }: Props) {
         form.reset();
       }}
       className={`btn btn-accent ${className}`}
+      role="button"
       type="button"
     >
       <span>{label ? label : "Reset"}</span>

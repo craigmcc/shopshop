@@ -48,6 +48,7 @@ export function CheckboxField({ className, label }: Props) {
       <input
         checked={value}
         className={`checkbox ${className}`}
+        id={field.name}
         name={field.name}
         onChange={(e) => field.handleChange(e.target.checked)}
         type="checkbox"

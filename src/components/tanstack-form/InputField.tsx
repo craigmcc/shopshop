@@ -46,9 +46,12 @@ const field = useFieldContext<string>();
 
   return (
     <fieldset className="fieldset w-full">
-      <legend className="fieldset-legend">{label}</legend>
+      <legend className="fieldset-legend">
+        <label htmlFor={field.name}>{label}</label>
+      </legend>
       <input
         className={`input input-bordered w-full max-w-xs ${className}`}
+        id={field.name}
         name={field.name}
         onChange={(e) => field.handleChange(e.target.value)}
         placeholder={placeholder ? placeholder : undefined}
