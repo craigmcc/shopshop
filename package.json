@@ -9,7 +9,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "dotenv -e .env.test.local -- vitest",
+    "test": "dotenv -e .env.test.local -- vitest --silent=false",
     "test:github:ci": "vitest run",
     "test:local": "dotenv -e .env.test.local -- vitest",
     "test:local:ci": "dotenv -e .env.test.local -- vitest run"
