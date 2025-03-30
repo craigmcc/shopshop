@@ -28,12 +28,8 @@ import { SignUpSchema, type SignUpSchemaType } from "@/zod-schemas/SignUpSchema"
 
 export function SignUpForm() {
 
-  const router = useRouter();
   const [result, setResult] = useState<ActionResult<Profile> | null>(null);
-
-  logger.trace({
-    context: "SignUpForm",
-  });
+  const router = useRouter();
 
   const defaultValues: SignUpSchemaType = {
     confirmPassword: "",

@@ -11,7 +11,7 @@
 // External Modules ----------------------------------------------------------
 
 import { Profile } from "@prisma/client";
-import { AuthError } from "next-auth";
+//import { AuthError } from "next-auth";
 
 // Internal Modules ----------------------------------------------------------
 
@@ -29,34 +29,48 @@ import{ type SignInSchemaType } from "@/zod-schemas/SignInSchema";
  *
  * @throws AuthError                    If the sign in fails
  */
-export async function doSignInAction(formData: SignInSchemaType) {
+export async function doSignInAction(formData: SignInSchemaType): Promise<ActionResult<Profile>> {
+
   try {
     logger.trace({
-      context: "doSignIn.input",
+      context: "doSignInAction.input",
       email: formData.email,
       password: "*REDACTED*",
     })
+
     const response = await signIn("credentials", {
       email: formData.email,
       password: formData.password,
       redirect: false,
     });
     logger.trace({
-      context: "doSignIn.output",
+      context: "doSignInAction.output",
       response: response,
     });
-    return response;
+
+    // Return a dummy profile object
+    const profile: Profile = {
+      createdAt: new Date(),
+      email: formData.email,
+      id: "",
+      imageUrl: "",
+      name: "",
+      password: "*REDACTED*",
+      updatedAt: new Date(),
+    };
+    return ({ model: profile });
+
   } catch (error) {
-    logger.trace({
-      context: "doSignIn.error",
+
+    logger.info({
+      context: "doSignInAction.error",
       error: error,
+      message: (error as Error).message,
     });
-    if (error instanceof Error) {
-      throw new AuthError(error.message);
-    } else {
-      throw new AuthError("Sign In failed");
-    }
+    return ({ message: (error as Error).message });
+
   }
+
 }
 
 /**
@@ -65,17 +79,21 @@ export async function doSignInAction(formData: SignInSchemaType) {
 export async function doSignOutAction(): Promise<ActionResult<Profile>> {
 
   logger.trace({
-    context: "doSignOut.input",
+    context: "doSignOutAction.input",
   });
 
   try {
+
     await signOut();
     logger.trace({
-      context: "doSignOut.output",
+      context: "doSignOutAction.output",
     });
     return ({ message: "Success" });
+
   } catch (error) {
+
     return ({ message: (error as Error).message });
+
   }
 
 }
