@@ -68,7 +68,9 @@ describe("SignInForm", () => {
 
   });
 
-  // TODO - Current error handling does not error on blank required fields
+  // When the form is initially rendered, the Save button is correctly disabled,
+  // so the click() call does not do anything.  But the rest of the test fails
+  // because it assumes the error messages would have been displayed.
   it.skip("should render with validation errors on empty fields", async () => {
 
     const user = userEvent.setup();
