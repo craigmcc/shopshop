@@ -10,7 +10,7 @@
 
 import { Profile } from "@prisma/client";
 import CredentialsProvider from "next-auth/providers/credentials";
-import NextAuth, { AuthError, DefaultSession } from "next-auth";
+import NextAuth, { DefaultSession } from "next-auth";
 //import { JWT } from "next-auth/jwt";
 
 // Internal Modules ----------------------------------------------------------
@@ -19,6 +19,7 @@ import { db } from "@/lib/db";
 import { verifyPassword } from "@/lib/Encryption";
 import { logger } from "@/lib/ServerLogger";
 import { SignInSchemaType } from "@/zod-schemas/SignInSchema";
+import {SignInError} from "@auth/core/errors";
 
 // Public Objects ------------------------------------------------------------
 
@@ -100,6 +101,34 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
 
   },
 
+  logger: {
+    debug(code, ...message) {
+      logger.debug({
+        context: "auth.debug",
+        code: code,
+        message: message,
+      });
+    },
+    error(error: Error) {
+      // Suppress CredentialsSignIn errors, since we are already
+      // logging them in the authorize() function
+      if ((error instanceof SignInError) && ((error as SignInError).type === "CredentialsSignin")) {
+        return;
+      }
+      logger.error({
+        context: "auth.error",
+        error: error,
+      });
+    },
+    warn(code, ...message) {
+      logger.warn({
+        context: "auth.warn",
+        code: code,
+        message: message,
+      });
+    },
+  },
+
   pages: {
     signIn: "/auth/signIn",
     signOut: "/auth/signOut",
@@ -146,19 +175,18 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
               profile: profile,
             };
           } else {
-            logger.info({
+            logger.error({
               context: "auth.authorize.failure.password",
               email: credentials.email,
             });
-//            throw new AuthError("Invalid Credentials");
             return null;
           }
         } else {
-          logger.info({
+          logger.error({
             context: "auth.authorize.failure.email",
             email: credentials.email,
           });
-          throw new AuthError("Invalid Credentials");
+          return null;
         }
 
       },

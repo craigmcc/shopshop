@@ -62,7 +62,8 @@ export async function doSignInAction(formData: SignInSchemaType): Promise<Action
 
   } catch (error) {
 
-    logger.info({
+    // Appropriate logging already happened in the authorize() method
+    logger.trace({
       context: "doSignInAction.error",
       error: error,
       message: (error as Error).message,
