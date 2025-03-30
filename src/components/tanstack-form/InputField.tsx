@@ -33,10 +33,9 @@ export function InputField({className, label, placeholder, type, ...props}: Prop
 
 const field = useFieldContext<string>();
   const {
-//    handleChange,
     state: {
-//      value,
       meta: { errors, isTouched },
+      value,
     },
   } = useFieldContext<string>();
 
@@ -57,14 +56,12 @@ const field = useFieldContext<string>();
         onChange={(e) => field.handleChange(e.target.value)}
         placeholder={placeholder ? placeholder : undefined}
         type={type ? type : "text"}
-        value={field.state.value}
+        value={value}
         {...props}
       />
-      {errorMessage ? (
-        <div className="label-text-alt text-error">
-          {errorMessage}
-        </div>
-      ) : null}
+      {errorMessage && (
+        <div className="label-text-alt text-error">{errorMessage}</div>
+      )}
     </label>
   );
 
