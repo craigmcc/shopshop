@@ -10,19 +10,16 @@
 
 // External Modules ----------------------------------------------------------
 
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Profile } from "@prisma/client";
-import { LoaderCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 
 // Internal Modules ----------------------------------------------------------
 
 import { updateProfile } from "@/actions/ProfileActions";
-import { InputField } from "@/components/daisyui/InputField";
 import { ServerResult } from "@/components/shared/ServerResult";
+import { useAppForm } from "@/components/tanstack-form/useAppForm";
 import { ActionResult } from "@/lib/ActionResult";
 import { logger } from "@/lib/ClientLogger";
 import {
@@ -41,26 +38,24 @@ type Props = {
 
 export function ProfileSettingsForm({ profile }: Props) {
 
-  const router = useRouter();
-  const [isSaving, setIsSaving] = useState<boolean>(false);
   const [result, setResult] = useState<ActionResult<Profile> | null>(null);
-
-  logger.trace({
-    context: "ProfileSettingsForm",
-    profile,
-  });
+  const router = useRouter();
 
   const defaultValuesUpdate: ProfileUpdateSchemaType = {
     email: profile.email,
     name: profile.name,
   }
-  const methods = useForm<ProfileUpdateSchemaType>({
+
+  const form = useAppForm({
     defaultValues: defaultValuesUpdate,
-    mode: "onBlur",
-    resolver: zodResolver(ProfileUpdateSchema),
-  });
-  const formState = methods.formState;
-  const errors = formState.errors;
+    onSubmit: async ({ value }) => {
+      await submitForm(value);
+    },
+    validators: {
+      onBlur: ProfileUpdateSchema,
+      onChange: ProfileUpdateSchema,
+    },
+  })
 
   async function submitForm(formData: ProfileUpdateSchemaType): Promise<void> {
 
@@ -69,10 +64,7 @@ export function ProfileSettingsForm({ profile }: Props) {
       formData,
     })
 
-    setIsSaving(true);
     const response = await updateProfile(profile.id, formData);
-    setIsSaving(false);
-
     logger.trace({
       context: "ProfileSettingsForm.submitForm.output",
       response,
@@ -96,44 +88,44 @@ export function ProfileSettingsForm({ profile }: Props) {
   return (
     <div className="card bg-base-300 shadow-xl">
       <div className="card-body">
-        <h2 className="card-title justify-center">
-          <ServerResult result={result} />
-          <div>Update Profile</div>
-        </h2>
-        <FormProvider {...methods}>
-          <form
-            className="flex flex-col w-full"
-            name="ProfileSettingsForm"
-            onSubmit={methods.handleSubmit(submitForm)}
-          >
-            <div className="gap-4">
-              <InputField
-                autoFocus
-                label="Name"
-                name="name"
-                placeholder="Your Name"
-                type="text"
-              />
-              <InputField
-                label="Email"
-                name="email"
-                placeholder="Your Email Address"
-                type="email"
-              />
-              <button
-                className="btn btn-primary"
-                disabled={Object.keys(errors).length > 0}
-                type="submit"
-              >
-                {isSaving ? (
-                  <>
-                    <LoaderCircle className="animate-spin"/>Saving
-                  </>
-                ) : "Save"}
-              </button>
-            </div>
-          </form>
-        </FormProvider>
+        {result && (
+          <h2 className="card-title justify-center">
+            <ServerResult result={result} />
+          </h2>
+        )}
+        <form
+          className="flex flex-row gap-2"
+          name="ProfileSettingsForm"
+          onSubmit={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            form.handleSubmit();
+          }}
+        >
+          <div className="flex flex-col gap-2">
+            <form.AppField name="name">
+              {(field) =>
+                <field.InputField
+                  autoFocus
+                  label="Name"
+                  placeholder="Your Name"
+                />}
+            </form.AppField>
+            <form.AppField name="email">
+              {(field) =>
+                <field.InputField
+                  label="Email"
+                  placeholder="Your email address"
+                />}
+            </form.AppField>
+            <form.AppForm>
+              <div className="flex flex-row justify-between">
+                <form.ResetButton/>
+                <form.SubmitButton/>
+              </div>
+            </form.AppForm>
+          </div>
+        </form>
       </div>
     </div>
   );

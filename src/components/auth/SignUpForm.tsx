@@ -86,7 +86,7 @@ export function SignUpForm() {
             form.handleSubmit();
           }}
         >
-          <div className="flex flex-col 2-full gap-2">
+          <div className="flex flex-col gap-2">
             <form.AppField name="name">
               {(field) =>
                 <field.InputField
@@ -123,7 +123,7 @@ export function SignUpForm() {
             <form.AppForm>
               <div className="flex flex-row justify-between">
                 <form.ResetButton/>
-                <form.SubmitButton/>
+                <form.SubmitButton isCreating/>
               </div>
             </form.AppForm>
           </div>

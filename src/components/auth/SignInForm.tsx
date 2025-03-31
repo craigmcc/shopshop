@@ -113,7 +113,7 @@ export function SignInForm() {
           </form.AppField>
           <form.AppForm>
             <div className="flex flex-row justify-center">
-              <form.SubmitButton label="Sign In"/>
+              <form.SubmitButton isCreating label="Sign In"/>
             </div>
           </form.AppForm>
         </form>

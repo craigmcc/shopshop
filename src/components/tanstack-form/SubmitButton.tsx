@@ -22,18 +22,21 @@ import {ButtonHTMLAttributes} from "react";
 type Props = {
   // Optional CSS classes to apply to the button.
   className?: string,
+  // Are we creating a new object?  [false]
+  isCreating?: boolean,
   // Optional label for the button.  [Save]
   label?: string,
 } & ButtonHTMLAttributes<HTMLButtonElement>;
 
-export function SubmitButton({ className, label }: Props) {
+export function SubmitButton({ className, isCreating, label }: Props) {
 
   const form = useFormContext();
   const { isSubmitting } = form.state;
 
   return (
     <form.Subscribe
-      selector={(state) => state.isValid && !state.isPristine}
+      selector={(state) =>
+        isCreating ? state.isValid && !state.isPristine : state.isValid}
     >
       {(canSubmit) => (
         <button
