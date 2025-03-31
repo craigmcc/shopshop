@@ -14,6 +14,7 @@ import { SelectHTMLAttributes } from "react";
 
 // Internal Modules ----------------------------------------------------------
 
+import {FieldErrors} from "@/components/tanstack-form/FieldErrors";
 import { useFieldContext } from "@/components/tanstack-form/useAppContexts";
 
 // Public Objects ------------------------------------------------------------
@@ -37,17 +38,8 @@ type Props = {
 } & SelectHTMLAttributes<HTMLSelectElement>;
 
 export function SelectField({ className, label, options, ...props }: Props) {
-  const field = useFieldContext<string>();
-  const {
-    state: {
-      meta: {errors, isTouched},
-      value,
-    },
-  } = useFieldContext<string>();
 
-  const errorMessage = isTouched
-    ? errors.map((e) => e.message).join(", ")
-    : undefined;
+  const field = useFieldContext<string>();
 
   return (
     <fieldset className="fieldset w-full">
@@ -59,7 +51,7 @@ export function SelectField({ className, label, options, ...props }: Props) {
         id={field.name}
         name={field.name}
         onChange={(e) => field.handleChange(e.target.value)}
-        value={value}
+        value={field.state.value}
         {...props}
       >
         {options.map((option) => (
@@ -72,11 +64,7 @@ export function SelectField({ className, label, options, ...props }: Props) {
           </option>
         ))}
       </select>
-      {errorMessage && (
-        <div className="fieldset-label font-bold text-error">
-          {errorMessage}
-        </div>
-      )}
+      <FieldErrors field={field} />
     </fieldset>
   );
 

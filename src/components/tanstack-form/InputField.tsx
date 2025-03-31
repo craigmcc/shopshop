@@ -14,6 +14,7 @@ import { InputHTMLAttributes } from "react";
 
 // Internal Modules ----------------------------------------------------------
 
+import { FieldErrors } from "@/components/tanstack-form/FieldErrors";
 import { useFieldContext } from "@/components/tanstack-form/useAppContexts";
 
 // Public Objects ------------------------------------------------------------
@@ -31,18 +32,7 @@ type Props = {
 
 export function InputField({className, label, placeholder, type, ...props}: Props) {
 
-const field = useFieldContext<string>();
-  const {
-    state: {
-      meta: { errors, isTouched },
-      value,
-    },
-  } = useFieldContext<string>();
-
-
-  const errorMessage = isTouched
-    ? errors.map((e) => e.message).join(", ")
-    : undefined;
+  const field = useFieldContext<string>();
 
   return (
     <fieldset className="fieldset w-full">
@@ -56,14 +46,10 @@ const field = useFieldContext<string>();
         onChange={(e) => field.handleChange(e.target.value)}
         placeholder={placeholder ? placeholder : undefined}
         type={type ? type : "text"}
-        value={value}
+        value={field.state.value}
         {...props}
       />
-      {errorMessage && (
-        <div className="fieldset-label font-bold text-error">
-          {errorMessage}
-        </div>
-      )}
+      <FieldErrors field={field} />
     </fieldset>
   );
 

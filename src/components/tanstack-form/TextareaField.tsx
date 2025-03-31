@@ -14,6 +14,7 @@ import { TextareaHTMLAttributes } from "react";
 
 // Internal Modules ----------------------------------------------------------
 
+import { FieldErrors } from "@/components/tanstack-form/FieldErrors";
 import { useFieldContext } from "@/components/tanstack-form/useAppContexts";
 
 // Public Objects ------------------------------------------------------------
@@ -30,16 +31,6 @@ type Props = {
 export function TextareaField({ className, label, placeholder, ...props }: Props) {
 
   const field = useFieldContext<string>();
-  const {
-    state: {
-      meta: { errors, isTouched },
-      value,
-    },
-  } = useFieldContext<string>();
-
-  const errorMessage = isTouched
-    ? errors.map((e) => e.message).join(", ")
-    : undefined;
 
   return (
     <fieldset className="fieldset w-full">
@@ -52,14 +43,10 @@ export function TextareaField({ className, label, placeholder, ...props }: Props
         name={field.name}
         onChange={(e) => field.handleChange(e.target.value)}
         placeholder={placeholder ? placeholder : undefined}
-        value={value}
+        value={field.state.value}
         {...props}
       />
-      {errorMessage && (
-        <div className="fieldset-label font-bold text-error">
-          {errorMessage}
-        </div>
-      )}
+      <FieldErrors field={field} />
     </fieldset>
   );
 
