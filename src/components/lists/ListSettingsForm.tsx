@@ -36,7 +36,7 @@ const isTesting = process.env.NODE_ENV === "test";
 
 type Props = {
   // List to be updated (for update only)
-  list: List | undefined,
+  list?: List | undefined,
 }
 
 export function ListSettingsForm({ list }: Props ) {
@@ -127,8 +127,8 @@ export function ListSettingsForm({ list }: Props ) {
             {(field) =>
               <field.InputField
                 autoFocus
-                label="Name"
-                placeholder="Your Name"
+                label="List Name"
+                placeholder="List Name"
               />}
           </form.AppField>
           <form.AppForm>
