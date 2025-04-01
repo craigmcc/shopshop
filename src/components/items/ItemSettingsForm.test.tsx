@@ -83,7 +83,7 @@ describe("ItemSettingsForm", () => {
         const user = userEvent.setup();
         const { submitButton } = elements();
         await user.click(submitButton);
-        await UTILS.pause(1000);
+        await UTILS.pause(500);
       });
 
       expect(screen.getByText("Name is required"));
@@ -104,7 +104,7 @@ describe("ItemSettingsForm", () => {
         await user.clear(nameField);
         await user.type(nameField, NEW_NAME);
         await user.click(submitButton);
-        await UTILS.pause(1000);
+        await UTILS.pause(500);
       });
 
       expect(screen.getByText(ERRORS.NOT_MEMBER));
@@ -125,7 +125,7 @@ describe("ItemSettingsForm", () => {
         await user.clear(nameField);
         await user.type(nameField, NEW_NAME);
         await user.click(submitButton);
-        await UTILS.pause(1000);
+        await UTILS.pause(500);
       });
 
       const item = await UTILS.lookupItemByName(category, NEW_NAME);
@@ -147,7 +147,7 @@ describe("ItemSettingsForm", () => {
         await user.clear(nameField);
         await user.type(nameField, NEW_NAME);
         await user.click(submitButton);
-        await UTILS.pause(1000);
+        await UTILS.pause(500);
       });
 
       const item = await UTILS.lookupItemByName(category, NEW_NAME);
@@ -184,7 +184,7 @@ describe("ItemSettingsForm", () => {
         const { nameField, submitButton } = elements();
         await user.clear(nameField);
         await user.click(submitButton);
-        await UTILS.pause(1000);
+        await UTILS.pause(500);
       });
 
       expect(screen.getByText("Name is required"));
@@ -206,7 +206,7 @@ describe("ItemSettingsForm", () => {
         await user.clear(nameField);
         await user.type(nameField, NEW_NAME);
         await user.click(submitButton);
-        await UTILS.pause(1000);
+        await UTILS.pause(500);
       });
 
       expect(screen.getByText(ERRORS.NOT_MEMBER));
@@ -228,7 +228,7 @@ describe("ItemSettingsForm", () => {
         await user.clear(nameField);
         await user.type(nameField, NEW_NAME);
         await user.click(submitButton);
-        await UTILS.pause(1000);
+        await UTILS.pause(500);
       });
 
       const output = await UTILS.lookupItemById(input.id);
@@ -252,7 +252,7 @@ describe("ItemSettingsForm", () => {
         await user.clear(nameField);
         await user.type(nameField, NEW_NAME);
         await user.click(submitButton);
-        await UTILS.pause(1000);
+        await UTILS.pause(500);
       });
 
       const output = await UTILS.lookupItemById(input.id);

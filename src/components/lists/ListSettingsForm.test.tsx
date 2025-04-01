@@ -79,6 +79,7 @@ describe("ListSettingsForm", () => {
         const user = userEvent.setup();
         const { submitButton } = elements();
         await user.click(submitButton);
+        await UTILS.pause(500);
       });
 
       expect(screen.getByText("Name is required"));
@@ -97,6 +98,7 @@ describe("ListSettingsForm", () => {
         const { nameField, submitButton } = elements();
         await user.type(nameField, NEW_NAME);
         await user.click(submitButton);
+        await UTILS.pause(500);
       });
 
       const list = await UTILS.lookupListByName(NEW_NAME);
@@ -131,6 +133,7 @@ describe("ListSettingsForm", () => {
         const { nameField, submitButton } = elements();
         await user.clear(nameField);
         await user.click(submitButton);
+        await UTILS.pause(500);
       });
 
       expect(screen.getByText("Name is required"));
@@ -151,6 +154,7 @@ describe("ListSettingsForm", () => {
         await user.clear(nameField);
         await user.type(nameField, NEW_NAME);
         await user.click(submitButton);
+        await UTILS.pause(500);
       });
 
       expect(screen.getByText(ERRORS.NOT_ADMIN));
@@ -171,6 +175,7 @@ describe("ListSettingsForm", () => {
         await user.clear(nameField);
         await user.type(nameField, NEW_NAME);
         await user.click(submitButton);
+        await UTILS.pause(500);
       });
 
       expect(screen.getByText(ERRORS.NOT_ADMIN));
@@ -195,6 +200,7 @@ describe("ListSettingsForm", () => {
         await user.clear(nameField);
         await user.type(nameField, NEW_NAME);
         await user.click(submitButton);
+        await UTILS.pause(500);
       });
 
       const output = await db.list.findUnique({

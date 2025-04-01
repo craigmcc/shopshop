@@ -40,7 +40,7 @@ type Props = {
   /* Category owning this Item */
   category: Category,
   /* Item to be updated (for update only) */
-  item: Item | undefined,
+  item?: Item | undefined,
 }
 
 export function ItemSettingsForm({ category, item }: Props ) {
