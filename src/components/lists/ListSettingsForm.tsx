@@ -10,19 +10,16 @@
 
 // External Modules ----------------------------------------------------------
 
-import { zodResolver } from "@hookform/resolvers/zod";
 import { List } from "@prisma/client";
-import { LoaderCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 
 // Internal Modules ----------------------------------------------------------
 
 import { createList, updateList } from "@/actions/ListActions";
-import { InputField } from "@/components/daisyui/InputField";
 import { ServerResult } from "@/components/shared/ServerResult";
+import { useAppForm } from "@/components/tanstack-form/useAppForm";
 import { useCurrentListContext } from "@/contexts/CurrentListContext";
 import { ActionResult } from "@/lib/ActionResult";
 import { logger } from "@/lib/ClientLogger";
@@ -45,9 +42,8 @@ type Props = {
 export function ListSettingsForm({ list }: Props ) {
 
   const isCreating = !list;
-  const router = useRouter();
-  const [isSaving, setIsSaving] = useState<boolean>(false);
   const [result, setResult] = useState<ActionResult<List> | null>(null);
+  const router = useRouter();
 
   const { setCurrentList } = useCurrentListContext();
   logger.trace({
@@ -65,14 +61,16 @@ export function ListSettingsForm({ list }: Props ) {
     private: list?.private ?? false,
   }
 
-  const methods = useForm<ListCreateSchemaType | ListUpdateSchemaType>({
+  const form = useAppForm({
     defaultValues: isCreating ? defaultValuesCreate : defaultValuesUpdate,
-    mode: "onBlur",
-    // @ts-expect-error Type weirdness on resolver property
-    resolver: isCreating ? zodResolver(ListCreateSchema) : zodResolver(ListUpdateSchema),
-  });
-  const formState = methods.formState;
-  const errors = formState.errors;
+    onSubmit: async ({ value }) => {
+      await submitForm(value);
+    },
+    validators: {
+      onBlur: isCreating ? ListCreateSchema : ListUpdateSchema,
+      onChange: isCreating ? ListCreateSchema : ListUpdateSchema,
+    },
+  })
 
   async function submitForm(formData: ListCreateSchemaType | ListUpdateSchemaType) {
 
@@ -81,13 +79,9 @@ export function ListSettingsForm({ list }: Props ) {
       formData,
       isCreating,
     });
-
-    setIsSaving(true);
     const response: ActionResult<List> = isCreating
       ? await createList(formData as ListCreateSchemaType)
       : await updateList(list!.id, formData as ListUpdateSchemaType);
-    setIsSaving(false);
-
     logger.trace({
       context: "ListSettingsForm.submitForm.output",
       response,
@@ -115,37 +109,35 @@ export function ListSettingsForm({ list }: Props ) {
   return (
     <div className="card bg-base-300 shadow-xl">
       <div className="card-body">
-        <h2 className="card-title justify-center">
-          <ServerResult result={result} />
-        </h2>
-        <FormProvider {...methods}>
-          <form
-            className="flex flex-col gap-2"
-            name="ListSettingsForm"
-            onSubmit={methods.handleSubmit(submitForm)}
-          >
-            <div className="flex flex-col w-full gap-2">
-              <InputField
-                autoFocus={true}
-                label="List Name"
-                name="name"
-                placeholder="List Name"
-                type="text"
-              />
-              <button
-                className="btn btn-primary"
-                disabled={Object.keys(errors).length > 0}
-                type="submit"
-              >
-                {isSaving ? (
-                  <>
-                    <LoaderCircle className="animate-spin"/>Saving
-                  </>
-                ) : "Save" }
-              </button>
+        {result && (
+          <h2 className="card-title justify-center">
+            <ServerResult result={result} />
+          </h2>
+        )}
+        <form
+          className="flex flex-col gap-2"
+          name="ListSettingsForm"
+          onSubmit={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            form.handleSubmit();
+          }}
+        >
+          <form.AppField name="name">
+            {(field) =>
+              <field.InputField
+                autoFocus
+                label="Name"
+                placeholder="Your Name"
+              />}
+          </form.AppField>
+          <form.AppForm>
+            <div className="flex flex-row justify-between">
+              <form.ResetButton/>
+              <form.SubmitButton isCreating={isCreating}/>
             </div>
-          </form>
-        </FormProvider>
+          </form.AppForm>
+        </form>
       </div>
     </div>
   );
