@@ -18,6 +18,7 @@ import React from "react";
 // @ts-expect-error "any" types should maybe be replaced
 export function FooterCell({ table }) {
 
+  const pageCount = table.getPageCount();
   const tableMeta = table.options.meta;
 
   return (
@@ -63,7 +64,7 @@ export function FooterCell({ table }) {
       <div>
           <span className="text-sm">
             Page {table.getState().pagination.pageIndex + 1} of{" "}
-            {table.getPageCount()}
+            {pageCount > 0 ? pageCount : `1`}
           </span>
         <span className="text-sm p-1">|</span>
         <span className="text-sm">

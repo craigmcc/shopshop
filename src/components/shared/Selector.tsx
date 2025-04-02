@@ -1,21 +1,19 @@
 "use client";
 
-// @/components/tanstack-form/SelectField.tsx
+// @/components/shared/Selector.tsx
 
 /**
- * TanStack Form select field for a select with a label.
+ * General purpose selector for the application.
  *
  * @packageDocumentation
  */
 
 // External Modules ----------------------------------------------------------
 
-import { SelectHTMLAttributes } from "react";
+import {ChangeEvent, SelectHTMLAttributes} from "react";
 
 // Internal Modules ----------------------------------------------------------
 
-import {FieldErrors} from "@/components/tanstack-form/FieldErrors";
-import { useFieldContext } from "@/components/tanstack-form/useAppContexts";
 import { SelectOption } from "@/types/types";
 
 // Public Objects ------------------------------------------------------------
@@ -23,27 +21,36 @@ import { SelectOption } from "@/types/types";
 type Props = {
   // Optional CSS classes to apply to the select field.
   className?: string;
-  // The label for the select field.
-  label: string;
-  // The options for the select field.
+  // The label for the select field (if any).
+  label?: string;
+  // HTML name of the select field.
+  name: string;
+  // Event handler for change events.
+  onChange: (event: ChangeEvent<HTMLSelectElement>) => void;
+  // The options for the select field (including header if any).
   options: SelectOption[];
 } & SelectHTMLAttributes<HTMLSelectElement>;
 
-export function SelectField({ className, label, options, ...props }: Props) {
-
-  const field = useFieldContext<string>();
-
+export function Selector({
+  className,
+  label,
+  name,
+  onChange,
+  options,
+  ...props
+}: Props) {
   return (
-    <fieldset className="fieldset w-full">
-      <legend className="fieldset-legend">
-        <label htmlFor={field.name}>{label}</label>
-      </legend>
+    <fieldset className={`fieldset w-full ${label ? 'grid-cols-2' : ''}`}>
+      {label && (
+        <legend className="fieldset-legend">
+          <label htmlFor={name}>{label}</label>
+        </legend>
+      )}
       <select
         className={`select w-full max-w-xs ${className}`}
-        id={field.name}
-        name={field.name}
-        onChange={(e) => field.handleChange(e.target.value)}
-        value={field.state.value}
+        id={name}
+        name={name}
+        onChange={onChange}
         {...props}
       >
         {options.map((option) => (
@@ -56,8 +63,6 @@ export function SelectField({ className, label, options, ...props }: Props) {
           </option>
         ))}
       </select>
-      <FieldErrors field={field} />
     </fieldset>
   );
-
 }

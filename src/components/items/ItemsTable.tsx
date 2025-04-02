@@ -10,36 +10,53 @@
 
 // External Modules ----------------------------------------------------------
 
-import { Item, MemberRole } from "@prisma/client";
+import { Category, Item, List, MemberRole } from "@prisma/client";
 import {
   CellContext,
   createColumnHelper,
   flexRender,
   getCoreRowModel,
+  getPaginationRowModel, PaginationState,
   useReactTable,
 } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import React, { ChangeEvent, useEffect, useRef, useState } from "react";
 
 // Internal Modules ----------------------------------------------------------
+
+import { Selector } from "@/components/shared/Selector";
+import {FooterCell} from "@/components/tables/FooterCell";
+import { SelectOption } from "@/types/types";
 
 // Public Objects ------------------------------------------------------------
 
 type Props = {
-  // Items for this Category
+  // Currently selected Category (if any)
+  category?: Category;
+  // The options for selecting a Category (label=category.name, value=category.id)
+  categoryOptions: SelectOption[];
+  // Items for the currently selected Category
   items: Item[],
+  // The list for which we are managing Items
+  list: List,
   // Current Profile's MemberRole for this List
   memberRole: MemberRole,
 }
 
 const fallbackData: Item[] = [];
 
-export function ItemsTable({ items, memberRole }: Props) {
+export function ItemsTable({ category, categoryOptions, items, list, memberRole }: Props) {
 
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const dropdownRefs = useRef<(HTMLDetailsElement | null)[]>([]);
-  const [data] = useState<Item[]>(items);
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 10,
+  });
+  const router = useRouter();
+//  const [data] = useState<Item[]>(items);
 
   useEffect(() => {
 
@@ -55,6 +72,16 @@ export function ItemsTable({ items, memberRole }: Props) {
     };
 
   }, []);
+
+  // Handle selection of a different Category
+  function handleCategoryChange(event: ChangeEvent<HTMLSelectElement>) {
+    const selectedCategoryId = event.target.value;
+    if (selectedCategoryId !== "") {
+      // Redirect to the selected category
+      router.push(`/lists/${list.id}/items?categoryId=${selectedCategoryId}`);
+      router.refresh();
+    }
+  }
 
   // RowActions definition
   const RowActions = ({ row }: CellContext<Item, unknown>) => {
@@ -108,14 +135,41 @@ export function ItemsTable({ items, memberRole }: Props) {
   // Overall table instance
   const table = useReactTable({
     columns,
-    data: data ?? fallbackData,
+    data: items ?? fallbackData,
     getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    onPaginationChange: setPagination,
+    state: {
+      pagination,
+    }
   });
 
   return (
     <div className={"card bg-base-300 shadow-xl"}>
       <table className="mt-4 rounded-lg border border-border">
+
         <thead>
+        <tr>
+          <th colSpan={table.getCenterLeafColumns().length}>
+            <div className="flex flex-row justify-between items-center">
+              <div className="flex flex-row w-full gap-2 items-center justify-center">
+                <div>
+                  <label htmlFor="categorySelector" className="font-bold">Category:</label>
+                </div>
+                <div>
+                  <Selector
+                    id="category"
+                    name="categorySelector"
+                    options={categoryOptions}
+                    value={category ? category.id : ""}
+                    onChange={handleCategoryChange}
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="divider"/>
+          </th>
+        </tr>
         {table.getHeaderGroups().map(headerGroup => (
           <tr key={headerGroup.id}>
             {headerGroup.headers.map(header => (
@@ -125,6 +179,9 @@ export function ItemsTable({ items, memberRole }: Props) {
             ))}
           </tr>
         ))}
+        <th colSpan={table.getCenterLeafColumns().length}>
+          <div className="divider"/>
+        </th>
         </thead>
         <tbody>
         {table.getRowModel().rows.map(row => (
@@ -137,6 +194,20 @@ export function ItemsTable({ items, memberRole }: Props) {
           </tr>
         ))}
         </tbody>
+
+        <tfoot>
+        <tr>
+          <th colSpan={table.getCenterLeafColumns().length}>
+            <div className="divider"/>
+          </th>
+        </tr>
+        <tr>
+          <th colSpan={table.getCenterLeafColumns().length}>
+            <FooterCell table={table} />
+          </th>
+        </tr>
+        </tfoot>
+
       </table>
     </div>
   )
