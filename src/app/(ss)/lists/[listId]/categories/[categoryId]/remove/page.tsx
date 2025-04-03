@@ -1,4 +1,4 @@
-// @/app/(ss)/lists/[listId]/categories/[categoryId]/remoe/page.tsx
+// @/app/(ss)/lists/[listId]/categories/[categoryId]/remove/page.tsx
 
 /**
  * Remove page for a Category.
@@ -13,8 +13,8 @@ import { redirect } from "next/navigation";
 
 // Internal Modules ----------------------------------------------------------
 
-import { SubHeader } from "@/components/layout/SubHeader";
 import { CategoryRemoveForm } from "@/components/categories/CategoryRemoveForm";
+import { SubHeader } from "@/components/layout/SubHeader";
 import { ServerResponse } from "@/components/shared/ServerResponse";
 import { db } from "@/lib/db";
 import { findProfile } from "@/lib/ProfileHelpers";
@@ -72,7 +72,7 @@ export default async function CategoryRemovePage(props: Props) {
   } else {
     return (
       <ServerResponse
-        result="This Category does not exist"
+        result="That Category does not exist"
       />
     );
   }
@@ -80,7 +80,7 @@ export default async function CategoryRemovePage(props: Props) {
   return (
     <div>
       <SubHeader
-        hrefBack={true}
+        hrefBack={`/lists/${listId}/categories`}
         title={`Remove Category for List '${member.list.name}'`}
       />
       <CategoryRemoveForm

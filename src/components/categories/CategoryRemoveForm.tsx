@@ -36,9 +36,9 @@ type Props = {
 
 export function CategoryRemoveForm({ category, list }: Props) {
 
-  const router = useRouter();
   const [isRemoving, setIsRemoving] = useState<boolean>(false);
   const [result, setResult] = useState<ActionResult<Category> | null>(null);
+  const router = useRouter();
 
   const performRemove = async () => {
 
@@ -64,7 +64,7 @@ export function CategoryRemoveForm({ category, list }: Props) {
       if (isTesting) {
         setResult({ message: "Success" });
       } else {
-        router.back();
+        router.push(`/lists/${list.id}/categories`);
       }
     } else {
       setResult(response);
@@ -75,29 +75,25 @@ export function CategoryRemoveForm({ category, list }: Props) {
   return (
     <div className="card bg-base-300 shadow-xl">
       <div className="card-body">
-        <h2 className="card-title justify-center">
-          <ServerResult result={result} />
-        </h2>
-        { category && (
-          <>
-            <h5
-              className="gap-2"
-            >
-              Are you sure you want to remove  Category &quot;{category.name}&quot;?
-            </h5>
-            <button
-              className="btn btn-warning justify-center"
-              onClick={performRemove}
-              type="button"
-            >
-              {isRemoving ? (
-                <>
-                  <LoaderCircle className="animate-spin"/>Removing
-                </>
-              ): "Remove" }
-            </button>
-          </>
+        { result && (
+          <h2 className="card-title justify-center">
+            <ServerResult result={result} />
+          </h2>
         )}
+        <span className="gap-2">
+          Are you sure you want to remove  Category &quot;{category.name}&quot;?
+        </span>
+        <button
+          className="btn btn-warning justify-center"
+          onClick={performRemove}
+          type="button"
+        >
+          {isRemoving ? (
+            <>
+              <LoaderCircle className="animate-spin"/>Removing
+            </>
+          ): "Remove" }
+        </button>
       </div>
     </div>
   )

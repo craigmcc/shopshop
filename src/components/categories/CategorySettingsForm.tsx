@@ -1,6 +1,6 @@
 "use client";
 
-// @/components/lists/CategorySettingsForm.tsx
+// @/components/categories/CategorySettingsForm.tsx
 
 /**
  * Form for creating and editing Categories.
@@ -10,19 +10,16 @@
 
 // External Modules ----------------------------------------------------------
 
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Category, List } from "@prisma/client";
-import { LoaderCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 
 // Internal Modules ----------------------------------------------------------
 
 import { createCategory, updateCategory } from "@/actions/CategoryActions";
-import { InputField } from "@/components/daisyui/InputField";
 import { ServerResult } from "@/components/shared/ServerResult";
+import { useAppForm } from "@/components/tanstack-form/useAppForm";
 import { ActionResult } from "@/lib/ActionResult";
 import { logger } from "@/lib/ClientLogger";
 import {
@@ -38,7 +35,7 @@ const isTesting = process.env.NODE_ENV === "test";
 
 type Props = {
   /* Category to be updated (for update only) */
-  category?: Category | undefined,
+  category?: Category,
   /* List that owns this Category */
   list: List,
 }
@@ -46,32 +43,27 @@ type Props = {
 export function CategorySettingsForm({ category, list }: Props ) {
 
   const isCreating = !category;
-  const router = useRouter();
-  const [isSaving, setIsSaving] = useState<boolean>(false);
   const [result, setResult] = useState<ActionResult<Category> | null>(null);
-
-  logger.trace({
-    context:  "CategorySettingsForm",
-    category,
-    list,
-  });
+  const router = useRouter();
 
   const defaultValuesCreate: CategoryCreateSchemaType = {
-    listId: list?.id ?? "",
+    listId: list.id,
     name: "",
   }
   const defaultValuesUpdate: CategoryUpdateSchemaType = {
     name: category?.name ?? "",
   }
 
-  const methods = useForm<CategoryCreateSchemaType | CategoryUpdateSchemaType>({
+  const form = useAppForm({
     defaultValues: isCreating ? defaultValuesCreate : defaultValuesUpdate,
-    mode: "onBlur",
-    // @ts-expect-error Type weirdness on resolver property
-    resolver: isCreating ? zodResolver(CategoryCreateSchema) : zodResolver(CategoryUpdateSchema),
+    onSubmit: async ({ value }) => {
+      await submitForm(value);
+    },
+    validators: {
+      onBlur: isCreating ? CategoryCreateSchema : CategoryUpdateSchema,
+      onChange: isCreating ? CategoryCreateSchema : CategoryUpdateSchema,
+    }
   });
-  const formState = methods.formState;
-  const errors = formState.errors;
 
   async function submitForm(formData: CategoryCreateSchemaType | CategoryUpdateSchemaType) {
 
@@ -81,12 +73,9 @@ export function CategorySettingsForm({ category, list }: Props ) {
       isCreating,
     });
 
-    setIsSaving(true);
     const response = isCreating
       ? await createCategory(formData as CategoryCreateSchemaType)
       : await updateCategory(category.id, formData as CategoryUpdateSchemaType);
-    setIsSaving(false);
-
     logger.trace({
       context: "CategorySettingsForm.submitForm.output",
       response,
@@ -99,7 +88,7 @@ export function CategorySettingsForm({ category, list }: Props ) {
       if (isTesting) {
         setResult({message: "Success"});
       } else {
-        router.back();
+        router.push(`/lists/${list.id}/categories`);
       }
     } else {
       setResult(response);
@@ -110,38 +99,38 @@ export function CategorySettingsForm({ category, list }: Props ) {
   return (
     <div className={"card bg-base-300 shadow-xl"}>
       <div className="card-body">
-        <h2 className="card-title justify-center">
-          <ServerResult result={result} />
-        </h2>
-        <FormProvider {...methods}>
+        {result && (
+          <h2 className="card-title justify-center">
+            <ServerResult result={result} />
+          </h2>
+        )}
           <form
             className="flex flex-col gap-2"
-            name="CategoryForm"
-            onSubmit={methods.handleSubmit(submitForm)}
+            name="CategorySettingsForm"
+            onSubmit={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              form.handleSubmit();
+            }}
           >
             <div className="flex flex-col w-full gap-2">
-              <InputField
-                autoFocus={true}
-                label="Category Name"
-                name="name"
-                placeholder="Category Name"
-                type="text"
-              />
-              {isCreating && <input type="hidden" name="listId" value={list?.id}/>}
-              <button
-                className="btn btn-primary"
-                disabled={Object.keys(errors).length > 0}
-                type="submit"
-              >
-                {isSaving ? (
-                  <>
-                    <LoaderCircle className="animate-spin"/>Saving
-                  </>
-                ) : "Save" }
-              </button>
+              <form.AppField name="name">
+                {(field) =>
+                  <field.InputField
+                    autoFocus
+                    label="Category Name"
+                    placeholder="Category Name"
+                  />}
+              </form.AppField>
+              {isCreating && <input type="hidden" name="listId" value={list.id}/>}
+              <form.AppForm>
+                <div className="flex flex-row justify-between">
+                  <form.ResetButton/>
+                  <form.SubmitButton/>
+                </div>
+              </form.AppForm>
             </div>
           </form>
-        </FormProvider>
       </div>
     </div>
   );

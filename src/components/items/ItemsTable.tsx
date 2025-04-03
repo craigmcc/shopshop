@@ -16,7 +16,8 @@ import {
   createColumnHelper,
   flexRender,
   getCoreRowModel,
-  getPaginationRowModel, PaginationState,
+  getPaginationRowModel,
+  PaginationState,
   useReactTable,
 } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
@@ -29,6 +30,7 @@ import { toast } from "react-toastify";
 
 import { Selector } from "@/components/shared/Selector";
 import {FooterCell} from "@/components/tables/FooterCell";
+import { useCurrentListContext } from "@/contexts/CurrentListContext";
 import { SelectOption } from "@/types/types";
 
 // Public Objects ------------------------------------------------------------
@@ -46,8 +48,6 @@ type Props = {
   memberRole: MemberRole,
 }
 
-const fallbackData: Item[] = [];
-
 export function ItemsTable({ category, categoryOptions, items, list, memberRole }: Props) {
 
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
@@ -57,7 +57,9 @@ export function ItemsTable({ category, categoryOptions, items, list, memberRole 
     pageSize: 10,
   });
   const router = useRouter();
-//  const [data] = useState<Item[]>(items);
+
+  const { setCurrentList } = useCurrentListContext();
+  setCurrentList(list);
 
   useEffect(() => {
 
@@ -134,9 +136,9 @@ export function ItemsTable({ category, categoryOptions, items, list, memberRole 
   //, []);
 
   // Overall table instance
-  const table = useReactTable({
+  const table = useReactTable<Item>({
     columns,
-    data: items ?? fallbackData,
+    data: items,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     meta: {
@@ -177,6 +179,10 @@ export function ItemsTable({ category, categoryOptions, items, list, memberRole 
                 </div>
               </div>
             </div>
+          </th>
+        </tr>
+        <tr>
+          <th colSpan={table.getCenterLeafColumns().length}>
             <div className="divider"/>
           </th>
         </tr>
@@ -189,10 +195,13 @@ export function ItemsTable({ category, categoryOptions, items, list, memberRole 
             ))}
           </tr>
         ))}
-        <th colSpan={table.getCenterLeafColumns().length}>
-          <div className="divider"/>
-        </th>
+        <tr>
+          <th colSpan={table.getCenterLeafColumns().length}>
+            <div className="divider"/>
+          </th>
+        </tr>
         </thead>
+
         <tbody>
         {table.getRowModel().rows.map(row => (
           <tr key={row.id}>

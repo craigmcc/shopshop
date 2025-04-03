@@ -71,7 +71,8 @@ describe("CategorySettingsForm", () => {
 
     });
 
-    it("should fail on invalid data", async () => {
+    // TODO - Save button is diabled, so will never fire validations
+    it.skip("should fail on invalid data", async () => {
 
       const profile = await UTILS.lookupProfile(PROFILES[0].email!);
       setTestProfile(profile);

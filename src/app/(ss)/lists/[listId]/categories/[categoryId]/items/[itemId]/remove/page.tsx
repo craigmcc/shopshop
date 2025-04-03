@@ -1,7 +1,7 @@
 // @/app/(ss)/lists/[listId]/categories/[categoryId]/items/[itemId]/remove/page.tsx
 
 /**
- * Remove Item page for a Category.
+ * Remove page for an Item.
  *
  * @packageDocumentation
  */
@@ -66,7 +66,7 @@ export default async function ItemRemovePage(props: Props) {
   if (!member) {
     return (
       <ServerResponse
-        result="You are not a member of this List, so you cannot view its Categories"
+        result="You are not a Member of this List, so you cannot remove its Items"
       />
     );
   }
@@ -89,6 +89,7 @@ export default async function ItemRemovePage(props: Props) {
   return (
     <div className="flex flex-col">
       <SubHeader
+        hrefBack={`/lists/${member.list.id}/items?categoryId=${categoryId}`}
         title={`Remove Item for Category '${member.list.categories[0].name}'`}
       />
       <ItemRemoveForm

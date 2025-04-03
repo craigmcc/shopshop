@@ -1,6 +1,6 @@
 "use client";
 
-// @/components/lists/ItemSettingsForm.tsx
+// @/components/items/ItemSettingsForm.tsx
 
 /**
  * Form for creating and editing Items.
@@ -37,7 +37,7 @@ type Props = {
   /* Category owning this Item */
   category: Category,
   /* Item to be updated (for update only) */
-  item?: Item | undefined,
+  item?: Item,
 }
 
 export function ItemSettingsForm({ category, item }: Props ) {
