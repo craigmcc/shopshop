@@ -55,7 +55,7 @@ export function ProfileSettingsForm({ profile }: Props) {
       onBlur: ProfileUpdateSchema,
       onChange: ProfileUpdateSchema,
     },
-  })
+  });
 
   async function submitForm(formData: ProfileUpdateSchemaType): Promise<void> {
 

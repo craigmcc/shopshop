@@ -10,19 +10,16 @@
 
 // External Modules ----------------------------------------------------------
 
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Category, Item } from "@prisma/client";
-import { LoaderCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 
 // Internal Modules ----------------------------------------------------------
 
 import { createItem, updateItem } from "@/actions/ItemActions";
-import { InputField } from "@/components/daisyui/InputField";
 import { ServerResult } from "@/components/shared/ServerResult";
+import { useAppForm } from "@/components/tanstack-form/useAppForm";
 import { ActionResult } from "@/lib/ActionResult";
 import { logger } from "@/lib/ClientLogger";
 import {
@@ -46,20 +43,13 @@ type Props = {
 export function ItemSettingsForm({ category, item }: Props ) {
 
   const isCreating = !item;
-  const router = useRouter();
-  const [isSaving, setIsSaving] = useState<boolean>(false);
   const [result, setResult] = useState<ActionResult<Item> | null>(null);
-
-  logger.trace({
-    context: "ItemSettingsForm",
-    category,
-    item,
-  });
+  const router = useRouter();
 
   const defaultValuesCreate: ItemCreateSchemaType = {
-    categoryId: category?.id ?? "",
+    categoryId: category.id,
     checked: false,
-    listId: category?.listId ?? "",
+    listId: category.listId,
     name: "",
     notes: "",
     selected: false,
@@ -70,14 +60,16 @@ export function ItemSettingsForm({ category, item }: Props ) {
     selected: item?.selected ?? false,
   }
 
-  const methods = useForm<ItemCreateSchemaType | ItemUpdateSchemaType>({
+  const form = useAppForm({
     defaultValues: isCreating ? defaultValuesCreate : defaultValuesUpdate,
-    mode: "onBlur",
-    // @ts-expect-error Type weirdness on resolver property
-    resolver: isCreating ? zodResolver(ItemCreateSchema) : zodResolver(ItemUpdateSchema),
+    onSubmit: async ({ value }) => {
+      await submitForm(value);
+    },
+    validators: {
+      onBlur: isCreating ? ItemCreateSchema : ItemUpdateSchema,
+      onChange: isCreating ? ItemCreateSchema : ItemUpdateSchema,
+    },
   });
-  const formState = methods.formState;
-  const errors = formState.errors;
 
   async function submitForm(formData: ItemCreateSchemaType | ItemUpdateSchemaType) {
 
@@ -87,12 +79,9 @@ export function ItemSettingsForm({ category, item }: Props ) {
       isCreating,
     });
 
-    setIsSaving(true);
     const response = isCreating
       ? await createItem(formData as ItemCreateSchemaType)
       : await updateItem(item.id, formData as ItemUpdateSchemaType);
-    setIsSaving(false);
-
     logger.trace({
       context: "ItemSettingsForm.submitForm.output",
       response,
@@ -105,7 +94,7 @@ export function ItemSettingsForm({ category, item }: Props ) {
       if (isTesting) {
         setResult({message: "Success"});
       } else {
-        router.push(`/lists/${category.listId}/categories/${category?.id}/items`);
+        router.push(`/lists/${category.listId}/items?categoryId=${category.id}`);
       }
     } else {
       setResult(response);
@@ -116,39 +105,39 @@ export function ItemSettingsForm({ category, item }: Props ) {
   return (
     <div className={"card bg-base-300 shadow-xl"}>
       <div className="card-body">
-        <h2 className="card-title justify-center">
-          <ServerResult result={result} />
-        </h2>
-        <FormProvider {...methods}>
-          <form
-            className="flex flex-col gap-2"
-            name="ItemForm"
-            onSubmit={methods.handleSubmit(submitForm)}
-          >
-            <div className="flex flex-col w-full gap-2">
-              <InputField
-                autoFocus={true}
-                label="Item Name"
-                name="name"
-                placeholder="Item Name"
-                type="text"
-              />
-              {isCreating && <input type="hidden" name="categoryId" value={category.id}/>}
-              {isCreating && <input type="hidden" name="listId" value={category.listId}/>}
-              <button
-                className="btn btn-primary"
-                disabled={Object.keys(errors).length > 0}
-                type="submit"
-              >
-                {isSaving ? (
-                  <>
-                    <LoaderCircle className="animate-spin"/>Saving
-                  </>
-                ) : "Save" }
-              </button>
-            </div>
-          </form>
-        </FormProvider>
+        {result && (
+          <h2 className="card-title justify-center">
+            <ServerResult result={result} />
+          </h2>
+        )}
+        <form
+          className="flex flex-col gap-2"
+          name="ItemSetingsForm"
+          onSubmit={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            form.handleSubmit();
+          }}
+        >
+          <div className="flex flex-col w-full gap-2">
+            <form.AppField name="name">
+              {(field) =>
+                <field.InputField
+                  autoFocus
+                  label="Item Name"
+                  placeholder="Item Name"
+                />}
+            </form.AppField>
+            {isCreating && <input type="hidden" name="categoryId" value={category.id}/>}
+            {isCreating && <input type="hidden" name="listId" value={category.listId}/>}
+            <form.AppForm>
+              <div className="flex flex-row justify-between">
+                <form.ResetButton/>
+                <form.SubmitButton/>
+              </div>
+            </form.AppForm>
+          </div>
+        </form>
       </div>
     </div>
   );

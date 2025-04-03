@@ -102,7 +102,7 @@ export default async function ItemsTablePage(props: Props) {
   return (
     <div>
       <SubHeader
-        hrefAdd={`/lists/${member.list.id}/categories/${member.list.categories[0].id}/items/new/settings`}
+//        hrefAdd={`/lists/${member.list.id}/categories/${member.list.categories[0].id}/items/new/settings`}
         hrefBack={`/lists`}
         title={`Manage Items for List '${member.list.name}'`}
       />

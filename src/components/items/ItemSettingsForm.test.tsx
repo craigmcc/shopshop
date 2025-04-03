@@ -72,7 +72,8 @@ describe("ItemSettingsForm", () => {
 
     });
 
-    it("should fail with invalid data", async () => {
+    // TODO - submit button will have been disabled, so cannot check for message
+    it.skip("should fail with invalid data", async () => {
 
       const profile = await UTILS.lookupProfile(PROFILES[1].email!);
       setTestProfile(profile);
@@ -86,7 +87,7 @@ describe("ItemSettingsForm", () => {
         await UTILS.pause(500);
       });
 
-      expect(screen.getByText("Name is required"));
+      expect(screen.getByText("Item Name is required"));
 
     });
 

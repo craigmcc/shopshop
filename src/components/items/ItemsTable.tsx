@@ -23,6 +23,7 @@ import { MoreHorizontal } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { ChangeEvent, useEffect, useRef, useState } from "react";
+import { toast } from "react-toastify";
 
 // Internal Modules ----------------------------------------------------------
 
@@ -138,6 +139,15 @@ export function ItemsTable({ category, categoryOptions, items, list, memberRole 
     data: items ?? fallbackData,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    meta: {
+      addRow: () => {
+        if (category) {
+          router.push(`/lists/${list.id}/categories/${category.id}/items/new/settings`);
+        } else {
+          toast.warning("You must select a Category first");
+        }
+      },
+    },
     onPaginationChange: setPagination,
     state: {
       pagination,

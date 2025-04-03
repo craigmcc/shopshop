@@ -97,7 +97,7 @@ export default async function ItemSettingsPage(props: Props) {
   return (
     <div className="flex flex-col">
       <SubHeader
-        hrefBack={`/lists/${listId}/categories/${categoryId}/items`}
+        hrefBack={`/lists/${listId}/items?categoryId=${categoryId}`}
         title={(item ? "Edit Item" : "Create New Item") + ` for Category '${member.list.categories[0].name}'`}
       />
       <ItemSettingsForm
