@@ -90,7 +90,7 @@ export function ItemsTable({ category, categoryOptions, items, list, memberRole 
   const RowActions = ({ row }: CellContext<Item, unknown>) => {
     return (
       <details
-        className="dropdown dropdown-center"
+        className="dropdown dropdown-center flex justify-center w-10px"
         open={openDropdown === row.id}
         onClick={() => {
           setOpenDropdown(openDropdown === row.id ? null : row.id);
@@ -158,7 +158,7 @@ export function ItemsTable({ category, categoryOptions, items, list, memberRole 
 
   return (
     <div className={"card bg-base-300 shadow-xl"}>
-      <table className="mt-4 rounded-lg border border-border">
+      <table className="mt-4 rounded-lg border border-border table-zebra">
 
         <thead>
         <tr>
@@ -206,7 +206,7 @@ export function ItemsTable({ category, categoryOptions, items, list, memberRole 
         {table.getRowModel().rows.map(row => (
           <tr key={row.id}>
             {row.getVisibleCells().map(cell => (
-              <td key={cell.id} className="p-1">
+              <td key={cell.id}>
                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
               </td>
             ))}

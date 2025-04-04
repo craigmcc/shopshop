@@ -77,7 +77,7 @@ export function CategoriesTable({ categories, list, memberRole }: Props) {
   const RowActions = ({ row }: CellContext<Category, unknown>) => {
     return (
       <details
-        className="dropdown dropdown-center"
+        className="dropdown dropdown-center flex flex justify-center w-10px"
         open={openDropdown === row.id}
         onClick={() => {
           setOpenDropdown(openDropdown === row.id ? null : row.id);
@@ -116,7 +116,7 @@ export function CategoriesTable({ categories, list, memberRole }: Props) {
 //  const columns = useMemo(() => [
   const columns = [
     columnHelper.accessor("name", {
-      header: () => <span className="font-bold">Item Name</span>,
+      header: () => <span className="font-bold">Category Name</span>,
       cell: info => info.getValue(),
     }),
     columnHelper.display({
@@ -147,13 +147,13 @@ export function CategoriesTable({ categories, list, memberRole }: Props) {
   return (
     <div className={"card bg-base-300 shadow-xl min-w-200"}>
 
-      <table className="rounded-lg border border-border">
+      <table className="rounded-lg border border-border table-zebra">
 
         <thead>
         {table.getHeaderGroups().map(headerGroup => (
           <tr key={headerGroup.id}>
             {headerGroup.headers.map(header => (
-              <th key={header.id} colSpan={header.colSpan}>
+              <th key={header.id} colSpan={header.colSpan} className="pt-4">
                 {flexRender(header.column.columnDef.header, header.getContext())}
               </th>
             ))}
