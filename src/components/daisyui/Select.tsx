@@ -1,6 +1,6 @@
 "use client";
 
-// @/components/shared/Selector.tsx
+// @/components/shared/Select.tsx
 
 /**
  * General purpose selector for the application.
@@ -31,7 +31,7 @@ type Props = {
   options: SelectOption[];
 } & SelectHTMLAttributes<HTMLSelectElement>;
 
-export function Selector({
+export function Select({
   className,
   label,
   name,

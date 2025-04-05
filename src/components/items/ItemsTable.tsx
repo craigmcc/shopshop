@@ -28,7 +28,7 @@ import { toast } from "react-toastify";
 
 // Internal Modules ----------------------------------------------------------
 
-import { Selector } from "@/components/shared/Selector";
+import { Select } from "@/components/daisyui/Select";
 import {FooterCell} from "@/components/tables/FooterCell";
 import { useCurrentListContext } from "@/contexts/CurrentListContext";
 import { SelectOption } from "@/types/types";
@@ -169,7 +169,7 @@ export function ItemsTable({ category, categoryOptions, items, list, memberRole 
                   <label htmlFor="categorySelector" className="font-bold">Category:</label>
                 </div>
                 <div>
-                  <Selector
+                  <Select
                     id="category"
                     name="categorySelector"
                     options={categoryOptions}
