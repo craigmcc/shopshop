@@ -8,14 +8,15 @@
 
 // External Modules ----------------------------------------------------------
 
-import { MemberRole } from "@prisma/client";
+import { List, MemberRole } from "@prisma/client";
 import { redirect } from "next/navigation";
 
 // Internal Modules ----------------------------------------------------------
 
 import { SubHeader } from "@/components/layout/SubHeader";
 import { ListRemoveForm } from "@/components/lists/ListRemoveForm";
-import { ServerResponse } from "@/components/shared/ServerResponse";
+import { ServerResult } from "@/components/shared/ServerResult";
+import { ActionResult } from "@/lib/ActionResult";
 import { db } from "@/lib/db";
 import { findProfile} from "@/lib/ProfileHelpers";
 //import { logger } from "@/lib/ServerLogger";
@@ -51,9 +52,12 @@ export default async function ListRemovePage(props: Props) {
     }
   });
   if (!member || (member.role !== MemberRole.ADMIN)) {
+    const result: ActionResult<List> = {
+      message: "You are not an ADMIN of this List, so you cannot remove it"
+    }
     return (
-      <ServerResponse
-        result="You are not an admin of this List, so you cannot remove it"
+      <ServerResult
+        result={result}
       />
     );
   }

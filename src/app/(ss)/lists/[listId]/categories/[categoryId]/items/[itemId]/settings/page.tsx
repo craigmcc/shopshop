@@ -15,7 +15,8 @@ import { redirect } from "next/navigation";
 
 import { ItemSettingsForm } from "@/components/items/ItemSettingsForm";
 import { SubHeader } from "@/components/layout/SubHeader";
-import { ServerResponse } from "@/components/shared/ServerResponse";
+import { ServerResult } from "@/components/shared/ServerResult";
+import { ActionResult } from "@/lib/ActionResult";
 import { db } from "@/lib/db";
 import { findProfile } from "@/lib/ProfileHelpers";
 // import { logger } from "@/lib/ServerLogger";
@@ -66,9 +67,12 @@ export default async function ItemSettingsPage(props: Props) {
     }
   });
   if (!member) {
+    const result: ActionResult<Item> = {
+      message: "You are not a Member of this List, so you cannot manage its Items",
+    }
     return (
-      <ServerResponse
-        result="You are not a Member of this List, so you cannot manage its Items"
+      <ServerResult
+        result={result}
       />
     );
   }
@@ -85,9 +89,12 @@ export default async function ItemSettingsPage(props: Props) {
     if (foundItem) {
       item = foundItem;
     } else {
+      const result: ActionResult<Item> = {
+        message: "This Item does not exist",
+      }
       return (
-        <ServerResponse
-          result="This Item does not exist"
+        <ServerResult
+          result={result}
         />
       );
     }

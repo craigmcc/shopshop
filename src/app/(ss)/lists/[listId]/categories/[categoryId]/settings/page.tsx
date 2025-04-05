@@ -15,7 +15,8 @@ import { redirect } from "next/navigation";
 
 import { CategorySettingsForm } from "@/components/categories/CategorySettingsForm";
 import { SubHeader } from "@/components/layout/SubHeader";
-import { ServerResponse } from "@/components/shared/ServerResponse";
+import { ServerResult } from "@/components/shared/ServerResult";
+import { ActionResult } from "@/lib/ActionResult";
 import { db } from "@/lib/db";
 import { findProfile } from "@/lib/ProfileHelpers";
 //import { logger } from "@/lib/ServerLogger";
@@ -54,9 +55,12 @@ export default async function CategorySettingsPage(props: Props) {
     }
   });
   if (!member) {
+    const result: ActionResult<Category> = {
+      message: "You are not a Member of this List, so you cannot manage its Categories"
+    }
     return (
-      <ServerResponse
-        result="You are not a Member of this List, so you cannot manage its Categories"
+      <ServerResult
+        result={result}
       />
     );
   }
@@ -71,9 +75,12 @@ export default async function CategorySettingsPage(props: Props) {
     if (foundCategory) {
       category = foundCategory;
     } else {
+      const result: ActionResult<Category> = {
+        message: "This Category does not exist",
+      }
       return (
-        <ServerResponse
-          result="This Category does not exist"
+        <ServerResult
+          result={result}
         />
       );
     }

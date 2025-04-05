@@ -8,12 +8,14 @@
 
 // External Modules ----------------------------------------------------------
 
+import { List } from "@prisma/client";
 import { ScrollText } from "lucide-react";
 import { redirect } from "next/navigation";
 
 // Internal Modules ----------------------------------------------------------
 
-import { ServerResponse } from "@/components/shared/ServerResponse";
+import { ServerResult } from "@/components/shared/ServerResult";
+import { ActionResult } from "@/lib/ActionResult";
 import { db } from "@/lib/db";
 import { findProfile } from "@/lib/ProfileHelpers";
 //import { logger } from "@/lib/ServerLogger";
@@ -50,9 +52,12 @@ export default async function ListEntriesPage(props: Props) {
     }
   });
   if (!member) {
+    const result: ActionResult<List> = {
+      message: "You are not a Member of this List, so you cannot manage its entries"
+    }
     return (
-      <ServerResponse
-        result="You are not a member of this List, so you cannot manage its entries"
+      <ServerResult
+        result={result}
       />
     )
   }

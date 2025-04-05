@@ -15,7 +15,8 @@ import { redirect } from "next/navigation";
 
 import { CategoryRemoveForm } from "@/components/categories/CategoryRemoveForm";
 import { SubHeader } from "@/components/layout/SubHeader";
-import { ServerResponse } from "@/components/shared/ServerResponse";
+import { ServerResult } from "@/components/shared/ServerResult";
+import { ActionResult } from "@/lib/ActionResult";
 import { db } from "@/lib/db";
 import { findProfile } from "@/lib/ProfileHelpers";
 //import { logger } from "@/lib/ServerLogger";
@@ -54,9 +55,12 @@ export default async function CategoryRemovePage(props: Props) {
     }
   });
   if (!member || (member.role !== MemberRole.ADMIN)) {
+    const result: ActionResult<Category> = {
+      message: "You are not an ADMIN of this List, so you cannot remove its Categories"
+    }
     return (
-      <ServerResponse
-        result="You are not an ADMIN of this List, so you cannot remove its Categories"
+      <ServerResult
+        result={result}
       />
     );
   }
@@ -70,9 +74,12 @@ export default async function CategoryRemovePage(props: Props) {
   if (foundCategory) {
     category = foundCategory;
   } else {
+    const result: ActionResult<Category> = {
+      message: "That Category does not exist",
+    }
     return (
-      <ServerResponse
-        result="That Category does not exist"
+      <ServerResult
+        result={result}
       />
     );
   }

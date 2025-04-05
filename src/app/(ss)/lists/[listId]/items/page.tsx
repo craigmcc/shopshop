@@ -15,7 +15,8 @@ import { redirect } from "next/navigation";
 
 import { ItemsTable } from "@/components/items/ItemsTable";
 import { SubHeader } from "@/components/layout/SubHeader";
-import { ServerResponse } from "@/components/shared/ServerResponse";
+import { ServerResult } from "@/components/shared/ServerResult";
+import { ActionResult } from "@/lib/ActionResult";
 import { db } from "@/lib/db";
 import { findProfile } from "@/lib/ProfileHelpers";
 import {SelectOption} from "@/types/types";
@@ -63,9 +64,12 @@ export default async function ItemsTablePage(props: Props) {
     }
   });
   if (!member) {
+    const result: ActionResult<Item> = {
+      message: "You are not a Member of this List, so you cannot manage its Items"
+    }
     return (
-      <ServerResponse
-        result="You are not a Member of this List, so you cannot manage its Items"
+      <ServerResult
+        result={result}
       />
     );
   }

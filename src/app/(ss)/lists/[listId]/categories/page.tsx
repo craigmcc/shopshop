@@ -8,13 +8,15 @@
 
 // External Modules ----------------------------------------------------------
 
+import { Category } from "@prisma/client";
 import { redirect } from "next/navigation";
 
 // Internal Modules ----------------------------------------------------------
 
 import { CategoriesTable } from "@/components/categories/CategoriesTable";
 import { SubHeader } from "@/components/layout/SubHeader";
-import { ServerResponse } from "@/components/shared/ServerResponse";
+import { ServerResult } from "@/components/shared/ServerResult";
+import { ActionResult } from "@/lib/ActionResult";
 import { db } from "@/lib/db";
 import { findProfile } from "@/lib/ProfileHelpers";
 //import { logger } from "@/lib/ServerLogger";
@@ -50,9 +52,12 @@ export default async function CatalogsTablePage(props: Props) {
     }
   });
   if (!member) {
+    const result: ActionResult<Category> = {
+      message: "You are not a member of this List, so you cannot view its Categories",
+    }
     return (
-      <ServerResponse
-        result="You are not an admin of this List, so you cannot view its Catalogs"
+      <ServerResult
+        result={result}
       />
     );
   }

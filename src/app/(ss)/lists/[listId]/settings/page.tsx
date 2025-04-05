@@ -15,7 +15,8 @@ import { redirect } from "next/navigation";
 
 import { SubHeader } from "@/components/layout/SubHeader";
 import { ListSettingsForm } from "@/components/lists/ListSettingsForm";
-import { ServerResponse } from "@/components/shared/ServerResponse";
+import { ServerResult } from "@/components/shared/ServerResult";
+import { ActionResult } from "@/lib/ActionResult";
 import { db } from "@/lib/db";
 import { findProfile } from "@/lib/ProfileHelpers";
 //import { logger } from "@/lib/ServerLogger";
@@ -54,9 +55,12 @@ export default async function ListSettingsPage(props: Props) {
       }
     });
     if (!member || (member.role !== MemberRole.ADMIN)) {
+      const result: ActionResult<List> = {
+        message: "You are not an ADMIN of this List, so you cannot manage its settings"
+      }
       return (
-        <ServerResponse
-          result="You are not an admin of this List, so you cannot update it"
+        <ServerResult
+          result={result}
         />
       );
     } else {
