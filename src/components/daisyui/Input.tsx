@@ -54,7 +54,7 @@ export function Input({
         </legend>
       )}
       <input
-        className={`input input-bordered w-full max-w-xs ${className}`}
+        className={`input input-bordered w-full ${className ? className : ""}`}
         id={name}
         name={name}
         onBlur={onBlur ? onBlur : undefined}
