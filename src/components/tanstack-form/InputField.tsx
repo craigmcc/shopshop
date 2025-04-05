@@ -14,6 +14,7 @@ import { InputHTMLAttributes } from "react";
 
 // Internal Modules ----------------------------------------------------------
 
+//import { Input } from "@/components/daisyui/Input";
 import { FieldErrors } from "@/components/tanstack-form/FieldErrors";
 import { useFieldContext } from "@/components/tanstack-form/useAppContexts";
 
@@ -34,6 +35,7 @@ export function InputField({className, label, placeholder, type, ...props}: Prop
 
   const field = useFieldContext<string>();
 
+
   return (
     <fieldset className="fieldset w-full">
       <legend className="fieldset-legend">
@@ -51,6 +53,22 @@ export function InputField({className, label, placeholder, type, ...props}: Prop
       />
       <FieldErrors field={field} />
     </fieldset>
+/*
+    <>
+      <Input
+        className={className ? className : undefined}
+        id={field.name}
+        label={label}
+        name={field.name}
+        onChange={(e) => field.handleChange(e.target.value)}
+        placeholder={placeholder ? placeholder : undefined}
+        type={type ? type : "text"}
+        value={field.state.value}
+        {...props}
+      />
+      <FieldErrors field={field} />
+    </>
+*/
   );
 
 }
