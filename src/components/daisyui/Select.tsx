@@ -47,7 +47,7 @@ export function Select({
         </legend>
       )}
       <select
-        className={`select w-full max-w-xs ${className}`}
+        className={`select w-full ${className ? className : ""}`}
         id={name}
         name={name}
         onChange={onChange}

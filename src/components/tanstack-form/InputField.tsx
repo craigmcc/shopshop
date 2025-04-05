@@ -42,7 +42,7 @@ export function InputField({className, label, placeholder, type, ...props}: Prop
         <label htmlFor={field.name}>{label}</label>
       </legend>
       <input
-        className={`input input-bordered w-full max-w-xs ${className}`}
+        className={`input input-bordered w-full ${className ? className : ""}`}
         id={field.name}
         name={field.name}
         onChange={(e) => field.handleChange(e.target.value)}
@@ -56,7 +56,7 @@ export function InputField({className, label, placeholder, type, ...props}: Prop
 /*
     <>
       <Input
-        className={className ? className : undefined}
+        className={className ? className : ""}
         id={field.name}
         label={label}
         name={field.name}

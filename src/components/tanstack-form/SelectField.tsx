@@ -39,7 +39,7 @@ export function SelectField({ className, label, options, ...props }: Props) {
         <label htmlFor={field.name}>{label}</label>
       </legend>
       <select
-        className={`select w-full max-w-xs ${className}`}
+        className={`select w-full ${className ? className : ""}`}
         id={field.name}
         name={field.name}
         onChange={(e) => field.handleChange(e.target.value)}

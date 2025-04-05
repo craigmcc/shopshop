@@ -38,7 +38,7 @@ export function TextareaField({ className, label, placeholder, ...props }: Props
         <label htmlFor={field.name}>{label}</label>
       </legend>
       <textarea
-        className={`textarea w-full max-w-xs ${className}`}
+        className={`textarea w-full ${className ? className : ""}`}
         id={field.name}
         name={field.name}
         onChange={(e) => field.handleChange(e.target.value)}
