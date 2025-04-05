@@ -166,15 +166,15 @@ export function ItemsTable({ category, categoryOptions, items, list, memberRole 
             <div className="flex flex-row justify-between items-center">
               <div className="flex flex-row w-full gap-2 items-center justify-center">
                 <div>
-                  <label htmlFor="categorySelector" className="font-bold">Category:</label>
+                  <label htmlFor="categorySelect" className="font-bold">Category:</label>
                 </div>
                 <div>
                   <Select
-                    id="category"
-                    name="categorySelector"
+                    id="categorySelect"
+                    name="categorySelect"
+                    onChange={handleCategoryChange}
                     options={categoryOptions}
                     value={category ? category.id : ""}
-                    onChange={handleCategoryChange}
                   />
                 </div>
               </div>
