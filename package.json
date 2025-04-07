@@ -43,7 +43,7 @@
     "@vitest/ui": "^3.0.9",
     "daisyui": "^5.0.13",
     "eslint": "^9",
-    "eslint-config-next": "15.2.2",
+    "eslint-config-next": "15.2.4",
     "global-jsdom": "^26.0.0",
     "jsdom": "^26.0.0",
     "postcss": "^8",
