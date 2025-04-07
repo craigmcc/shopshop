@@ -41,7 +41,7 @@
     "@types/react-dom": "^19",
     "@vitejs/plugin-react": "^4.3.4",
     "@vitest/ui": "^3.0.9",
-    "daisyui": "^5.0.13",
+    "daisyui": "^5.0.14",
     "eslint": "^9",
     "eslint-config-next": "15.2.2",
     "global-jsdom": "^26.0.0",
