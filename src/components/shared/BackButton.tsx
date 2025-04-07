@@ -32,7 +32,7 @@ type Props = {
 
 export function BackButton({ className, href, onClick }: Props) {
 
-  const { setCurrentList } = useCurrentListContext();
+  const { changeCurrentList } = useCurrentListContext();
   const router = useRouter();
 
   const handleClick = () => {
@@ -44,7 +44,7 @@ export function BackButton({ className, href, onClick }: Props) {
       logger.info({
         context: "BackButton.resettingCurrentList",
       });
-      setCurrentList(null);
+      changeCurrentList(null);
     }
     if (onClick) {
       onClick();

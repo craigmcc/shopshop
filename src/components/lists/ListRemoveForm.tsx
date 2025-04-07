@@ -43,8 +43,8 @@ export function ListRemoveForm({ list }: Props) {
     context: "ListRemoveForm.settingCurrentList",
     list,
   });
-  const { setCurrentList } = useCurrentListContext();
-  setCurrentList(list);
+  const { changeCurrentList } = useCurrentListContext();
+  changeCurrentList(list);
 
   const performRemove = async () => {
 
@@ -72,7 +72,7 @@ export function ListRemoveForm({ list }: Props) {
         logger.trace({
           context: "ListRemoveForm.resettingCurrentList",
         });
-        setCurrentList(null);
+        changeCurrentList(null);
         router.push("/lists");
       }
     } else {

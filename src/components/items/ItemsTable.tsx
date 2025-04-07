@@ -58,8 +58,8 @@ export function ItemsTable({ category, categoryOptions, items, list, memberRole 
   });
   const router = useRouter();
 
-  const { setCurrentList } = useCurrentListContext();
-  setCurrentList(list);
+  const { changeCurrentList } = useCurrentListContext();
+  changeCurrentList(list);
 
   useEffect(() => {
 

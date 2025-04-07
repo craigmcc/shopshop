@@ -11,7 +11,7 @@
 
 // External Modules ----------------------------------------------------------
 
-import { createContext, useContext, useMemo, useState } from "react";
+import {createContext, useCallback, useContext, useMemo, useState} from "react";
 
 // Internal Modules ----------------------------------------------------------
 
@@ -23,13 +23,13 @@ interface CurrentListContextProps {
   // Currently selected List
   currentList: List | null;
   // Function to change the currently selected List
-  setCurrentList: (list: List | null) => void;
+  changeCurrentList: (list: List | null) => void;
 }
 
 export const CurrentListContext = createContext<CurrentListContextProps>({
   currentList: null,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  setCurrentList: (newCurrentList: List| null) => {},
+  changeCurrentList: (newCurrentList: List| null) => {},
 });
 
 export const CurrentListContextProvider = ({children}: {
@@ -37,10 +37,15 @@ export const CurrentListContextProvider = ({children}: {
 }) => {
 
   const [currentList, setCurrentList] = useState<List | null>(null);
-  const memoizedProps = useMemo(() => ({currentList, setCurrentList}), [currentList]);
+  const changeCurrentList = useCallback((list: List | null) => {
+    setCurrentList(list);
+  }, []);
+  const contextValue = useMemo(() => (
+    {currentList, changeCurrentList}),
+    [currentList, changeCurrentList]);
 
   return (
-    <CurrentListContext.Provider value={memoizedProps}>
+    <CurrentListContext.Provider value={contextValue}>
       {children}
     </CurrentListContext.Provider>
   );

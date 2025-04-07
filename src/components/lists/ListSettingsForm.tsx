@@ -45,12 +45,12 @@ export function ListSettingsForm({ list }: Props ) {
   const [result, setResult] = useState<ActionResult<List> | null>(null);
   const router = useRouter();
 
-  const { setCurrentList } = useCurrentListContext();
+  const { changeCurrentList } = useCurrentListContext();
   logger.trace({
     context: "ListSettingsForm.settingCurrentList",
     list,
   });
-  setCurrentList(list ?? null);
+  changeCurrentList(list ?? null);
 
   const defaultValuesCreate: ListCreateSchemaType = {
     name: "",
@@ -97,7 +97,7 @@ export function ListSettingsForm({ list }: Props ) {
         logger.trace({
           context: "ListSettingsForm.resettingCurrentList",
         })
-        setCurrentList(response.model);
+        changeCurrentList(response.model);
         router.push("/lists");
       }
     } else {

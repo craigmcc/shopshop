@@ -55,8 +55,8 @@ export function CategoriesTable({ categories, list, memberRole }: Props) {
   });
   const router = useRouter();
 
-  const { setCurrentList } = useCurrentListContext();
-  setCurrentList(list);
+  const { changeCurrentList } = useCurrentListContext();
+  changeCurrentList(list);
 
   useEffect(() => {
 
