@@ -45,7 +45,7 @@
     "eslint": "^9",
     "eslint-config-next": "15.2.4",
     "global-jsdom": "^26.0.0",
-    "jsdom": "^26.0.0",
+    "jsdom": "^26.1.0",
     "postcss": "^8",
     "prisma": "^6.4.1",
     "tailwindcss": "^4.0.9",
