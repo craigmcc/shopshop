@@ -112,7 +112,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
     error(error: Error) {
       // Suppress CredentialsSignIn errors, since we are already
       // logging them in the authorize() function
-      if ((error instanceof SignInError) && ((error as SignInError).type === "CredentialsSignin")) {
+      if ((error instanceof SignInError) && ((error as SignInError).name === "CredentialsSignin")) {
         return;
       }
       logger.error({
